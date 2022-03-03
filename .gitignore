@@ -1,0 +1,13 @@
+*-commands.sh
+*.xlsx
+.Rproj.user
+.snakemake
+__pycache__
+ms-*.log
+bak/
+benchmarks/
+data/
+nohup*
+results/
+tmp/
+~*
