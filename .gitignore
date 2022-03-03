@@ -3,10 +3,10 @@
 .Rproj.user
 .snakemake
 __pycache__
-ms-*.log
 bak/
 benchmarks/
-data/
+data/Ancestral_paths_new/
+ms-*.log
 nohup*
 results/
 tmp/

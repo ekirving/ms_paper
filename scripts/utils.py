@@ -54,4 +54,3 @@ def get_modern_pops(config, wildcards):
     """
     samples = get_samples(config, wildcards.dataset, wildcards.population)
     return sorted(set(samples[samples["age"] == 0]["popId"].tolist()))
-

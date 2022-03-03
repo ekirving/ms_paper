@@ -18,7 +18,8 @@ See https://github.com/35ajstern/clues/
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 
-CHROM = r'(\d+|X|Y|MT)'
+CHROM = r"(\d+|X|Y|MT)"
+
 
 wildcard_constraints:
     # `chr:pos:ref:alt`
@@ -35,7 +36,7 @@ rule clues_modern_frequency:
     log:
         log="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.ancient.log",
     params:
-        bed=lambda wildcards: re.search(r'^({CHROM}:\d+)', "X:12:G:T").group()
+        bed=lambda wildcards: re.search(r"^({CHROM}:\d+)", "X:12:G:T").group(),
     shell:
         ""
 
@@ -119,7 +120,7 @@ rule clues_plot_trajectory:
         png="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.png",
     params:
         input="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}",
-        output="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}"
+        output="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}",
     shell:
         "python scripts/clues_plot_trajectory.py"
         " --gen-time {config[gen_time]}"
@@ -129,5 +130,3 @@ rule clues_plot_trajectory:
         " --ext png"
         " {params.input}"
         " {params.output}"
-
-
