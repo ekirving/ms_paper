@@ -9,34 +9,18 @@ __license__ = "MIT"
 import pandas as pd
 
 
-def get_samples(config, dataset, population):
+def get_samples(config, dataset):
     """
-    Get the samples in this analysis group
+    Get the samples in this dataset
     """
-
-    # load the sample metadata
-    df = pd.read_table(config["samples"][dataset]["metadata"]).set_index("sampleId", drop=False)
-
-    # get the filters for this population
-    filters = config["samples"][dataset]["populations"][population]
-
-    # apply all the filters
-    for key, value in filters.items():
-        if isinstance(value, list):
-            df = df[df[key].isin(value)]
-        elif isinstance(value, int):
-            df = df[df[key] <= value]
-        else:
-            raise RuntimeError("Unknown sample filter {}: {}".format(key, value))
-
-    return df
+    return pd.read_table(config["samples"][dataset]["metadata"]).set_index("sampleId", drop=False)
 
 
 def get_ancient_samples(config, wildcards):
     """
     Get list of sample IDs for all the ancient samples in the current analysis group
     """
-    samples = get_samples(config, wildcards.dataset, wildcards.population)
+    samples = get_samples(config, wildcards.dataset)
     return [str(s) for s in samples[samples["age"] != 0]["sampleId"].tolist()]
 
 
@@ -44,7 +28,7 @@ def get_modern_samples(config, wildcards):
     """
     Get list of sample IDs for all the modern samples in the current analysis group
     """
-    samples = get_samples(config, wildcards.dataset, wildcards.population)
+    samples = get_samples(config, wildcards.dataset)
     return [str(s) for s in samples[samples["age"] == 0]["sampleId"].tolist()]
 
 
@@ -52,5 +36,5 @@ def get_modern_pops(config, wildcards):
     """
     Get list of population IDs for all the modern samples in the current analysis group
     """
-    samples = get_samples(config, wildcards.dataset, wildcards.population)
+    samples = get_samples(config, wildcards.dataset)
     return sorted(set(samples[samples["age"] == 0]["popId"].tolist()))

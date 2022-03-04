@@ -45,16 +45,13 @@ MIN_ANCIENT_SAMPLES = 2
 
 @click.command()
 @click.option("--vcf", "vcf_file", metavar="<file>", help="VCF file", type=click.Path(exists=True), required=True)
-@click.option("--chr", "chrom", metavar="<chr>", help="Chromosome of the variant", required=True)
-@click.option("--pos", metavar="<int>", help="Position of the variant", type=int, required=True)
-@click.option("--ancestral", metavar="<chr>", help="The ancestral allele", type=click.Choice(BASES_N), required=True)
 @click.option("--dataset", metavar="<string>", help="Name of the dataset", required=True)
-@click.option("--population", metavar="<string>", help="Name of the population", required=True)
+@click.option("--variant", metavar="<chr:pos:ref:alt>", help="Variant name", required=True)
 @click.option("--ancestry", metavar="<string>", help="Ancestry code", type=click.Choice(ANCESTRY_MAP), required=True)
 @click.option("--gen-time", metavar="<int>", help="Years per generation", type=int, required=True)
 @click.option("--mod-freq", metavar="<file>", type=click.File("w"), help="Modern frequency filename", required=True)
 @click.option("--output", metavar="<file>", type=click.File("w"), help="Output filename", required=True)
-def clues_ancient_samples(vcf_file, chrom, pos, ancestral, dataset, population, ancestry, gen_time, mod_freq, output):
+def clues_ancient_samples(vcf_file, dataset, variant, ancestry, gen_time, mod_freq, output):
     """
     Generate the ancient samples genotype likelihood file for `clues`.
 
@@ -63,8 +60,11 @@ def clues_ancient_samples(vcf_file, chrom, pos, ancestral, dataset, population, 
     with open("config.yaml") as fin:
         config = yaml.safe_load(fin)
 
+    # unpack the variant ID
+    chrom, pos, ancestral, derived = variant.split(":")
+
     # get all the ancient samples in the current analysis group
-    samples = get_samples(config, dataset, population)
+    samples = get_samples(config, dataset)
     ancients = samples[samples["age"] != 0]
     ancients = ancients[ancients["age"].notnull()]
     ancients = ancients.sort_values("age")
@@ -76,6 +76,8 @@ def clues_ancient_samples(vcf_file, chrom, pos, ancestral, dataset, population, 
     vcf = pysam.VariantFile(vcf_file)
 
     try:
+        pos = int(pos)
+
         # fetch the record from the VCF
         rec = next(vcf.fetch(chrom, pos - 1, pos))
 

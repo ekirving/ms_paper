@@ -23,8 +23,8 @@ CHROM = r"(\d+|X|Y|MT)"
 
 wildcard_constraints:
     # `chr:pos:ref:alt`
-    variant="{CHROM}:\d+:[ACGT]:[ACGT]",
-    path="(.+/)+",
+    variant="\d+:\d+:[ACGT]:[ACGT]",
+    rsid="rs\d+",
 
 
 rule clues_modern_frequency:
@@ -32,9 +32,9 @@ rule clues_modern_frequency:
         vcf=lambda wildcards: config["samples"][wildcards.dataset]["genotypes"],
         smpl="data/1000g/samples/{population}.samples",
     output:
-        frq="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.modfreq",
+        frq="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.modfreq",
     log:
-        log="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.ancient.log",
+        log="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.ancient.log",
     params:
         bed=lambda wildcards: re.search(r"^({CHROM}:\d+)", "X:12:G:T").group(),
     shell:
@@ -45,15 +45,15 @@ rule clues_ancient_samples:
     input:
         vcf=lambda wildcards: config["samples"][wildcards.dataset]["genotypes"],
     output:
-        anc="results/clues/{path}/{dataset}-{variant}-{ancestry}.ancient",
-        frq="results/clues/{path}/{dataset}-{variant}-{ancestry}.modfreq",
+        anc="results/clues/{rsid}/{dataset}-{variant}-{ancestry}.ancient",
+        frq="results/clues/{rsid}/{dataset}-{variant}-{ancestry}.modfreq",
     log:
-        log="results/clues/{path}/{dataset}-{variant}-{ancestry}.ancient.log",
+        log="results/clues/{rsid}/{dataset}-{variant}-{ancestry}.ancient.log",
     shell:
         "python scripts/clues_ancient_samples.py"
         " --vcf {input.vcf}"
-        " --variant {wildcards.variant}"
         " --dataset {wildcards.dataset}"
+        " --variant {wildcards.variant}"
         " --ancestry {wildcards.ancestry}"
         " --gen-time {config[gen_time]}"
         " --mod-freq {output.frq}"
@@ -74,16 +74,16 @@ rule clues_inference_ancient:
     input:
         coal="data/relate/coalescence_rates/relate_{population}.coal",
         bins="results/clues/{dataset}-time.bins",
-        anct="results/clues/{path}/{dataset}-{variant}-{ancestry}.ancient",
-        freq="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.freq",
+        anct="results/clues/{rsid}/{dataset}-{variant}-{ancestry}.ancient",
+        freq="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.freq",
     output:
-        epch="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.epochs.npy",
-        freq="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.freqs.npy",
-        post="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.post.npy",
+        epch="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.epochs.npy",
+        freq="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.freqs.npy",
+        post="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.post.npy",
     log:
-        "results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.epochs.log",
+        "results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.epochs.log",
     params:
-        out="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}",
+        out="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}",
         daf=lambda wildcards, input: open(str(input.freq)).read().strip(),
         flg=lambda wildcards: "ancientSamps" if wildcards.ancestry == "ALL" else "ancientHaps",
     shell:
@@ -97,9 +97,9 @@ rule clues_inference_ancient:
 
 rule clues_parse_log:
     input:
-        log="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.epochs.log",
+        log="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.epochs.log",
     output:
-        json="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.json",
+        json="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.json",
     shell:
         "python scripts/clues_parse_log.py"
         " --variant {wildcards.variant}"
@@ -111,16 +111,16 @@ rule clues_parse_log:
 
 rule clues_plot_trajectory:
     input:
-        epch="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.epochs.npy",
-        freq="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.freqs.npy",
-        post="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.post.npy",
-        json="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.json",
+        epch="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.epochs.npy",
+        freq="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.freqs.npy",
+        post="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.post.npy",
+        json="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.json",
         label="variants/labels/{dataset}/{population}/{dataset}-{variant}-{population}-label.json",  # TODO refactor this!
     output:
-        png="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}.png",
+        png="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}.png",
     params:
-        input="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}",
-        output="results/clues/{path}/{dataset}-{variant}-{population}-{ancestry}",
+        input="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}",
+        output="results/clues/{rsid}/{dataset}-{variant}-{population}-{ancestry}",
     shell:
         "python scripts/clues_plot_trajectory.py"
         " --gen-time {config[gen_time]}"
