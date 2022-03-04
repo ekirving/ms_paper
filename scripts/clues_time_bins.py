@@ -20,10 +20,9 @@ from scripts.utils import get_samples
 
 @click.command()
 @click.option("--dataset", metavar="<string>", help="Name of the dataset", required=True)
-@click.option("--population", metavar="<string>", help="Name of the population", required=True)
 @click.option("--gen-time", metavar="<int>", help="Years per generation", type=int, required=True)
 @click.option("--output", metavar="<file>", type=click.File("w"), help="Output filename", required=True)
-def clues_time_bins(dataset, population, gen_time, output):
+def clues_time_bins(dataset, gen_time, output):
     """
     Generate a time bins file for `clues` with one epoch, that lasts from the oldest sample to the most recent.
 
@@ -33,7 +32,7 @@ def clues_time_bins(dataset, population, gen_time, output):
         config = yaml.safe_load(fin)
 
     # get all the samples in the current analysis group
-    samples = get_samples(config, dataset, population)
+    samples = get_samples(config, dataset)
     epoch_start = floor(min(samples["age"]) / gen_time)
     epoch_end = ceil(max(samples["age"]) / gen_time)
 

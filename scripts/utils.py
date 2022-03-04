@@ -38,3 +38,22 @@ def get_modern_pops(config, wildcards):
     """
     samples = get_samples(config, wildcards.dataset)
     return sorted(set(samples[samples["age"] == 0]["popId"].tolist()))
+
+
+def gen_dict_extract(key, var: dict):
+    """Find keys in nested dictionaries"""
+    if hasattr(var, "items"):
+        for k, v in var.items():
+            if k == key:
+                yield v
+            if isinstance(v, dict):
+                for result in gen_dict_extract(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    for result in gen_dict_extract(key, d):
+                        yield result
+    elif isinstance(var, list):
+        for d in var:
+            for result in gen_dict_extract(key, d):
+                yield result

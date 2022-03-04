@@ -10,16 +10,13 @@ import json
 
 import click
 
-SEXES = ["XX", "XY", "any"]
-
 
 @click.command()
 @click.option("--rsid", metavar="<string>", help="RefSeq ID", required=True)
-@click.option("--mode", metavar="<string>", help="Clues mode", required=True)
 @click.option("--ancestry", metavar="<string>", help="Ancestral path", required=True)
 @click.option("--log", "log_file", metavar="<file>", type=click.Path(writable=True), help="Log file", required=True)
 @click.option("--out", "output", metavar="<file>", type=click.File("w"), help="Output filename", required=True)
-def clues_parse_log(rsid, mode, ancestry, log_file, output):
+def clues_parse_log(rsid, ancestry, log_file, output):
     """
     Parse the Clues log file to extract the information we want.
     """
@@ -40,7 +37,7 @@ def clues_parse_log(rsid, mode, ancestry, log_file, output):
 
         data = {
             "rsid": rsid,
-            "mode": mode,
+            "mode": "ancient",
             "ancestry": ancestry,
             "logLR": float(lnl_ratio),
             "epochs": epochs,

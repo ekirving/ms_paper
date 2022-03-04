@@ -6,6 +6,12 @@ __pycache__
 bak/
 benchmarks/
 data/Ancestral_paths_new/
+data/clues/
+data/ensembl/
+data/gwascat/
+data/labels/
+data/metadata/
+data/relate/
 ms-*.log
 nohup*
 results/

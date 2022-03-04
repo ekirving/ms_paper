@@ -6,7 +6,4 @@
 # License:   MIT
 
 # fetch the CLUES code and checkout the PALM branch
-cd ..
-git clone git@github.com:35ajstern/clues.git
-cd clues/
-git checkout aaron/palm-integration
+git clone git@github.com:35ajstern/clues.git --branch aaron/palm-integration bin/clues/

@@ -10,6 +10,8 @@ __license__ = "MIT"
 configfile: "config.yaml"
 
 
+include: "rules/gwascat.smk"
+include: "rules/variants.smk"
 include: "rules/clues.smk"
 
 
