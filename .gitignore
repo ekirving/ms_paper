@@ -5,12 +5,14 @@
 __pycache__
 bak/
 benchmarks/
-data/Ancestral_paths_new/
+data/Ancestral_paths_new
 data/clues/
 data/ensembl/
 data/gwascat/
 data/labels/
 data/metadata/
+data/neo.impute
+data/neo.likelihoods
 data/relate/
 ms-*.log
 nohup*
