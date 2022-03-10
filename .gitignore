@@ -5,6 +5,7 @@
 __pycache__
 bak/
 benchmarks/
+bin/
 data/Ancestral_paths_new
 data/clues/
 data/ensembl/
