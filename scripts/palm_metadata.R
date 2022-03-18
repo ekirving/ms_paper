@@ -39,6 +39,6 @@ data <- gwas %>%
         beta = ifelse(effect_allele == ALT, beta, -beta)
     ) %>%
     rename(pvalue = P, rsid = SNP) %>%
-    select(ld_block, variant, derived_allele, beta, pvalue, rsid)
+    select(ld_block, variant, rsid, derived_allele, beta, se, pvalue)
 
 write_tsv(data, argv$output)

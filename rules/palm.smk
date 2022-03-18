@@ -106,7 +106,7 @@ rule palm_single_trait:
     params:
         dir="results/palm/{dataset}/{ancestry}/{trait}/",
     shell:
-        "python palm.py"
+        "python bin/palm/palm.py"
         " --traitDir {params.dir}"
         " --metadata {input.tsv}"
         " --maxp 5e-8"
