@@ -16,9 +16,9 @@ table_cols <- colnames(ms)
 
 # convert the `ra` columns to the same format as `ms`
 ra <- ra %>%
-    rename(effect_allele=A1, other_allele=A2, OR=`OR(A1)`) %>%
-    separate(`OR_95%CIup-OR_95%CIlow`, into=c("OR_upper", "OR_lower"), sep="-") %>%
-    mutate(beta=log(as.numeric(OR)), se=NA) %>%
+    rename(effect_allele = A1, other_allele = A2, OR = `OR(A1)`) %>%
+    separate(`OR_95%CIup-OR_95%CIlow`, into = c("OR_upper", "OR_lower"), sep = "-") %>%
+    mutate(beta = log(as.numeric(OR)), se = NA) %>%
     select(all_of(table_cols))
 
 write_tsv(ra, "data/targets/all_clumped_annotated_ra.tsv")
@@ -28,19 +28,26 @@ write_tsv(ra, "data/targets/all_clumped_annotated_ra.tsv")
 # -------------------------------------------------
 
 # check that all the SNPs are present and that the reported alleles match
-variants_ms <- read_tsv("variants_ms.list", col_types = cols(.default = "c"), col_names=c("chrom", "pos", "ref", "alt", "id")) %>%
-    separate(id, into=c("rsid", "other"), sep=";")
-    
-joined_ms <- ms %>%
-    left_join(variants_ms, by = c('CHR'='chrom', 'BP'='pos'))
+variants_ms <- read_tsv("variants_ms.list", col_types = cols(.default = "c"), col_names = c("chrom", "pos", "ref", "alt", "id")) %>%
+    separate(id, into = c("rsid", "other"), sep = ";")
 
-joined_ms %>% filter(is.na(ref)) %>% pull(SNP)
+joined_ms <- ms %>%
+    left_join(variants_ms, by = c("CHR" = "chrom", "BP" = "pos"))
+
+joined_ms %>%
+    filter(is.na(ref)) %>%
+    pull(SNP)
 # none!
 
-joined_ms %>% filter(effect_allele != ref & effect_allele != alt) %>% nrow() # 91
-joined_ms %>% filter(other_allele != ref & other_allele != alt) %>% nrow()   # 91
+joined_ms %>%
+    filter(effect_allele != ref & effect_allele != alt) %>%
+    nrow() # 91
+joined_ms %>%
+    filter(other_allele != ref & other_allele != alt) %>%
+    nrow() # 91
 
-mismatch_ms <- joined_ms %>% mutate(mismatch=(effect_allele != ref & effect_allele != alt) | (other_allele != ref & other_allele != alt)) %>%
+mismatch_ms <- joined_ms %>%
+    mutate(mismatch = (effect_allele != ref & effect_allele != alt) | (other_allele != ref & other_allele != alt)) %>%
     select(-c(rsid, other))
 
 write_tsv(mismatch_ms, "data/targets/all_clumped_annotated_ms_mismatchs.tsv")
@@ -49,15 +56,20 @@ write_tsv(mismatch_ms, "data/targets/all_clumped_annotated_ms_mismatchs.tsv")
 # rheumatoid arthritis
 # -------------------------------------------------
 
-variants_ra <- read_tsv("variants_ra.list", col_types = cols(.default = "c"), col_names=c("chrom", "pos", "ref", "alt", "id")) %>%
-    separate(id, into=c("rsid", "other"), sep=";")
+variants_ra <- read_tsv("variants_ra.list", col_types = cols(.default = "c"), col_names = c("chrom", "pos", "ref", "alt", "id")) %>%
+    separate(id, into = c("rsid", "other"), sep = ";")
 
 joined_ra <- ra %>%
-    left_join(variants_ra, by = c('CHR'='chrom', 'BP'='pos'))
+    left_join(variants_ra, by = c("CHR" = "chrom", "BP" = "pos"))
 
-joined_ra %>% filter(is.na(ref)) %>% View()
+joined_ra %>%
+    filter(is.na(ref)) %>%
+    View()
 # "rs9275601" "rs3873444"
 
-joined_ra %>% filter(effect_allele != ref & effect_allele != alt) %>% nrow() # 0
-joined_ra %>% filter(other_allele != ref & other_allele != alt) %>% nrow()   # 0
-
+joined_ra %>%
+    filter(effect_allele != ref & effect_allele != alt) %>%
+    nrow() # 0
+joined_ra %>%
+    filter(other_allele != ref & other_allele != alt) %>%
+    nrow() # 0

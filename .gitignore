@@ -1,5 +1,6 @@
 *-commands.sh
 *.xlsx
+*_mismatchs.tsv
 .Rproj.user
 .snakemake
 __pycache__
@@ -15,6 +16,7 @@ data/metadata/
 data/neo.impute
 data/neo.likelihoods
 data/relate/
+doi_10.6078_D11M62__v3
 ms-*.log
 nohup*
 results/

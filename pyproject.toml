@@ -1,7 +1,7 @@
 [tool.snakefmt]
 line-length = 120
 include = '\.smk$|^Snakefile|\.py$'
-exclude = 'bin/clues/'
+exclude = 'bin|doi_10.6078_D11M62__v3'
 
 # snakefmt passes these options on to black
 [tool.black]
