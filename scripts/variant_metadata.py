@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 __author__ = "Evan K. Irving-Pease"
-__copyright__ = "Copyright 2020, University of Copenhagen"
+__copyright__ = "Copyright 2022, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
