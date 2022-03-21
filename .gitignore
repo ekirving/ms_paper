@@ -1,4 +1,5 @@
 *-commands.sh
+*.list
 *.xlsx
 *_mismatchs.tsv
 .Rproj.user

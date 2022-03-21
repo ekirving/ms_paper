@@ -12,16 +12,16 @@ setwd("/Users/evan/Dropbox/Code/ms")
 ms <- read_tsv("data/targets/all_clumped_annotated_ms.tsv", col_types = cols(.default = "c"))
 ra <- read_tsv("data/targets/all_clumped_annotated_ra.tsv", col_types = cols(.default = "c"))
 
-table_cols <- colnames(ms)
-
-# convert the `ra` columns to the same format as `ms`
-ra <- ra %>%
-    rename(effect_allele = A1, other_allele = A2, OR = `OR(A1)`) %>%
-    separate(`OR_95%CIup-OR_95%CIlow`, into = c("OR_upper", "OR_lower"), sep = "-") %>%
-    mutate(beta = log(as.numeric(OR)), se = NA) %>%
-    select(all_of(table_cols))
-
-write_tsv(ra, "data/targets/all_clumped_annotated_ra.tsv")
+# table_cols <- colnames(ms)
+# 
+# # convert the `ra` columns to the same format as `ms`
+# ra <- ra %>%
+#     rename(effect_allele = A1, other_allele = A2, OR = `OR(A1)`) %>%
+#     separate(`OR_95%CIup-OR_95%CIlow`, into = c("OR_upper", "OR_lower"), sep = "-") %>%
+#     mutate(beta = log(as.numeric(OR)), se = NA) %>%
+#     select(all_of(table_cols))
+# 
+# write_tsv(ra, "data/targets/all_clumped_annotated_ra.tsv")
 
 # -------------------------------------------------
 # multiple sclerosis
@@ -40,17 +40,9 @@ joined_ms %>%
 # none!
 
 joined_ms %>%
-    filter(effect_allele != ref & effect_allele != alt) %>%
+    filter((effect_allele != ref & effect_allele != alt) | (other_allele != ref & other_allele != alt)) %>%
     nrow() # 91
-joined_ms %>%
-    filter(other_allele != ref & other_allele != alt) %>%
-    nrow() # 91
-
-mismatch_ms <- joined_ms %>%
-    mutate(mismatch = (effect_allele != ref & effect_allele != alt) | (other_allele != ref & other_allele != alt)) %>%
-    select(-c(rsid, other))
-
-write_tsv(mismatch_ms, "data/targets/all_clumped_annotated_ms_mismatchs.tsv")
+# none!
 
 # -------------------------------------------------
 # rheumatoid arthritis
@@ -68,8 +60,6 @@ joined_ra %>%
 # "rs9275601" "rs3873444"
 
 joined_ra %>%
-    filter(effect_allele != ref & effect_allele != alt) %>%
-    nrow() # 0
-joined_ra %>%
-    filter(other_allele != ref & other_allele != alt) %>%
-    nrow() # 0
+    filter((effect_allele != ref & effect_allele != alt) | (other_allele != ref & other_allele != alt)) %>%
+    nrow()
+# none!
