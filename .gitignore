@@ -18,6 +18,8 @@ data/neo.impute
 data/neo.likelihoods
 data/relate/
 data/targets/*_palm.tsv
+data/targets/*_positions.tsv
+data/targets/*_variants.tsv
 doi_10.6078_D11M62__v3
 ms-*.log
 nohup*
