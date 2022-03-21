@@ -34,11 +34,12 @@ data <- gwas %>%
 
         # default to ALT if the ancestral allele is unknown
         derived_allele = ifelse(ANC == ALT, REF, ALT),
+        ancestral_allele = ifelse(derived_allele == ALT, REF, ALT),
 
         # PALM assumes that betas measure the effect of the ALT allele
         beta = ifelse(effect_allele == ALT, beta, -beta)
     ) %>%
-    rename(pvalue = P, rsid = SNP) %>%
-    select(ld_block, variant, rsid, derived_allele, beta, se, pvalue)
+    rename(pval = P, rsid = SNP) %>%
+    select(ld_block, variant, rsid, derived_allele, ancestral_allele, beta, se, pval)
 
 write_tsv(data, argv$output)

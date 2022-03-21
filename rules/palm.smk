@@ -56,8 +56,14 @@ def clues_quad_fit(wildcards):
 
     rsid = snp["rsid"]
     dataset = wildcards.dataset
-    variant = snp["variant"]
     ancestry = wildcards.ancestry
+
+    chr, pos, ref, alt = snp["variant"].split(":")
+    der = snp["derived_allele"]
+    anc = snp["ancestral_allele"]
+
+    # CLUES expects the variant name to be polarized by the ancestral allele
+    variant = f"{chr}:{pos}:{anc}:{der}"
 
     return f"results/clues/{rsid}/{dataset}-{variant}-{ancestry}.quad_fit.npy"
 

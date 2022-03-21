@@ -46,7 +46,7 @@ MIN_ANCIENT_SAMPLES = 2
 @click.command()
 @click.option("--vcf", "vcf_file", metavar="<file>", help="VCF file", type=click.Path(exists=True), required=True)
 @click.option("--dataset", metavar="<string>", help="Name of the dataset", required=True)
-@click.option("--variant", metavar="<chr:pos:ref:alt>", help="Variant name", required=True)
+@click.option("--variant", metavar="<chr:pos:anc:der>", help="Variant name", required=True)
 @click.option("--ancestry", metavar="<string>", help="Ancestry code", type=click.Choice(ANCESTRY_MAP), required=True)
 @click.option("--gen-time", metavar="<int>", help="Years per generation", type=int, required=True)
 @click.option("--mod-freq", metavar="<file>", type=click.File("w"), help="Modern frequency filename", required=True)
