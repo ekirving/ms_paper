@@ -108,7 +108,9 @@ rule palm_single_trait:
     input:
         unpack(palm_quad_fit),
     output:
-        quad="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.log",
+        txt="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.txt",
+    log:
+        log="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.log",
     params:
         dir="results/palm/{dataset}/{ancestry}/{trait}/",
     shell:
@@ -117,3 +119,22 @@ rule palm_single_trait:
         " --metadata {input.tsv}"
         " --maxp 5e-8"
         " --B 1000"
+        " 1> {output.txt}"
+        " 2> {log}"
+
+
+rule palm_parse_txt:
+    """
+    Convert the text output into a JSON file
+    """
+    input:
+        palm="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.txt",
+    output:
+        json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
+    shell:
+        "python scripts/palm_parse_txt.py"
+        " --dataset {wildcards.dataset}"
+        " --ancestry {wildcards.ancestry}"
+        " --trait {wildcards.trait}"
+        " --palm {input.palm}"
+        " --out {output.json}"
