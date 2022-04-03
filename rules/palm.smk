@@ -19,6 +19,9 @@ wildcard_constraints:
 
 
 rule reference_metadata:
+    """
+    Extract the REF, ALT and ancestral alleles from the dataset VCF
+    """
     input:
         vcf=lambda wildcards: config["samples"][wildcards.dataset]["genotypes"],
         tsv="data/targets/all_clumped_annotated_{trait}.tsv",
@@ -33,6 +36,9 @@ rule reference_metadata:
 
 
 checkpoint palm_metadata:
+    """
+    Convert the GWAS metadata into PALM input format
+    """
     input:
         tsv="data/targets/all_clumped_annotated_{trait}.tsv",
         var="data/targets/all_clumped_annotated_{trait}_{dataset}_variants.tsv",
@@ -82,7 +88,7 @@ rule palm_organise_clues:
 
 def palm_quad_fit(wildcards):
     """
-    Return a list of all the SNPs for the current trait
+    Return a list of the `.quad_fit` files for each SNP associated with the current trait
     """
     # noinspection PyUnresolvedReferences
     meta_tsv = checkpoints.palm_metadata.get(**wildcards).output.tsv
@@ -97,7 +103,7 @@ def palm_quad_fit(wildcards):
         block, pos = snp["ld_block"], snp["variant"].split(":")[1]
         files.append(f"results/palm/{dataset}/{ancestry}/{trait}/ld_{block}/bp{pos}.quad_fit.npy")
 
-    return {"tsv": "data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv", "quat": files}
+    return {"tsv": "data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv", "quad_fit": files}
 
 
 # noinspection PyUnresolvedReferences
@@ -125,7 +131,7 @@ rule palm_single_trait:
 
 rule palm_parse_txt:
     """
-    Convert the text output into a JSON file
+    Convert the text output from PALM into a JSON file
     """
     input:
         palm="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.txt",
