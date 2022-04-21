@@ -9,6 +9,7 @@ quiet <- function(x) {
     suppressMessages(suppressWarnings(x))
 }
 quiet(library(tidyverse)) # v1.3.1
+quiet(library(RcppCNPy)) # v0.2.11
 
 clues_load_data <- function(prefix) {
 

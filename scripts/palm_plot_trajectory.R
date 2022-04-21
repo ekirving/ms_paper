@@ -10,8 +10,6 @@ quiet <- function(x) {
 }
 quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
-# quiet(library(RcppCNPy))  # v0.2.11
-# quiet(library(RcppRoll))  # v0.3.0
 
 # load the helper functions
 source("scripts/clues_utils.R")
@@ -19,6 +17,9 @@ source("scripts/clues_utils.R")
 # get the command line arguments
 p <- arg_parser("Convert the GWAS metadata into PALM input format")
 p <- add_argument(p, "--palm", help = "PALM metadata", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--trait", help = "The complex trait name", default = "Multiple sclerosis")
+p <- add_argument(p, "--datasource", help = "The datasource", default = "ancestral_paths_new")
+p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
 p <- add_argument(p, "--output", help = "PALM trajectory", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.png")
 
@@ -27,20 +28,18 @@ argv <- parse_args(p)
 # load the list of SNPs and their effect sizes
 palm <- read_tsv(argv$palm, col_types = cols())
 
-prefixes <- c(
-    "results/clues/rs10175798/ancestral_paths_new-2:30449594:G:A-ALL",
-    "results/clues/rs12527959/ancestral_paths_new-6:29537426:C:T-ALL"
-)
+# compose the model prefixes from the PALM metadata
+prefixes <- palm %>%
+    mutate(prefix = paste0("results/clues/", rsid, "/", argv$datasource, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry)) %>%
+    pull(prefix)
 
-models <- list(
-    clues_load_data(prefixes[[1]]),
-    clues_load_data(prefixes[[2]])
-)
+# load all the models
+models <- lapply(prefixes, clues_load_data)
 
 df_prob <- models[[1]]
 
 for (model in models[-1]) {
-    # model <- models[-1][[1]]
+    # get the joint probability of this model and all previous models
     df_prob <- inner_join(df_prob, model, by = "epoch") %>%
         mutate(
             freq = freq.x + freq.y,
@@ -48,7 +47,8 @@ for (model in models[-1]) {
             density = density.x * density.y
         ) %>%
         group_by(epoch, freq) %>%
-        summarise(density = sum(density), .groups = "drop")
+        summarise(density = sum(density), .groups = "drop") %>%
+        filter(density > 0)
 }
 
 # get the original frequency bins
@@ -57,7 +57,7 @@ bins <- models[[1]] %>%
     mutate(bin = row_number()) %>%
     select(bin, freq, height)
 
-# convert the summed marginal frequencies back to the original frequency bins
+# group the summed marginal frequencies into the original frequency bins
 df_prob <- df_prob %>%
     mutate(freq = freq / length(models)) %>%
     mutate(bin = cut(freq, breaks = c(-1, bins$freq), labels = FALSE)) %>%
@@ -77,22 +77,20 @@ max_traj <- df_prob %>%
     top_n(1, density) %>%
     ungroup() %>%
     arrange(epoch)
-# TODO broken
-# mutate(freq = roll_mean(freq, 5, align = "left", fill = max(freq)))
 
 df_prob %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = freq, height = height, fill = density)) +
     geom_tile() +
 
-    # plot the maximum posterior trajectory
-    geom_line(mapping = aes(x = epoch, y = freq), data = max_traj, color = "red") +
+    # plot the maximum likelihood trajectory
+    # geom_line(mapping = aes(x = epoch, y = freq), data = max_traj, color = "red") +
 
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
-    scale_fill_viridis_c(limits = c(0, 0.5)) +
-    labs(fill = "Density") +
+    scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma") +
+    labs(title = argv$trait, fill = "Density") +
     ylab("Polygenic Risk Score") +
     xlab("kyr BP") +
 
