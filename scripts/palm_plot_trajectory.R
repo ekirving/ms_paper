@@ -39,16 +39,19 @@ models <- lapply(prefixes, clues_load_data)
 df_prob <- models[[1]]
 
 for (model in models[-1]) {
-    # get the joint probability of this model and all previous models
+    # get the joint probability of this model and the previous models
     df_prob <- inner_join(df_prob, model, by = "epoch") %>%
         mutate(
             freq = freq.x + freq.y,
-            # TODO float underflow issue
             density = density.x * density.y
         ) %>%
         group_by(epoch, freq) %>%
-        summarise(density = sum(density), .groups = "drop") %>%
-        filter(density > 0)
+        summarise(density = sum(density), .groups = "drop") %>% 
+        # prevent combinatorial explosion by dropping extremely low probability points
+        filter(density > 1e-20)
+
+    # force garbage collection so we don't cause an out-of-memory crash
+    gc()
 }
 
 # get the original frequency bins
@@ -78,7 +81,7 @@ max_traj <- df_prob %>%
     ungroup() %>%
     arrange(epoch)
 
-df_prob %>%
+plt <- df_prob %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = freq, height = height, fill = density)) +
     geom_tile() +
@@ -91,7 +94,7 @@ df_prob %>%
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
     scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma") +
     labs(title = argv$trait, fill = "Density") +
-    ylab("Polygenic Risk Score") +
+    ylab("Scaled PRS") +
     xlab("kyr BP") +
 
     # basic styling
@@ -101,5 +104,12 @@ df_prob %>%
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        panel.background = element_blank()
+        # fill in all the blanks with the zero density colour
+        panel.background = element_rect(fill="#0D1687", color=NA)
     )
+
+png(file = argv$output, width = 16, height = 9, units = "in", res = 300)
+plt
+dev <- dev.off()
+
+plt
