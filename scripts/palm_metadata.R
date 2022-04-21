@@ -25,7 +25,6 @@ vars <- read_tsv(argv$variants, col_names = c("CHR", "BP", "REF", "ALT", "ANC"),
 data <- gwas %>%
     # join the variant metadata (this drops any SNPs that are not in the callset)
     inner_join(vars, by = c("CHR", "BP")) %>%
-    
     mutate(
         # our SNPs are already LP-pruned
         ld_block = row_number(),
@@ -40,10 +39,8 @@ data <- gwas %>%
         # PALM assumes that betas measure the effect of the ALT allele
         beta = ifelse(effect_allele == ALT, beta, -beta)
     ) %>%
-    
     # remove any SNPs without a valid p-value or standard error for the association
-    filter(P!=0 & se!=0) %>%
-    
+    filter(P != 0 & se != 0) %>%
     rename(pval = P, rsid = SNP) %>%
     select(ld_block, variant, rsid, derived_allele, ancestral_allele, beta, se, pval)
 

@@ -6,12 +6,12 @@
 # License:   MIT
 
 quiet <- function(x) {
-  suppressMessages(suppressWarnings(x))
+    suppressMessages(suppressWarnings(x))
 }
 quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
-quiet(library(RcppCNPy))  # v0.2.11
-quiet(library(RcppRoll))  # v0.3.0
+quiet(library(RcppCNPy)) # v0.2.11
+quiet(library(RcppRoll)) # v0.3.0
 
 # get the command line arguments
 p <- arg_parser("Convert the GWAS metadata into PALM input format")
@@ -24,73 +24,73 @@ argv <- parse_args(p)
 # load the list of SNPs and their effect sizes
 palm <- read_tsv(argv$palm, col_types = cols())
 
-load_clues_model <- function(prefix) {
+clues_trajectory <- function(prefix) {
 
     # load the CLUES model data
     epochs <- npyLoad(paste0(prefix, ".epochs.npy"))
     freqs <- npyLoad(paste0(prefix, ".freqs.npy"))
     logpost <- npyLoad(paste0(prefix, ".post.npy"), dotranspose = F)
-    
+
+    # .name_repair = make.names
     df <- as_tibble(logpost) %>%
-        
         # convert posterior densities from log-likelihoods
         exp() %>%
-        
         # add the frequency labels
         add_column(freq = freqs, .before = 1) %>%
-        
         # add the title heights (and a little padding to make sure there are no gaps)
         # tile heights are not equal because there is higher sampling density near 0 and 1
         add_column(height = diff(c(0, freqs)) + 1e-4, .before = 2) %>%
-        
         # pivot the columns into long format
         pivot_longer(-c(freq, height), names_to = "epoch", values_to = "density") %>%
-        
         # convert the column names into epochs (and switch the direction of time)
         mutate(epoch = -epochs[as.numeric(gsub("V", "", epoch))])
-    
-    df
+
+    # extract the maximum likelihood trajectory
+    traj <- df %>%
+        group_by(epoch) %>%
+        top_n(1, density) %>%
+        ungroup() %>%
+        arrange(epoch) %>%
+        mutate(freq = roll_mean(freq, 5, align = "left", fill = max(freq)))
+
+    traj
 }
 
 # TODO remove when done testing
+models <- c(
+    # "results/clues/rs10175798/ancestral_paths_new-2:30449594:G:A-ALL",
+    "results/clues/rs12527959/ancestral_paths_new-6:29537426:C:T-ALL"
+)
 
-prefix <- "results/clues/rs10175798/ancestral_paths_new-2:30449594:G:A-ALL"
-
-
-df <- load_clues_model(prefix)
+# load the trajectories
+traj <- bind_rows(
+    lapply(models, function(model) {
+        clues_trajectory(model) %>% mutate(label = model)
+    })
+)
 
 # constrain the extent of the plotting
-xmin <- min(-df$epoch)
-xmax <- max(-df$epoch)
+xmin <- min(-traj$epoch)
+xmax <- max(-traj$epoch)
 xbreaks <- seq(xmin, xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
 
-max_traj <- df %>%
-    group_by(epoch) %>%
-    top_n(1, density) %>%
-    ungroup() %>%
-    arrange(epoch) %>%
-    mutate(freq = roll_mean(freq, 5, align = "left", fill = max(freq)))
+plt <- ggplot(traj) +
 
+    # plot the density raster
+    # geom_tile(aes(x = epoch, y = freq, height = height, fill = density)) +
 
-plt <- df %>%
-    # plot the heatmap
-    ggplot(aes(x = epoch, y = freq, height = height, fill = density)) +
-    geom_tile() +
-    
     # plot the maximum posterior trajectory
-    # geom_line(aes(x = epoch, y = freq), max_traj) +
-    
+    geom_line(aes(x = epoch, y = freq, color = label)) +
+
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
     scale_fill_viridis_c(limits = c(0, 0.5)) +
-    # scale_fill_gradient(low = "white", high = "black", limits = c(0, 0.5)) +
-    
-    labs(title = prefix) +
+    labs(title = "Trait name") +
     ylab("Derived Allele Frequency") +
     xlab("kyr BP") +
-    
+
     # basic styling
     theme_minimal() +
     theme(

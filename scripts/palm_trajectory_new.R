@@ -10,8 +10,8 @@ quiet <- function(x) {
 }
 quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
-quiet(library(RcppCNPy))  # v0.2.11
-quiet(library(RcppRoll))  # v0.3.0
+# quiet(library(RcppCNPy))  # v0.2.11
+# quiet(library(RcppRoll))  # v0.3.0
 
 # load the helper functions
 source("scripts/clues_utils.R")
@@ -33,37 +33,37 @@ prefixes <- c(
 )
 
 models <- list(
-    clues_load_data(prefixes[[1]], "rs10175798"),
-    clues_load_data(prefixes[[2]], "rs12527959")
+    clues_load_data(prefixes[[1]]),
+    clues_load_data(prefixes[[2]])
 )
 
 df_prob <- models[[1]]
 
 for (model in models[-1]) {
     # model <- models[-1][[1]]
-    df_prob <- inner_join(df_prob, model, by = 'epoch') %>%
+    df_prob <- inner_join(df_prob, model, by = "epoch") %>%
         mutate(
-            freq=freq.x+freq.y,
+            freq = freq.x + freq.y,
             # TODO float underflow issue
-            density=density.x*density.y
+            density = density.x * density.y
         ) %>%
         group_by(epoch, freq) %>%
-        summarise(density=sum(density), .groups="drop")
+        summarise(density = sum(density), .groups = "drop")
 }
 
 # get the original frequency bins
-bins <- models[[1]] %>% 
-    filter(epoch==0) %>% 
-    mutate(bin=row_number()) %>%
+bins <- models[[1]] %>%
+    filter(epoch == 0) %>%
+    mutate(bin = row_number()) %>%
     select(bin, freq, height)
 
 # convert the summed marginal frequencies back to the original frequency bins
 df_prob <- df_prob %>%
-    mutate(freq=freq/length(models)) %>%
-    mutate(bin=cut(df_prob$freq, breaks=c(-1, bins$freq), labels=FALSE)) %>%
+    mutate(freq = freq / length(models)) %>%
+    mutate(bin = cut(freq, breaks = c(-1, bins$freq), labels = FALSE)) %>%
     group_by(epoch, bin) %>%
-    summarise(density=sum(density), .groups="drop") %>%
-    left_join(bins, by="bin")
+    summarise(density = sum(density), .groups = "drop") %>%
+    left_join(bins, by = "bin")
 
 # constrain the extent of the plotting
 xmin <- min(-df_prob$epoch)
@@ -76,27 +76,26 @@ max_traj <- df_prob %>%
     group_by(epoch) %>%
     top_n(1, density) %>%
     ungroup() %>%
-    arrange(epoch) %>%
-    mutate(freq = roll_mean(freq, 5, align = "left", fill = max(freq)))
+    arrange(epoch)
+# TODO broken
+# mutate(freq = roll_mean(freq, 5, align = "left", fill = max(freq)))
 
 df_prob %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = freq, height = height, fill = density)) +
     geom_tile() +
-    
+
     # plot the maximum posterior trajectory
-    geom_line(aes(x = epoch, y = freq), max_traj) +
-    
+    geom_line(mapping = aes(x = epoch, y = freq), data = max_traj, color = "red") +
+
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
     scale_fill_viridis_c(limits = c(0, 0.5)) +
-    # scale_fill_gradient(low = "white", high = "black", limits = c(0, 0.5)) +
-    
-    labs(title = argv$prefix) +
-    ylab("Derived Allele Frequency") +
+    labs(fill = "Density") +
+    ylab("Polygenic Risk Score") +
     xlab("kyr BP") +
-    
+
     # basic styling
     theme_minimal() +
     theme(
@@ -106,4 +105,3 @@ df_prob %>%
         panel.border = element_blank(),
         panel.background = element_blank()
     )
-
