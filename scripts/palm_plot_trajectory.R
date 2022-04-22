@@ -21,26 +21,32 @@ p <- add_argument(p, "--trait", help = "The complex trait name", default = "Mult
 p <- add_argument(p, "--datasource", help = "The datasource", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
+p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = 1e-20)
 p <- add_argument(p, "--output", help = "PALM trajectory", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.png")
 
 argv <- parse_args(p)
 
+# reduce the memory overhead by filtering out frequency bins below this probability threshold
+MIN_POSTERIOR_DENSITY <- as.numeric(argv$min_density)
+
 # load the list of SNPs and their effect sizes
 palm <- read_tsv(argv$palm, col_types = cols())
 
-# compose the model prefixes from the PALM metadata
-prefixes <- palm %>%
-    mutate(prefix = paste0("results/clues/", rsid, "/", argv$datasource, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry)) %>%
-    pull(prefix)
+palm <- palm %>%
+    # compose the model prefixes from the PALM metadata
+    mutate(prefix = paste0("results/clues/", rsid, "/", argv$datasource, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry))
 
 # load all the models
-models <- lapply(prefixes, clues_load_data)
+models <- lapply(palm$prefix, clues_load_data)
 
-df_prob <- models[[1]]
+df_prob <- models[[1]] %>%
+    filter(density > 0)
 
 for (model in models[-1]) {
-    # get the joint probability of this model and the previous models
-    df_prob <- inner_join(df_prob, model, by = "epoch") %>%
+    # get the joint probability of this model and all the previous models
+    df_prob <- model %>%
+        filter(density > 0) %>%
+        inner_join(df_prob, by = "epoch") %>%
         mutate(
             freq = freq.x + freq.y,
             density = density.x * density.y
@@ -48,7 +54,7 @@ for (model in models[-1]) {
         group_by(epoch, freq) %>%
         summarise(density = sum(density), .groups = "drop") %>% 
         # prevent combinatorial explosion by dropping extremely low probability points
-        filter(density > 1e-20)
+        filter(density > MIN_POSTERIOR_DENSITY)
 
     # force garbage collection so we don't cause an out-of-memory crash
     gc()
@@ -92,7 +98,7 @@ plt <- df_prob %>%
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
-    scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma") +
+    scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma", na.value = "#F0F820") +
     labs(title = argv$trait, fill = "Density") +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
