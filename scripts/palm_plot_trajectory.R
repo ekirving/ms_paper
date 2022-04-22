@@ -32,12 +32,36 @@ MIN_POSTERIOR_DENSITY <- as.numeric(argv$min_density)
 # load the list of SNPs and their effect sizes
 palm <- read_tsv(argv$palm, col_types = cols())
 
+# get the maximum possible PRS
+prs_max <- sum(abs(palm$beta))
+
 palm <- palm %>%
+    # PALM assumes that betas measure the effect of the ALT allele, and CLUES models the frequency of the derived allele
+    # here we want to polarize the trajectories by the positive effect allele
+    mutate(flip = (alt == derived_allele & beta < 0) | (alt == ancestral_allele & beta > 0)) %>%
+    # normalise the beta scores by the maximum PRS
+    mutate(prs = abs(beta) / prs_max) %>%
     # compose the model prefixes from the PALM metadata
     mutate(prefix = paste0("results/clues/", rsid, "/", argv$datasource, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry))
 
-# load all the models
-models <- lapply(palm$prefix, clues_load_data)
+models <- list()
+for (i in 1:nrow(palm)) {
+    # load the CLUES model
+    model <- clues_load_data(palm[i, ]$prefix)
+
+    if (palm[i, ]$flip) {
+        # polarize the model (if necessary)
+        model <- model %>%
+            mutate(freq = 1.0 - freq) %>%
+            arrange(freq)
+    }
+
+    model <- model %>%
+        # apply the scaled PRS
+        mutate(prs_freq = palm[i, ]$prs * freq)
+
+    models <- append(models, list(model))
+}
 
 df_prob <- models[[1]] %>%
     filter(density > 0)
@@ -48,11 +72,11 @@ for (model in models[-1]) {
         filter(density > 0) %>%
         inner_join(df_prob, by = "epoch") %>%
         mutate(
-            freq = freq.x + freq.y,
+            prs_freq = round(prs_freq.x + prs_freq.y, 4),
             density = density.x * density.y
         ) %>%
-        group_by(epoch, freq) %>%
-        summarise(density = sum(density), .groups = "drop") %>% 
+        group_by(epoch, prs_freq) %>%
+        summarise(density = sum(density), .groups = "drop") %>%
         # prevent combinatorial explosion by dropping extremely low probability points
         filter(density > MIN_POSTERIOR_DENSITY)
 
@@ -63,13 +87,13 @@ for (model in models[-1]) {
 # get the original frequency bins
 bins <- models[[1]] %>%
     filter(epoch == 0) %>%
+    arrange(freq) %>%
     mutate(bin = row_number()) %>%
     select(bin, freq, height)
 
 # group the summed marginal frequencies into the original frequency bins
 df_prob <- df_prob %>%
-    mutate(freq = freq / length(models)) %>%
-    mutate(bin = cut(freq, breaks = c(-1, bins$freq), labels = FALSE)) %>%
+    mutate(bin = cut(prs_freq, breaks = c(-1, bins$freq), labels = FALSE)) %>%
     group_by(epoch, bin) %>%
     summarise(density = sum(density), .groups = "drop") %>%
     left_join(bins, by = "bin")
@@ -118,4 +142,3 @@ png(file = argv$output, width = 16, height = 9, units = "in", res = 300)
 plt
 dev <- dev.off()
 
-plt

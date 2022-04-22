@@ -42,6 +42,6 @@ data <- gwas %>%
     # remove any SNPs without a valid p-value or standard error for the association
     filter(P != 0 & se != 0) %>%
     rename(pval = P, rsid = SNP, chrom = CHR, pos = BP, ref = REF, alt = ALT) %>%
-    select(ld_block, variant, chrom, pos, rsid, ref, alt, derived_allele, ancestral_allele, beta, se, pval)
+    select(ld_block, variant, chrom, pos, rsid, ref, alt, ancestral_allele, derived_allele, beta, se, pval)
 
 write_tsv(data, argv$output)
