@@ -122,8 +122,7 @@ plt <- df_prob %>%
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
-    # scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma", na.value = "#F0F820") +
-    scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma", na.value = "green") +
+    scale_fill_viridis_c(option = "plasma") +
     labs(title = argv$trait, fill = "Density") +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
@@ -136,7 +135,7 @@ plt <- df_prob %>%
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         # fill in all the blanks with the zero density colour
-        # panel.background = element_rect(fill="#0D1687", color=NA)
+        panel.background = element_rect(fill="#0D1687", color=NA)
     )
 
 png(file = argv$output, width = 16, height = 9, units = "in", res = 300)
