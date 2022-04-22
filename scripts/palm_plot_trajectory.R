@@ -21,7 +21,7 @@ p <- add_argument(p, "--trait", help = "The complex trait name", default = "Mult
 p <- add_argument(p, "--datasource", help = "The datasource", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = 1e-20)
+p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = 1e-10)
 p <- add_argument(p, "--output", help = "PALM trajectory", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.png")
 
 argv <- parse_args(p)
@@ -122,7 +122,8 @@ plt <- df_prob %>%
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
-    scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma", na.value = "#F0F820") +
+    # scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma", na.value = "#F0F820") +
+    scale_fill_viridis_c(limits = c(0, 0.5), option = "plasma", na.value = "green") +
     labs(title = argv$trait, fill = "Density") +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
@@ -135,10 +136,9 @@ plt <- df_prob %>%
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         # fill in all the blanks with the zero density colour
-        panel.background = element_rect(fill="#0D1687", color=NA)
+        # panel.background = element_rect(fill="#0D1687", color=NA)
     )
 
 png(file = argv$output, width = 16, height = 9, units = "in", res = 300)
 plt
 dev <- dev.off()
-
