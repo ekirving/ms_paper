@@ -21,7 +21,7 @@ p <- add_argument(p, "--trait", help = "The complex trait name", default = "Mult
 p <- add_argument(p, "--datasource", help = "The datasource", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = 1e-10)
+p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = "1e-10")
 p <- add_argument(p, "--output", help = "PALM trajectory", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.png")
 
 argv <- parse_args(p)
