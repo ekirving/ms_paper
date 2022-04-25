@@ -10,6 +10,7 @@ quiet <- function(x) {
 }
 quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
+quiet(library(jsonlite)) # v1.8.0
 
 # load the helper functions
 source("scripts/clues_utils.R")
@@ -17,17 +18,21 @@ source("scripts/clues_utils.R")
 # get the command line arguments
 p <- arg_parser("Convert the GWAS metadata into PALM input format")
 p <- add_argument(p, "--palm", help = "PALM metadata", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.json")
 p <- add_argument(p, "--trait", help = "The complex trait name", default = "Multiple sclerosis")
-p <- add_argument(p, "--datasource", help = "The datasource", default = "ancestral_paths_new")
+p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
 p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = "1e-10")
-p <- add_argument(p, "--output", help = "PALM trajectory", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.png")
+p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.png")
 
 argv <- parse_args(p)
 
 # reduce the memory overhead by filtering out frequency bins below this probability threshold
 MIN_POSTERIOR_DENSITY <- as.numeric(argv$min_density)
+
+# load the PALM results
+results <- fromJSON(argv$json)
 
 # load the list of SNPs and their effect sizes
 palm <- read_tsv(argv$palm, col_types = cols())
@@ -42,7 +47,7 @@ palm <- palm %>%
     # normalise the beta scores by the maximum PRS
     mutate(prs = abs(beta) / prs_max) %>%
     # compose the model prefixes from the PALM metadata
-    mutate(prefix = paste0("results/clues/", rsid, "/", argv$datasource, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry))
+    mutate(prefix = paste0("results/clues/", rsid, "/", argv$dataset, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry))
 
 models <- list()
 for (i in 1:nrow(palm)) {
@@ -111,6 +116,32 @@ max_traj <- df_prob %>%
     ungroup() %>%
     arrange(epoch)
 
+ancestries <- list(
+    "ALL" = "All ancestries",
+    "ANA" = "Anatolian Farmers",
+    "CHG" = "Caucasus Hunter-gatherers",
+    "WHG" = "Western Hunter-gatherers",
+    "EHG" = "Eastern Hunter-gatherers"
+)
+
+traits <- list(
+    "ms" = "Multiple sclerosis",
+    "ra" = "Rheumatoid arthritis",
+    "ibd" = "Inflammatory bowel disease",
+    "celiac" = "Celiac disease"
+)
+
+# add the model results to the plot title
+plot_title <- paste0(
+    traits[[argv$trait]],
+    " (n = ", results$num_loci, ")",
+    " | ", ancestries[[results$ancestry]],
+    " | ω = ", results$sel,
+    " | se = ", results$se,
+    " | z = ", results$z,
+    " | p = ", signif(pnorm(q = as.numeric(results$z), lower.tail = FALSE) * 2, 3)
+)
+
 plt <- df_prob %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = freq, height = height, fill = density)) +
@@ -123,7 +154,7 @@ plt <- df_prob %>%
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
     scale_fill_viridis_c(option = "plasma") +
-    labs(title = argv$trait, fill = "Density") +
+    labs(title = plot_title, fill = "Density") +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
 
@@ -135,9 +166,8 @@ plt <- df_prob %>%
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         # fill in all the blanks with the zero density colour
-        panel.background = element_rect(fill="#0D1687", color=NA)
+        panel.background = element_rect(fill = "#0D1687", color = NA)
     )
 
-png(file = argv$output, width = 16, height = 9, units = "in", res = 300)
-plt
-dev <- dev.off()
+# save the plot
+ggsave(filename = argv$output, plt, width=12, heigh=8)

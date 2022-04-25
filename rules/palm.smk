@@ -144,3 +144,22 @@ rule palm_parse_txt:
         " --trait {wildcards.trait}"
         " --palm {input.palm}"
         " --out {output.json}"
+
+
+rule palm_plot_trajectory:
+    """
+    Plot the PALM trajectory
+    """
+    input:
+        tsv="data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv",
+        json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
+    output:
+        png="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.png",
+    shell:
+        "Rscript scripts/palm_plot_trajectory.R"
+        " --palm {input.tsv}"
+        " --json {input.json}"
+        " --trait {wildcards.trait}"
+        " --dataset {wildcards.dataset}"
+        " --ancestry {wildcards.ancestry}"
+        " --output {output.png}"
