@@ -139,7 +139,7 @@ plot_title <- paste0(
     " | ω = ", results$sel,
     " | se = ", results$se,
     " | z = ", results$z,
-    " | p = ", signif(pnorm(q = as.numeric(results$z), lower.tail = FALSE) * 2, 3)
+    " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
 plt <- df_prob %>%
