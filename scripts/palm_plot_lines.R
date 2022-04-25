@@ -16,26 +16,25 @@ quiet(library(jsonlite)) # v1.8.0
 source("scripts/clues_utils.R")
 
 # get the command line arguments
-p <- arg_parser("Plot the trajectory of the polygenic risk score")
+p <- arg_parser("Plot the trajectory of the polygenic risk score as a stacked line")
 p <- add_argument(p, "--palm", help = "PALM metadata", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.tsv")
 p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.json")
 p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = "1e-10")
 p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.png")
 
 argv <- parse_args(p)
-
-# reduce the memory overhead by filtering out frequency bins below this probability threshold
-MIN_POSTERIOR_DENSITY <- as.numeric(argv$min_density)
 
 # load the PALM results
 results <- fromJSON(argv$json)
 
 # load the list of SNPs and their effect sizes
 palm <- read_tsv(argv$palm, col_types = cols())
+
+# TODO remove when done testing
+palm <- head(palm, n = 10)
 
 # get the maximum possible PRS
 prs_max <- sum(abs(palm$beta))
@@ -51,14 +50,18 @@ palm <- palm %>%
 
 models <- list()
 for (i in 1:nrow(palm)) {
-    # load the CLUES model
-    model <- clues_load_data(palm[i, ]$prefix)
+    # load the CLUES model, and extract the maximum likelihood path
+    model <- clues_load_data(palm[i, ]$prefix) %>%
+        group_by(epoch) %>%
+        top_n(1, density) %>%
+        ungroup() %>%
+        arrange(epoch) %>%
+        mutate(prefix=palm[i, ]$prefix)
 
     if (palm[i, ]$flip) {
         # polarize the model (if necessary)
         model <- model %>%
-            mutate(freq = 1.0 - freq) %>%
-            arrange(freq)
+            mutate(freq = 1.0 - freq)
     }
 
     model <- model %>%
@@ -68,53 +71,13 @@ for (i in 1:nrow(palm)) {
     models <- append(models, list(model))
 }
 
-df_prob <- models[[1]] %>%
-    filter(density > 0)
-
-for (model in models[-1]) {
-    # get the joint probability of this model and all the previous models
-    df_prob <- model %>%
-        filter(density > 0) %>%
-        inner_join(df_prob, by = "epoch") %>%
-        mutate(
-            prs_freq = round(prs_freq.x + prs_freq.y, 4),
-            density = density.x * density.y
-        ) %>%
-        group_by(epoch, prs_freq) %>%
-        summarise(density = sum(density), .groups = "drop") %>%
-        # prevent combinatorial explosion by dropping extremely low probability points
-        filter(density > MIN_POSTERIOR_DENSITY)
-
-    # force garbage collection so we don't cause an out-of-memory crash
-    gc()
-}
-
-# get the original frequency bins
-bins <- models[[1]] %>%
-    filter(epoch == 0) %>%
-    arrange(freq) %>%
-    mutate(bin = row_number()) %>%
-    select(bin, freq, height)
-
-# group the summed marginal frequencies into the original frequency bins
-df_prob <- df_prob %>%
-    mutate(bin = cut(prs_freq, breaks = c(-1, bins$freq), labels = FALSE)) %>%
-    group_by(epoch, bin) %>%
-    summarise(density = sum(density), .groups = "drop") %>%
-    left_join(bins, by = "bin")
+df_ml <- bind_rows(models)
 
 # constrain the extent of the plotting
-xmin <- min(-df_prob$epoch)
-xmax <- max(-df_prob$epoch)
+xmin <- min(-df_ml$epoch)
+xmax <- max(-df_ml$epoch)
 xbreaks <- seq(xmin, xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
-
-# get the maximum likelihood trajectory
-max_traj <- df_prob %>%
-    group_by(epoch) %>%
-    top_n(1, density) %>%
-    ungroup() %>%
-    arrange(epoch)
 
 ancestries <- list(
     "ALL" = "All ancestries",
@@ -142,31 +105,29 @@ plot_title <- paste0(
     " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
-plt <- df_prob %>%
+df_ml %>%
     # plot the heatmap
-    ggplot(aes(x = epoch, y = freq, height = height, fill = density)) +
-    geom_tile() +
+    ggplot(aes(x = epoch, y = prs_freq, color = prefix, fill = prefix)) +
 
-    # plot the maximum likelihood trajectory
-    # geom_line(mapping = aes(x = epoch, y = freq), data = max_traj, color = "red") +
+    # plot the maximum likelihood trajectories as stacked lines
+    geom_line(position = "stack", size = 2) +
+    geom_area(position="stack", stat="identity",alpha = 0.5) +
 
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
-    scale_fill_viridis_c(option = "plasma") +
-    labs(title = plot_title, fill = "Density") +
+    labs(title = plot_title) +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
 
     # basic styling
     theme_minimal() +
     theme(
-        # legend.position = "none",
+        legend.position = "none",
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        # fill in all the blanks with the zero density colour
-        panel.background = element_rect(fill = "#0D1687", color = NA)
+        panel.background = element_blank()
     )
 
 # save the plot
