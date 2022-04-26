@@ -146,20 +146,36 @@ rule palm_parse_txt:
         " --out {output.json}"
 
 
+rule palm_report:
+    input:
+        tsv="data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv",
+    output:
+        tsv="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv",
+    log:
+        log="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv.log",
+    shell:
+        "python scripts/palm_report.py"
+        " --data {input.tsv}"
+        " --dataset {wildcards.dataset}"
+        " --ancestry {wildcards.ancestry}"
+        " --output {output.tsv} &> {log}"
+
+
 rule palm_plot_trajectory:
     """
     Plot the PALM trajectory
     """
     input:
-        tsv="data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv",
+        tsv="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv",
         json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
     output:
         png="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.png",
     shell:
         "Rscript scripts/palm_plot_trajectory.R"
-        " --palm {input.tsv}"
+        " --tsv {input.tsv}"
         " --json {input.json}"
         " --trait {wildcards.trait}"
         " --dataset {wildcards.dataset}"
         " --ancestry {wildcards.ancestry}"
         " --output {output.png}"
+

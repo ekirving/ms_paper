@@ -17,7 +17,7 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Plot the trajectory of the polygenic risk score")
-p <- add_argument(p, "--palm", help = "PALM metadata", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm_report.tsv")
 p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.json")
 p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
@@ -35,7 +35,7 @@ MIN_POSTERIOR_DENSITY <- as.numeric(argv$min_density)
 results <- fromJSON(argv$json)
 
 # load the list of SNPs and their effect sizes
-palm <- read_tsv(argv$palm, col_types = cols())
+palm <- read_tsv(argv$tsv, col_types = cols())
 
 # get the maximum possible PRS
 prs_max <- sum(abs(palm$beta))
@@ -170,4 +170,4 @@ plt <- df_prob %>%
     )
 
 # save the plot
-ggsave(filename = argv$output, plt, width=12, heigh=8)
+ggsave(filename = argv$output, plt, width = 12, heigh = 8)
