@@ -11,12 +11,13 @@ quiet <- function(x) {
 quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
 quiet(library(jsonlite)) # v1.8.0
+quiet(library(directlabels)) #v2021.1.13
 
 # load the helper functions
 source("scripts/clues_utils.R")
 
 # get the command line arguments
-p <- arg_parser("Plot the trajectory of the polygenic risk score as a stacked line")
+p <- arg_parser("Plot the trajectory of the polygenic risk score as stacked lines")
 p <- add_argument(p, "--palm", help = "PALM metadata", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.tsv")
 p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.json")
 p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
@@ -32,9 +33,6 @@ results <- fromJSON(argv$json)
 
 # load the list of SNPs and their effect sizes
 palm <- read_tsv(argv$palm, col_types = cols())
-
-# TODO remove when done testing
-palm <- head(palm, n = 10)
 
 # get the maximum possible PRS
 prs_max <- sum(abs(palm$beta))
@@ -56,7 +54,7 @@ for (i in 1:nrow(palm)) {
         top_n(1, density) %>%
         ungroup() %>%
         arrange(epoch) %>%
-        mutate(prefix=palm[i, ]$prefix)
+        mutate(rsid=palm[i, ]$rsid)
 
     if (palm[i, ]$flip) {
         # polarize the model (if necessary)
@@ -72,6 +70,18 @@ for (i in 1:nrow(palm)) {
 }
 
 df_ml <- bind_rows(models)
+
+# sort the SNPs by the increase in their scaled PRS
+snp_order <- df_ml %>%
+    filter(epoch %in% c(0, -528)) %>%
+    select(rsid, epoch, prs_freq) %>%
+    pivot_wider(rsid, names_from="epoch", values_from="prs_freq") %>%
+    mutate(effect=`0` - `-528`) %>%
+    arrange(desc(effect)) %>%
+    pull(rsid)
+
+# apply the sort ordering
+df_ml$rsid <- factor(df_ml$rsid, levels = snp_order)
 
 # constrain the extent of the plotting
 xmin <- min(-df_ml$epoch)
@@ -105,17 +115,21 @@ plot_title <- paste0(
     " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
-df_ml %>%
+plt <- df_ml %>%
     # plot the heatmap
-    ggplot(aes(x = epoch, y = prs_freq, color = prefix, fill = prefix)) +
+    ggplot(aes(x = epoch, y = prs_freq, color = rsid)) +
 
     # plot the maximum likelihood trajectories as stacked lines
-    geom_line(position = "stack", size = 2) +
-    geom_area(position="stack", stat="identity",alpha = 0.5) +
+    geom_line(position = "stack") +
+    geom_area(aes(fill = rsid), position="stack", stat="identity", alpha = 0.5) +
 
+    # label the ends of each line
+    geom_dl(aes(label = rsid), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
+    geom_dl(aes(label = rsid), method = list(dl.trans(x = x - 0.1), "first.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
+    
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
-    scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
+    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1), expand = c(0, 0), position = "right") +
+    scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(55, 55))) +
     labs(title = plot_title) +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
