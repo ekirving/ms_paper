@@ -71,7 +71,10 @@ def clues_quad_fit(wildcards):
     # CLUES expects the variant name to be polarized by the ancestral allele
     variant = f"{chr}:{pos}:{anc}:{der}"
 
-    return f"results/clues/{rsid}/{dataset}-{variant}-{ancestry}.quad_fit.npy"
+    return [
+        f"results/clues/{rsid}/{dataset}-{variant}-{ancestry}.quad_fit.npy",
+        f"results/clues/{rsid}/{dataset}-{variant}-{ancestry}.json",
+    ]
 
 
 rule palm_organise_clues:
@@ -83,7 +86,7 @@ rule palm_organise_clues:
     output:
         quad="results/palm/{dataset}/{ancestry}/{trait}/ld_{block}/bp{pos}.quad_fit.npy",
     shell:
-        "cp {input} {output}"
+        "cp {input[0]} {output}"
 
 
 def palm_quad_fit(wildcards):
@@ -149,16 +152,15 @@ rule palm_parse_txt:
 rule palm_report:
     input:
         tsv="data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv",
+        json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
     output:
         tsv="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv",
-    log:
-        log="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv.log",
     shell:
         "python scripts/palm_report.py"
         " --data {input.tsv}"
         " --dataset {wildcards.dataset}"
         " --ancestry {wildcards.ancestry}"
-        " --output {output.tsv} &> {log}"
+        " --output {output.tsv}"
 
 
 rule palm_plot_trajectory:

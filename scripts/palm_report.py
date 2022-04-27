@@ -28,8 +28,6 @@ def palm_report(data_tsv, dataset, ancestry, output):
     # get the list of SNPs to load
     data = pd.read_table(data_tsv)
 
-    print(f"INFO: Loading {len(data['rsid']):,} SNPs", file=sys.stderr)
-
     rows = []
 
     for _, snp in data.iterrows():
@@ -40,13 +38,9 @@ def palm_report(data_tsv, dataset, ancestry, output):
 
         # load the model parameters
         mod_file = f"results/clues/{rsid}/{dataset}-{variant}-{ancestry}.json"
-        try:
-            with open(mod_file) as fin:
-                model = json.load(fin)
 
-        except FileNotFoundError:
-            print(f"WARNING: Missing model {mod_file}", file=sys.stderr)
-            continue
+        with open(mod_file) as fin:
+            model = json.load(fin)
 
         # extract the first (and only) epoch
         epoch, s = list(model.pop("epochs").items())[0]
@@ -55,8 +49,6 @@ def palm_report(data_tsv, dataset, ancestry, output):
         model["s"] = s
 
         rows.append({**snp, **model})
-
-    print(f"INFO: Loaded {len(rows):,} models for the report", file=sys.stderr)
 
     # get the Bonferroni corrected significance threshold
     num_snps = data.shape[0]
@@ -68,9 +60,6 @@ def palm_report(data_tsv, dataset, ancestry, output):
     df["p.value"] = df["logLR"].apply(lambda logLR: chi2.sf(logLR, 1))
     df["significant"] = df["p.value"].apply(lambda p: p <= bonferroni)
     df.to_csv(output, sep="\t", index=False)
-
-    print("INFO: Finished!", file=sys.stderr)
-
 
 if __name__ == "__main__":
     palm_report()
