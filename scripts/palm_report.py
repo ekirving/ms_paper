@@ -61,5 +61,6 @@ def palm_report(data_tsv, dataset, ancestry, output):
     df["significant"] = df["p.value"].apply(lambda p: p <= bonferroni)
     df.to_csv(output, sep="\t", index=False)
 
+
 if __name__ == "__main__":
     palm_report()

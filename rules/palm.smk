@@ -165,19 +165,20 @@ rule palm_report:
 
 rule palm_plot_trajectory:
     """
-    Plot the PALM trajectory
+    Plot the PALM trajectory as a rater or as stacked lines
     """
     input:
         tsv="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv",
         json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
     output:
-        png="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.png",
+        png="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_{type}.png",
+    wildcard_constraints:
+        type="trajectory|lines",
     shell:
-        "Rscript scripts/palm_plot_trajectory.R"
+        "Rscript scripts/palm_plot_{wildcards.type}.R"
         " --tsv {input.tsv}"
         " --json {input.json}"
         " --trait {wildcards.trait}"
         " --dataset {wildcards.dataset}"
         " --ancestry {wildcards.ancestry}"
         " --output {output.png}"
-
