@@ -35,12 +35,12 @@ MIN_POSTERIOR_DENSITY <- as.numeric(argv$min_density)
 results <- fromJSON(argv$json)
 
 # load the list of SNPs and their effect sizes
-palm <- read_tsv(argv$tsv, col_types = cols())
+snps <- read_tsv(argv$tsv, col_types = cols())
 
 # get the maximum possible PRS
-prs_max <- sum(abs(palm$beta))
+prs_max <- sum(abs(snps$beta))
 
-palm <- palm %>%
+snps <- snps %>%
     # PALM assumes that betas measure the effect of the ALT allele, and CLUES models the frequency of the derived allele
     # here we want to polarize the trajectories by the positive effect allele
     mutate(flip = (alt == derived_allele & beta < 0) | (alt == ancestral_allele & beta > 0)) %>%
@@ -50,11 +50,11 @@ palm <- palm %>%
     mutate(prefix = paste0("results/clues/", rsid, "/", argv$dataset, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry))
 
 models <- list()
-for (i in 1:nrow(palm)) {
+for (i in 1:nrow(snps)) {
     # load the CLUES model
-    model <- clues_load_data(palm[i, ]$prefix)
+    model <- clues_load_data(snps[i, ]$prefix)
 
-    if (palm[i, ]$flip) {
+    if (snps[i, ]$flip) {
         # polarize the model (if necessary)
         model <- model %>%
             mutate(freq = 1.0 - freq) %>%
@@ -63,7 +63,7 @@ for (i in 1:nrow(palm)) {
 
     model <- model %>%
         # apply the scaled PRS
-        mutate(prs_freq = palm[i, ]$prs * freq)
+        mutate(prs_freq = snps[i, ]$prs * freq)
 
     models <- append(models, list(model))
 }
@@ -159,7 +159,7 @@ plt <- df_prob %>%
     xlab("kyr BP") +
 
     # basic styling
-    theme_minimal() +
+    theme_bw() +
     theme(
         # legend.position = "none",
         panel.grid.major = element_blank(),
