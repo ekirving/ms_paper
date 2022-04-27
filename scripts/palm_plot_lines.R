@@ -55,7 +55,8 @@ for (i in 1:nrow(snps)) {
         ungroup() %>%
         arrange(epoch) %>%
         mutate(
-            rsid = snps[i, ]$rsid, 
+            rsid = snps[i, ]$rsid,
+            logp = -log10(snps[i, ]$p.value),
             significant = snps[i, ]$significant
         )
 
@@ -76,13 +77,10 @@ df_ml <- bind_rows(models) %>%
     # only label the significant SNPs
     mutate(label = ifelse(significant, rsid, NA))
 
-# sort the SNPs by the increase in their scaled PRS
-snp_order <- df_ml %>%
-    filter(epoch %in% c(0, -528)) %>%
-    select(rsid, epoch, prs_freq) %>%
-    pivot_wider(rsid, names_from="epoch", values_from="prs_freq") %>%
-    mutate(effect=`0` - `-528`) %>%
-    arrange(desc(effect)) %>%
+# sort the SNPs by their -log10(p)
+snp_order <- snps %>%
+    mutate(logp = -log10(p.value)) %>%
+    arrange(desc(logp)) %>%
     pull(rsid)
 
 # apply the sort ordering
@@ -120,28 +118,50 @@ plot_title <- paste0(
     " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
+# get the Bonferroni corrected significance threshold
+bonferroni <- round(-log10(0.05 / nrow(snps)), 1)
+
+# get the maximum -log10(p.value)
+max_logp <- max(df_ml$logp)
+
+# use these to set the colour bar breaks
+bar_breaks <- seq(0, max_logp, bonferroni)
+bar_labels <- sprintf("%.1f", bar_breaks)
+bar_labels[2] <- paste0(bar_labels[2], "*")
+
+
 plt <- df_ml %>%
     # plot the heatmap
-    ggplot(aes(x = epoch, y = prs_freq, color = rsid)) +
+    ggplot(aes(x = epoch, y = prs_freq, group = rsid)) +
 
     # plot the maximum likelihood trajectories as stacked lines
-    geom_line(position = "stack") +
-    geom_area(aes(fill = rsid), position = "stack", stat = "identity", alpha = 0.5) +
+    geom_area(aes(fill = logp, color = logp), position = "stack", stat = "identity", outline.type = "full") +
+    # geom_line(aes(color = logp), position = "stack") +
 
     # label the ends of each line
-    geom_dl(aes(label = label), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
+    geom_dl(aes(label = label, color = logp), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .1), expand = c(0, 0), position = "right") +
-    scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(0, 55))) +
-    labs(title = plot_title) +
+    scale_y_continuous(limits = c(0, 0.55), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
+    scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 55))) +
+    labs(
+        title = plot_title,
+        fill = "-log10(p.value)"
+    ) +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
 
+    # set the colour scales
+    scale_fill_viridis_c(option = "plasma", breaks=bar_breaks, labels=bar_labels, end=.85, alpha = 0.9) +
+    scale_color_viridis_c(option = "plasma", end=.85) +
+
+    # hide these legends
+    guides(color = "none") +
+
     # basic styling
-    theme_minimal() +
+    theme_bw() +
     theme(
-        legend.position = "none",
+        # legend.position = "none",
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
@@ -149,4 +169,4 @@ plt <- df_ml %>%
     )
 
 # save the plot
-ggsave(filename = argv$output, plt, width=12, heigh=8)
+ggsave(filename = argv$output, plt, width = 12, heigh = 8)
