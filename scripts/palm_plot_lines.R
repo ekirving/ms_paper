@@ -136,6 +136,16 @@ bar_breaks <- seq(0, max_logp, bonferroni)
 bar_labels <- sprintf("%.1f", bar_breaks)
 bar_labels[2] <- paste0(bar_labels[2], "*")
 
+# define a rescaling function which caps the upper range of colorbar at the Bonferroni threshold
+show_significant <- function(x, to = c(0, 1), from = NULL) {
+    ifelse(x < bonferroni, scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), bonferroni)), 1)
+}
+
+# define a rescaling function which caps the lower range of colorbar at the Bonferroni threshold
+# show_significant <- function(x, to = c(0, 1), from = NULL) {
+#     ifelse(x < bonferroni, 0, scales::rescale(x, to = to, from = c(bonferroni, max(x, na.rm = TRUE))))
+# }
+
 plt <- df_ml %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = prs_freq, group = rsid)) +
@@ -158,8 +168,8 @@ plt <- df_ml %>%
     xlab("kyr BP") +
 
     # set the colour scales
-    scale_fill_viridis_c(option = "plasma", breaks = bar_breaks, labels = bar_labels, end = 0.85, alpha = 0.9) +
-    scale_color_viridis_c(option = "plasma", end = 0.85) +
+    scale_fill_viridis_c(option = "plasma", rescaler = show_significant, breaks = bar_breaks, labels = bar_labels, end = 0.85, alpha = 0.9) +
+    scale_color_viridis_c(option = "plasma", rescaler = show_significant, end = 0.85) +
 
     # hide these legends
     guides(color = "none") +
