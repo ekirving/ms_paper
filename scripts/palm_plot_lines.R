@@ -85,19 +85,20 @@ snp_order <- bind_rows(
     select(rsid, logp, type, prs_freq) %>%
     pivot_wider(id_cols = c(rsid, logp), names_from = "type", values_from = "prs_freq") %>%
     mutate(direction = ifelse(max_epoch > min_epoch, 1, -1)) %>%
-    mutate(order = direction * logp) %>%
-    arrange(desc(order)) %>%
-    pull(rsid)
+    mutate(signed_logp = direction * logp) %>%
+    arrange(desc(signed_logp)) %>%
+    select(rsid, signed_logp)
 
-# apply the sort ordering
-df_ml$rsid <- factor(df_ml$rsid, levels = snp_order)
+# apply the sort ordering, by setting the factor levels
+df_ml$rsid <- factor(df_ml$rsid, levels = snp_order$rsid)
 
-# constrain the extent of the plotting
-xmin <- min(-df_ml$epoch)
-xmax <- max(-df_ml$epoch)
-xbreaks <- seq(xmin, xmax + 1, round(1000 / argv$gen_time))
-xlabels <- round(xbreaks * argv$gen_time / 1000)
+# get the Bonferroni corrected significance threshold
+bonferroni <- round(-log10(0.05 / nrow(snps)), 1)
 
+# get the maximum -log10(p.value)
+max_logp <- max(df_ml$logp)
+
+# decode the ancestry and trait names
 ancestries <- list(
     "ALL" = "All ancestries",
     "ANA" = "Anatolian Farmers",
@@ -124,13 +125,13 @@ plot_title <- paste0(
     " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
-# get the Bonferroni corrected significance threshold
-bonferroni <- round(-log10(0.05 / nrow(snps)), 1)
+# constrain the extent of the plotting
+xmin <- min(-df_ml$epoch)
+xmax <- max(-df_ml$epoch)
+xbreaks <- seq(xmin, xmax + 1, round(1000 / argv$gen_time))
+xlabels <- round(xbreaks * argv$gen_time / 1000)
 
-# get the maximum -log10(p.value)
-max_logp <- max(df_ml$logp)
-
-# use these to set the colour bar breaks
+# set the colour bar breaks, ensuring that the first break is the Bonferroni threshold
 bar_breaks <- seq(0, max_logp, bonferroni)
 bar_labels <- sprintf("%.1f", bar_breaks)
 bar_labels[2] <- paste0(bar_labels[2], "*")
