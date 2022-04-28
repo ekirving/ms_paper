@@ -2,6 +2,7 @@
 *.list
 *.xlsx
 *_mismatchs.tsv
+*.zip
 .Rproj.user
 .snakemake
 __pycache__
