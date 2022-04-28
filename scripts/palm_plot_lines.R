@@ -163,7 +163,7 @@ plt <- df_ml %>%
     geom_dl(aes(label = label, color = logp), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 0.55), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
+    scale_y_continuous(limits = c(0, 0.60), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-limits$xmax, limits$xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 55))) +
     labs(
         title = plot_title,
