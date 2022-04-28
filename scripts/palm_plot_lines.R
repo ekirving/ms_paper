@@ -77,10 +77,16 @@ df_ml <- bind_rows(models) %>%
     # only label the significant SNPs
     mutate(label = ifelse(significant, rsid, NA))
 
-# sort the SNPs by their -log10(p)
-snp_order <- snps %>%
-    mutate(logp = -log10(p.value)) %>%
-    arrange(desc(logp)) %>%
+# sort the SNPs by their -log10(p) and the direction of the effect (positive on top)
+snp_order <- bind_rows(
+    df_ml %>% group_by(rsid) %>% slice_min(epoch) %>% mutate(type = "min_epoch"),
+    df_ml %>% group_by(rsid) %>% slice_max(epoch) %>% mutate(type = "max_epoch"),
+) %>%
+    select(rsid, logp, type, prs_freq) %>%
+    pivot_wider(id_cols = c(rsid, logp), names_from = "type", values_from = "prs_freq") %>%
+    mutate(direction = ifelse(max_epoch > min_epoch, 1, -1)) %>%
+    mutate(order = direction * logp) %>%
+    arrange(desc(order)) %>%
     pull(rsid)
 
 # apply the sort ordering
@@ -129,7 +135,6 @@ bar_breaks <- seq(0, max_logp, bonferroni)
 bar_labels <- sprintf("%.1f", bar_breaks)
 bar_labels[2] <- paste0(bar_labels[2], "*")
 
-
 plt <- df_ml %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = prs_freq, group = rsid)) +
@@ -152,8 +157,8 @@ plt <- df_ml %>%
     xlab("kyr BP") +
 
     # set the colour scales
-    scale_fill_viridis_c(option = "plasma", breaks=bar_breaks, labels=bar_labels, end=.85, alpha = 0.9) +
-    scale_color_viridis_c(option = "plasma", end=.85) +
+    scale_fill_viridis_c(option = "plasma", breaks = bar_breaks, labels = bar_labels, end = 0.85, alpha = 0.9) +
+    scale_color_viridis_c(option = "plasma", end = 0.85) +
 
     # hide these legends
     guides(color = "none") +
