@@ -125,10 +125,15 @@ plot_title <- paste0(
     " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
-# constrain the extent of the plotting
-xmin <- min(-df_ml$epoch)
-xmax <- max(-df_ml$epoch)
-xbreaks <- seq(xmin, xmax + 1, round(1000 / argv$gen_time))
+# constrain the extent of the plotting 
+# some SNPs have trajectories that don't go back the as far as others
+limits <- df_ml %>%
+    group_by(rsid) %>%
+    summarise(xmin=min(-epoch), xmax=max(-epoch)) %>%
+    group_by() %>%
+    summarise(xmin=min(xmin), xmax=min(xmax))
+
+xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
 
 # set the colour bar breaks, ensuring that the first break is the Bonferroni threshold
@@ -159,7 +164,7 @@ plt <- df_ml %>%
 
     # set the axis breaks
     scale_y_continuous(limits = c(0, 0.55), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
-    scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 55))) +
+    scale_x_continuous(limits = c(-limits$xmax, limits$xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 55))) +
     labs(
         title = plot_title,
         fill = "-log10(p.value)"
