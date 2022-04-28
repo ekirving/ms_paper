@@ -24,7 +24,7 @@ p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.png")
+p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_lines.png")
 
 argv <- parse_args(p)
 
@@ -125,13 +125,13 @@ plot_title <- paste0(
     " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
-# constrain the extent of the plotting 
+# constrain the extent of the plotting
 # some SNPs have trajectories that don't go back the as far as others
 limits <- df_ml %>%
     group_by(rsid) %>%
-    summarise(xmin=min(-epoch), xmax=max(-epoch)) %>%
+    summarise(xmin = min(-epoch), xmax = max(-epoch)) %>%
     group_by() %>%
-    summarise(xmin=min(xmin), xmax=min(xmax))
+    summarise(xmin = min(xmin), xmax = min(xmax))
 
 xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
@@ -141,12 +141,12 @@ bar_breaks <- seq(0, max_logp, bonferroni)
 bar_labels <- sprintf("%.1f", bar_breaks)
 bar_labels[2] <- paste0(bar_labels[2], "*")
 
-# define a rescaling function which caps the upper range of colorbar at the Bonferroni threshold
+# define a rescaling function which caps the upper range of the colorbar at the Bonferroni threshold
 show_significant <- function(x, to = c(0, 1), from = NULL) {
     ifelse(x < bonferroni, scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), bonferroni)), 1)
 }
 
-# define a rescaling function which caps the lower range of colorbar at the Bonferroni threshold
+# define a rescaling function which caps the lower range of the colorbar at the Bonferroni threshold
 # show_significant <- function(x, to = c(0, 1), from = NULL) {
 #     ifelse(x < bonferroni, 0, scales::rescale(x, to = to, from = c(bonferroni, max(x, na.rm = TRUE))))
 # }
@@ -190,4 +190,4 @@ plt <- df_ml %>%
     )
 
 # save the plot
-ggsave(filename = argv$output, plt, width = 12, heigh = 8)
+ggsave(filename = argv$output, plt, width = 12, height = 8)

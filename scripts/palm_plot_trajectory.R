@@ -16,15 +16,15 @@ quiet(library(jsonlite)) # v1.8.0
 source("scripts/clues_utils.R")
 
 # get the command line arguments
-p <- arg_parser("Plot the trajectory of the polygenic risk score")
+p <- arg_parser("Plot the trajectory of the polygenic risk score as a posterior density raster")
 p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm_report.tsv")
 p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.json")
 p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = "1e-10")
-p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.png")
+p <- add_argument(p, "--min-density", help = "Minimum posterior density", default = "1e-20")
+p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_trajectory.png")
 
 argv <- parse_args(p)
 
@@ -103,19 +103,7 @@ df_prob <- df_prob %>%
     summarise(density = sum(density), .groups = "drop") %>%
     left_join(bins, by = "bin")
 
-# constrain the extent of the plotting
-xmin <- min(-df_prob$epoch)
-xmax <- max(-df_prob$epoch)
-xbreaks <- seq(xmin, xmax + 1, round(1000 / argv$gen_time))
-xlabels <- round(xbreaks * argv$gen_time / 1000)
-
-# get the maximum likelihood trajectory
-max_traj <- df_prob %>%
-    group_by(epoch) %>%
-    top_n(1, density) %>%
-    ungroup() %>%
-    arrange(epoch)
-
+# decode the ancestry and trait names
 ancestries <- list(
     "ALL" = "All ancestries",
     "ANA" = "Anatolian Farmers",
@@ -142,6 +130,20 @@ plot_title <- paste0(
     " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
 )
 
+# constrain the extent of the plotting
+xmin <- min(-df_prob$epoch)
+xmax <- max(-df_prob$epoch)
+xbreaks <- seq(xmin, xmax + 1, round(1000 / argv$gen_time))
+xlabels <- round(xbreaks * argv$gen_time / 1000)
+
+# get the maximum likelihood trajectory
+max_traj <- df_prob %>%
+    group_by(epoch) %>%
+    top_n(1, density) %>%
+    ungroup() %>%
+    arrange(epoch)
+
+
 plt <- df_prob %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = freq, height = height, fill = density)) +
@@ -153,10 +155,15 @@ plt <- df_prob %>%
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-xmax, xmin), breaks = -xbreaks, labels = xlabels, expand = c(0, 0)) +
-    scale_fill_viridis_c(option = "plasma") +
-    labs(title = plot_title, fill = "Density") +
+    labs(
+        title = plot_title,
+        fill = "Density"
+    ) +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
+
+    # set the colour scales
+    scale_fill_viridis_c(option = "plasma") +
 
     # basic styling
     theme_bw() +
@@ -170,4 +177,4 @@ plt <- df_prob %>%
     )
 
 # save the plot
-ggsave(filename = argv$output, plt, width = 12, heigh = 8)
+ggsave(filename = argv$output, plt, width = 12, height = 8)
