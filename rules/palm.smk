@@ -117,9 +117,9 @@ rule palm_single_trait:
     input:
         unpack(palm_quad_fit),
     output:
-        txt="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.txt",
+        txt="results/palm/{dataset}-{ancestry}-{trait}-palm.txt",
     log:
-        log="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.log",
+        log="results/palm/{dataset}-{ancestry}-{trait}-palm.log",
     params:
         dir="results/palm/{dataset}/{ancestry}/{trait}/",
     shell:
@@ -137,9 +137,9 @@ rule palm_parse_txt:
     Convert the text output from PALM into a JSON file
     """
     input:
-        palm="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.txt",
+        palm="results/palm/{dataset}-{ancestry}-{trait}-palm.txt",
     output:
-        json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
+        json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
     shell:
         "python scripts/palm_parse_txt.py"
         " --dataset {wildcards.dataset}"
@@ -152,9 +152,9 @@ rule palm_parse_txt:
 rule palm_report:
     input:
         tsv="data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv",
-        json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
+        json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
     output:
-        tsv="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv",
+        tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv",
     shell:
         "python scripts/palm_report.py"
         " --data {input.tsv}"
@@ -168,10 +168,10 @@ rule palm_plot_trajectory:
     Plot the PALM trajectory as a rater or as stacked lines
     """
     input:
-        tsv="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_report.tsv",
-        json="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm.json",
+        tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv",
+        json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
     output:
-        png="results/palm/{dataset}/{ancestry}/{trait}/{trait}_palm_{type}.png",
+        png="results/palm/{dataset}-{ancestry}-{trait}-palm_{type}.png",
     wildcard_constraints:
         type="trajectory|lines",
     shell:
