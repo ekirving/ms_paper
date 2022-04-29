@@ -26,7 +26,7 @@ def all_clumped_annotated(trait):
     """
     Run all the SNPs in the `all_clumped_annotated` ascertainments
     """
-    df = pd.read_table(f"data/targets/all_clumped_annotated_{trait}.tsv")
+    df = pd.read_table(f"data/targets/gwas_{trait}.tsv")
 
     files = []
 

@@ -13,9 +13,9 @@ quiet(library(tidyverse)) # v1.3.1
 
 # get the command line arguments
 p <- arg_parser("Convert the GWAS metadata into PALM input format")
-p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/all_clumped_annotated_ms.tsv")
-p <- add_argument(p, "--variants", help = "Variant metadata", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_variants.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "data/targets/all_clumped_annotated_ms_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/gwas_ms.tsv")
+p <- add_argument(p, "--variants", help = "Variant metadata", default = "data/targets/gwas_ms_ancestral_paths_new_variants.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_ms_ancestral_paths_new_palm.tsv")
 
 argv <- parse_args(p)
 

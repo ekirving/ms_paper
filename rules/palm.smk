@@ -24,10 +24,10 @@ rule reference_metadata:
     """
     input:
         vcf=lambda wildcards: config["samples"][wildcards.dataset]["genotypes"],
-        tsv="data/targets/all_clumped_annotated_{trait}.tsv",
+        tsv="data/targets/gwas_{trait}.tsv",
     output:
-        pos=temp("data/targets/all_clumped_annotated_{trait}_{dataset}_positions.tsv"),
-        var=temp("data/targets/all_clumped_annotated_{trait}_{dataset}_variants.tsv"),
+        pos=temp("data/targets/gwas_{trait}_{dataset}_positions.tsv"),
+        var=temp("data/targets/gwas_{trait}_{dataset}_variants.tsv"),
     shell:
         "awk 'NR>1 {{ print $1\"\\t\"$2 }}' {input.tsv} > {output.pos} && "
         "bcftools view --regions-file {output.pos} {input.vcf} | "
@@ -40,10 +40,11 @@ checkpoint palm_metadata:
     Convert the GWAS metadata into PALM input format
     """
     input:
-        tsv="data/targets/all_clumped_annotated_{trait}.tsv",
-        var="data/targets/all_clumped_annotated_{trait}_{dataset}_variants.tsv",
+        # TODO make this a config call
+        tsv="data/targets/gwas_{trait}.tsv",
+        var="data/targets/gwas_{trait}_{dataset}_variants.tsv",
     output:
-        tsv="data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv",
+        tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
     shell:
         "Rscript scripts/palm_metadata.R"
         " --gwas {input.tsv}"
@@ -106,7 +107,7 @@ def palm_quad_fit(wildcards):
         block, pos = snp["ld_block"], snp["variant"].split(":")[1]
         files.append(f"results/palm/{dataset}/{ancestry}/{trait}/ld_{block}/bp{pos}.quad_fit.npy")
 
-    return {"tsv": "data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv", "quad_fit": files}
+    return {"tsv": "data/targets/gwas_{trait}_{dataset}_palm.tsv", "quad_fit": files}
 
 
 # noinspection PyUnresolvedReferences
@@ -151,7 +152,7 @@ rule palm_parse_txt:
 
 rule palm_report:
     input:
-        tsv="data/targets/all_clumped_annotated_{trait}_{dataset}_palm.tsv",
+        tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
         json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
     output:
         tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv",
