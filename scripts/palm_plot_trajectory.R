@@ -31,6 +31,9 @@ argv <- parse_args(p)
 # reduce the memory overhead by filtering out frequency bins below this probability threshold
 MIN_POSTERIOR_DENSITY <- as.numeric(argv$min_density)
 
+# reduce the memory overhead by rounding to this maximum precision
+MAX_PRECISION <- 5
+
 # load the PALM results
 results <- fromJSON(argv$json)
 
@@ -77,7 +80,7 @@ for (model in models[-1]) {
         filter(density > 0) %>%
         inner_join(df_prob, by = "epoch") %>%
         mutate(
-            prs_freq = round(prs_freq.x + prs_freq.y, 4),
+            prs_freq = round(prs_freq.x + prs_freq.y, MAX_PRECISION),
             density = density.x * density.y
         ) %>%
         group_by(epoch, prs_freq) %>%
