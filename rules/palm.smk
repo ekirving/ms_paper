@@ -175,6 +175,8 @@ rule palm_plot_trajectory:
         png="results/palm/{dataset}-{ancestry}-{trait}-palm_{type}.png",
     wildcard_constraints:
         type="trajectory|lines",
+    resources:
+        mem_mb=40 * 1024,
     shell:
         "Rscript scripts/palm_plot_{wildcards.type}.R"
         " --tsv {input.tsv}"
