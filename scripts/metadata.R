@@ -228,7 +228,7 @@ meta_joined %>%
 
 bind_rows(
     lapply(c("celiac", "ibd", "ms", "ra", "schizophrenia"), function(trait) {
-        read_tsv(paste0("data/targets/gwas_", trait, ".tsv"), col_types = cols(.default = "c")) %>% mutate(trait=trait)
+        read_tsv(paste0("data/targets/gwas_", trait, ".tsv"), col_types = cols(.default = "c")) %>% mutate(trait = trait)
     })
 ) %>%
     group_by(SNP) %>%
