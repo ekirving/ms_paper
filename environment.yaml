@@ -20,6 +20,7 @@ dependencies:
   - conda-forge::r-argparser=0.6
   - conda-forge::r-base=4.0.5
   - conda-forge::r-directlabels=2021.1.13
+  - conda-forge::r-ggdist=3.1.1
   - conda-forge::r-jsonlite=1.8.0
   - conda-forge::r-rcppcnpy=0.2.11
   - conda-forge::r-rcpproll=0.3.0
