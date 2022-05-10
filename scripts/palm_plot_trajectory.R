@@ -17,8 +17,8 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Plot the trajectory of the polygenic risk score as a posterior density raster")
-p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm_report.tsv")
-p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new/ALL/ms/ms_palm.json")
+p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
+p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new-ALL-ms-palm.json")
 p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
