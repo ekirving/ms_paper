@@ -49,6 +49,7 @@ def variant_label(vcf_file, meta_file, output_file):
     if metadata["ancestral"] is None:
         # default to the REF allele as the ancestral
         metadata["ancestral"] = rec.ref
+        metadata["derived"] = rec.alts[0]
 
     # compose the title for the rsID
     title = "{rsid} | chr{chrom}:{start} | Gene(s): {genes} | {ancestral}/{derived}".format(**metadata)

@@ -31,9 +31,6 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
     """
     Parse the Ensembl record to retrieve the rsID metadata
     """
-    with open("config.yaml") as fin:
-        config = yaml.safe_load(fin)
-
     try:
         var = json.load(var_file)
         vep = json.load(vep_file)
@@ -105,8 +102,11 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
     # use the Ensembl annotation
     alleles = mapping.get("allele_string").split("/")
 
-    # the derived is whichever allele is left
-    derived = (set(alleles) - {ancestral}).pop()
+    if ancestral is None or len(alleles) > 2:
+        derived = None
+    else:
+        # the derived is whichever allele is left
+        derived = (set(alleles) - {ancestral}).pop()
 
     # save the metadata for the variant
     metadata = {
