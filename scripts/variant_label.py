@@ -39,14 +39,16 @@ def variant_label(vcf_file, meta_file, output_file):
         # variant not in the VCF
         raise RuntimeError("SNP {}:{} not found in {}".format(metadata["chrom"], metadata["start"], vcf_file))
 
-    alleles = [rec.ref] + list(rec.alts)
-
     if metadata.get("genes", "") == "":
         metadata["genes"] = "N/A"
     else:
         # deduplicate, but keep the original order
         genes = re.split("[,;]+", metadata["genes"])
         metadata["genes"] = "; ".join(list(OrderedDict.fromkeys(genes)))
+
+    if metadata["ancestral"] is None:
+        # default to the REF allele as the ancestral
+        metadata["ancestral"] = rec.ref
 
     # compose the title for the rsID
     title = "{rsid} | chr{chrom}:{start} | Gene(s): {genes} | {ancestral}/{derived}".format(**metadata)
