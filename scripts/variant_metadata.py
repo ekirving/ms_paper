@@ -58,7 +58,7 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
 
     try:
         # get all the GWAS Catalog records for the target rsID
-        gwas_target = pd.read_table(gwas_file, dtype=str).set_index("rsid", drop=False).fillna("").loc[[rsid]]
+        gwas_target = pd.read_table(gwas_file, dtype=str).set_index("SNPS", drop=False).fillna("").loc[[rsid]]
     except KeyError:
         # no matching rows (i.e. this is a neutral SNP)
         gwas_ra = None
@@ -68,7 +68,7 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
         # handle multiple GWAS associations for this rsID
         for idx, gwascat in gwas_target.iterrows():
             # extract the GWAS Catalog allele
-            gwascat_allele = gwascat["GwasCat_RA"].split("-").pop()
+            gwascat_allele = gwascat["STRONGEST SNP-RISK ALLELE"].split("-").pop()
 
             # drop any GWAS studies where the RA is not listed
             if gwascat_allele not in ["A", "C", "G", "T", "?"]:
@@ -76,23 +76,24 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
 
             gwas_records.append(
                 {
-                    "pubmedid": gwascat["GwasCat_PubMedID"],
-                    "genes": gwascat["GwasCat_Genes"],
+                    "pubmedid": gwascat["PUBMEDID"],
+                    "genes": gwascat["MAPPED_GENE"],
                     "allele": gwascat_allele,
-                    "raf": gwascat["GwasCat_RAF"],
-                    "p": gwascat["GwasCat_P"],
-                    "ororbeta": gwascat["GwasCat_OrorBeta"],
-                    "phenotype": gwascat["GwasCat_Phenotype"],
-                    "samples": gwascat["GwasCat_Samples"],
-                    "ontology": gwascat["GwasCat_Ontology"],
+                    "raf": gwascat["RISK ALLELE FREQUENCY"],
+                    "p": gwascat["P-VALUE"],
+                    "ororbeta": gwascat["OR or BETA"],
+                    "phenotype": gwascat["DISEASE/TRAIT"],
+                    "samples": gwascat["INITIAL SAMPLE SIZE"],
+                    "trait": gwascat["MAPPED_TRAIT"],
+                    "trait_uri": gwascat["MAPPED_TRAIT_URI"],
                 }
             )
 
         # get the most common risk allele (some rsIDs have multiple)
-        gwas_ra = gwas_target["GwasCat_RA"].value_counts().index[0].split("-").pop().replace("?", "")
+        gwas_ra = gwas_target["STRONGEST SNP-RISK ALLELE"].value_counts().index[0].split("-").pop().replace("?", "")
 
         # get all the associated genes
-        gwas_genes = "/".join(set(gwas_target["GwasCat_Genes"].tolist()))
+        gwas_genes = "/".join(set(gwas_target["MAPPED_GENE"].tolist()))
 
     # always use the first mapping
     mappings = var.get("mappings", [])

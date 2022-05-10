@@ -7,7 +7,7 @@ __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
 import json
-import sys
+from collections import defaultdict
 
 import click
 import pandas as pd
@@ -32,6 +32,22 @@ def palm_report(data_tsv, dataset, ancestry, output):
 
     for _, snp in data.iterrows():
         rsid = snp["rsid"]
+
+        # load the SNP metadata
+        with open(f"data/metadata/GRCh37/{rsid}.json") as fin:
+            meta = json.load(fin)
+
+            gwascat = defaultdict(list)
+
+            # extract the phenotypes
+            for gwas in meta.get("gwascat", []):
+                for trait in gwas["trait"].split(", "):
+                    gwascat[trait].append(gwas["pubmedid"])
+
+            snp["genes"] = meta["genes"]
+            snp["gwascat"] = "; ".join(
+                sorted([f"{trait} (PMID: {', '.join(studies)})" for trait, studies in gwascat.items()])
+            )
 
         # compose the variant identifier
         variant = f"{snp['chrom']}:{snp['pos']}:{snp['ancestral_allele']}:{snp['derived_allele']}"
