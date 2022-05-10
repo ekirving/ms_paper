@@ -55,10 +55,12 @@ def variant_label(vcf_file, meta_file, output_file):
 
     # group the GWAS associations by risk allele and phenotype
     for record in metadata.get("gwascat", []):
-        if record["phenotype"] not in group[record["allele"]]:
-            group[record["allele"]][record["phenotype"]] = [record["pubmedid"]]
-        else:
-            group[record["allele"]][record["phenotype"]].append(record["pubmedid"])
+        for trait in record["trait"].split(", "):
+            if trait not in group[record["allele"]]:
+                group[record["allele"]][trait] = []
+
+            # add the PUBMED ID
+            group[record["allele"]][trait].append(record["pubmedid"])
 
     gwascat = []
 
