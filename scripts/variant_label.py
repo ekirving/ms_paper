@@ -7,9 +7,8 @@ __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
 import json
-import re
 import textwrap
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 import click
 import pysam
@@ -41,13 +40,9 @@ def variant_label(vcf_file, meta_file, output_file):
 
     if metadata.get("genes", "") == "":
         metadata["genes"] = "N/A"
-    else:
-        # deduplicate, but keep the original order
-        genes = re.split("[,;]+", metadata["genes"])
-        metadata["genes"] = "; ".join(list(OrderedDict.fromkeys(genes)))
 
     if metadata["ancestral"] is None:
-        # default to the REF allele as the ancestral
+        # default to the REF allele as the ancestral, and the ALT as the derived (consistent with the CLUES models)
         metadata["ancestral"] = rec.ref
         metadata["derived"] = rec.alts[0]
 

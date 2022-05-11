@@ -8,11 +8,12 @@ __license__ = "MIT"
 
 import json
 import os
+import re
 import sys
+from collections import OrderedDict
 
 import click
 import pandas as pd
-import yaml
 
 sys.path.append(os.getcwd())
 
@@ -71,10 +72,14 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
             if gwascat_allele not in ["A", "C", "G", "T", "?"]:
                 continue
 
+            # deduplicate within studies (due to duplicates in the GWAS Catalog), but keep the original order
+            genes = re.split("[,;] *", gwascat["MAPPED_GENE"])
+            genes = list(OrderedDict.fromkeys(genes))
+
             gwas_records.append(
                 {
                     "pubmedid": gwascat["PUBMEDID"],
-                    "genes": gwascat["MAPPED_GENE"],
+                    "genes": genes,
                     "allele": gwascat_allele,
                     "raf": gwascat["RISK ALLELE FREQUENCY"],
                     "p": gwascat["P-VALUE"],
@@ -89,8 +94,9 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
         # get the most common risk allele (some rsIDs have multiple)
         gwas_ra = gwas_target["STRONGEST SNP-RISK ALLELE"].value_counts().index[0].split("-").pop().replace("?", "")
 
-        # get all the associated genes
-        gwas_genes = "/".join(set(gwas_target["MAPPED_GENE"].tolist()))
+        # deduplicate across studies, but keep the original order
+        gwas_genes = list(OrderedDict.fromkeys([gene for record in gwas_records for gene in record["genes"]]))
+        gwas_genes = ", ".join(sorted(gwas_genes))
 
     # always use the first mapping
     mappings = var.get("mappings", [])
