@@ -20,26 +20,42 @@ include: "rules/palm.smk"
 
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
+TRAITS = ["ms", "ibd", "ra", "celiac"]
 
 
-def all_clumped_annotated(trait):
+def all_clues_plots(_):
     """
-    Run all the SNPs in the `all_clumped_annotated` ascertainments
+    Run CLUES for all the SNPs in all the traits
     """
-    df = pd.read_table(f"data/targets/gwas_{trait}.tsv")
-
     files = []
 
-    for row in df.itertuples():
-        rsid = row.SNP
-        variant = f"{row.CHR}:{row.BP}:{row.other_allele}:{row.effect_allele}"
+    for trait in TRAITS:
+        # noinspection PyUnresolvedReferences
+        meta_tsv = checkpoints.palm_metadata.get(dataset="ancestral_paths_new", trait=trait).output.tsv
 
-        files += [f"results/clues/{rsid}/ancestral_paths_new-{variant}-{ancestry}.png" for ancestry in ANCESTRIES]
+        snp = pd.read_table(meta_tsv)
+
+        for row in snp.itertuples():
+            rsid = row.SNP
+            variant = f"{row.CHR}:{row.BP}:{row.ancestral_allele}:{row.derived_allele}"
+
+            files += [f"results/clues/{rsid}/ancestral_paths_new-{variant}-{ancestry}.png" for ancestry in ANCESTRIES]
 
     return files
 
 
 rule all:
     input:
-        all_clumped_annotated("ms"),
-        all_clumped_annotated("ra"),
+        # plot all the CLUES models
+        # all_clues_plots,
+        # run PALM and plot all the traits
+        expand(
+            [
+                "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_trajectory.png",
+                "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-pval.png",
+                "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-prs.png",
+                "results/palm/ancestral_paths_new-{trait}-delta_prs.png",
+            ],
+            ancestry=ANCESTRIES,
+            trait=TRAITS,
+        ),

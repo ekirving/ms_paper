@@ -204,3 +204,39 @@ rule palm_plot_lines:
         " --dataset {wildcards.dataset}"
         " --ancestry {wildcards.ancestry}"
         " --output {output.png}"
+
+
+rule palm_plot_delta_prs:
+    """
+    Plot the distribution of the delta PRS for all SNPs in all ancestries  
+    """
+    input:
+        all_json="results/palm/{dataset}-ALL-{trait}-palm.json",
+        ana_json="results/palm/{dataset}-ANA-{trait}-palm.json",
+        chg_json="results/palm/{dataset}-CHG-{trait}-palm.json",
+        ehg_json="results/palm/{dataset}-EHG-{trait}-palm.json",
+        whg_json="results/palm/{dataset}-WHG-{trait}-palm.json",
+        all_tsv="results/palm/{dataset}-ALL-{trait}-palm_report.tsv",
+        ana_tsv="results/palm/{dataset}-ANA-{trait}-palm_report.tsv",
+        chg_tsv="results/palm/{dataset}-CHG-{trait}-palm_report.tsv",
+        ehg_tsv="results/palm/{dataset}-EHG-{trait}-palm_report.tsv",
+        whg_tsv="results/palm/{dataset}-WHG-{trait}-palm_report.tsv",
+    output:
+        png="results/palm/{dataset}-{trait}-delta_prs.png",
+    wildcard_constraints:
+        sort="pval|prs",
+    shell:
+        "Rscript scripts/palm_plot_delta_prs.R"
+        " --trait {wildcards.trait}"
+        " --dataset {wildcards.dataset}"
+        " --all-json {input.all_json}"
+        " --ana-json {input.ana_json}"
+        " --chg-json {input.chg_json}"
+        " --ehg-json {input.ehg_json}"
+        " --whg-json {input.whg_json}"
+        " --all-tsv {input.all_tsv}"
+        " --ana-tsv {input.ana_tsv}"
+        " --chg-tsv {input.chg_tsv}"
+        " --ehg-tsv {input.ehg_tsv}"
+        " --whg-tsv {input.whg_tsv}"
+        " --output {output.png}"
