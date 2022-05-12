@@ -41,8 +41,13 @@ def palm_report(data_tsv, dataset, ancestry, output):
 
             # extract the phenotypes
             for gwas in meta.get("gwascat", []):
-                for trait in gwas["trait"].split(", "):
-                    gwascat[trait].append(gwas["pubmedid"])
+                if gwas["trait"] != "":
+                    # use the standardised trait ontology name
+                    for trait in gwas["trait"].split(", "):
+                        gwascat[trait].append(gwas["pubmedid"])
+                else:
+                    # use the free-text trait name reported in the submission
+                    gwascat[gwas["phenotype"]].append(gwas["pubmedid"])
 
             snp["genes"] = meta["genes"]
             snp["gwascat"] = "; ".join(
