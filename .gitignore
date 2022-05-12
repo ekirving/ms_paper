@@ -1,10 +1,11 @@
 *-commands.sh
 *.list
 *.xlsx
-*_mismatchs.tsv
 *.zip
+*_mismatchs.tsv
 .Rproj.user
 .snakemake
+_*
 __pycache__
 bak/
 benchmarks/

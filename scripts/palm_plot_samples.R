@@ -33,26 +33,20 @@ snps <- snps %>%
     # compose the model prefixes from the PALM metadata
     mutate(prefix = paste0("results/clues/", rsid, "/", argv$dataset, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele))
 
-snps <- head(snps, n=5)
+snps <- head(snps, n = 5)
 
 
 models <- list()
 for (i in 1:nrow(snps)) {
     # load the diploid pan-ancestry models
     read_table(paste0(snps[i, ]$prefix, "-ALL.ancient"), col_names = c("generations", "hom_ref", "het", "hom_alt"), col_types = cols()) %>%
-        mutate(ancestry="ALL", rsid=snps[i, ]$rsid)
+        mutate(ancestry = "ALL", rsid = snps[i, ]$rsid)
 }
 
 for (i in 1:nrow(snps)) {
     for (ancestry in c("ANA", "CHG", "EHG", "WHG")) {
         # load the CLUES genotype files
         read_table(paste0(snps[i, ]$prefix, "-", ancestry, ".ancient"), col_names = c("generations", "hom_ref", "hom_alt"), col_types = cols()) %>%
-            mutate(ancestry=ancestry, rsid=snps[i, ]$rsid)
-        
+            mutate(ancestry = ancestry, rsid = snps[i, ]$rsid)
     }
 }
-
-
-
-
-
