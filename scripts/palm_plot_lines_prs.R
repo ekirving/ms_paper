@@ -173,7 +173,5 @@ plt <- df_ml %>%
         panel.background = element_blank()
     )
 
-plt
-
 # save the plot
 ggsave(filename = argv$output, plt, width = 12, height = 8)
