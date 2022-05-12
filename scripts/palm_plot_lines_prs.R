@@ -135,11 +135,6 @@ limits <- df_ml %>%
 xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
 
-# set the colour bar breaks, ensuring that the first break is the Bonferroni threshold
-bar_breaks <- seq(0, max(max_logp, bonferroni), bonferroni)
-bar_labels <- sprintf("%.1f", bar_breaks)
-bar_labels[2] <- paste0(bar_labels[2], "*")
-
 plt <- df_ml %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = prs_freq, group = rsid)) +
