@@ -166,19 +166,38 @@ rule palm_report:
 
 rule palm_plot_trajectory:
     """
-    Plot the PALM trajectory as a rater or as stacked lines
+    Plot the PALM trajectory as a raster of the joint posterior densities of all SNPs
     """
     input:
         tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv",
         json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
     output:
-        png="results/palm/{dataset}-{ancestry}-{trait}-palm_{type}.png",
-    wildcard_constraints:
-        type="trajectory|lines",
+        png="results/palm/{dataset}-{ancestry}-{trait}-palm_trajectory.png",
     resources:
         mem_mb=40 * 1024,
     shell:
-        "Rscript scripts/palm_plot_{wildcards.type}.R"
+        "Rscript scripts/palm_plot_trajectory.R"
+        " --tsv {input.tsv}"
+        " --json {input.json}"
+        " --trait {wildcards.trait}"
+        " --dataset {wildcards.dataset}"
+        " --ancestry {wildcards.ancestry}"
+        " --output {output.png}"
+
+
+rule palm_plot_lines:
+    """
+    Plot the PALM trajectory as a stacked line plot of each individual SNP trajectory
+    """
+    input:
+        tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv",
+        json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
+    output:
+        png="results/palm/{dataset}-{ancestry}-{trait}-palm_lines-{sort}.png",
+    wildcard_constraints:
+        sort="pval|prs",
+    shell:
+        "Rscript scripts/palm_plot_lines_{wildcards.sort}.R"
         " --tsv {input.tsv}"
         " --json {input.json}"
         " --trait {wildcards.trait}"

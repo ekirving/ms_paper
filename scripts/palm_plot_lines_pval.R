@@ -24,7 +24,7 @@ p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_lines.png")
+p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_lines-pval.png")
 
 argv <- parse_args(p)
 
@@ -41,8 +41,10 @@ snps <- snps %>%
     # PALM assumes that betas measure the effect of the ALT allele, and CLUES models the frequency of the derived allele
     # here we want to polarize the trajectories by the positive effect allele
     mutate(flip = (alt == derived_allele & beta < 0) | (alt == ancestral_allele & beta > 0)) %>%
+    # record the focal allele (to avoid any ambiguity)
+    mutate(focal_allele = ifelse(beta < 0, ref, alt), .after = "derived_allele") %>%
     # normalise the beta scores by the maximum PRS
-    mutate(prs = abs(beta) / prs_max) %>%
+    mutate(scaled_beta = abs(beta) / prs_max) %>%
     # compose the model prefixes from the PALM metadata
     mutate(prefix = paste0("results/clues/", rsid, "/", argv$dataset, "-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", argv$ancestry))
 
@@ -68,7 +70,7 @@ for (i in 1:nrow(snps)) {
 
     model <- model %>%
         # apply the scaled PRS
-        mutate(prs_freq = snps[i, ]$prs * freq)
+        mutate(prs_freq = snps[i, ]$scaled_beta * freq)
 
     models <- append(models, list(model))
 }
@@ -79,24 +81,24 @@ df_ml <- bind_rows(models) %>%
 
 # sort the SNPs by their -log10(p) and the direction of the effect (positive on top)
 snp_order <- bind_rows(
-    df_ml %>% group_by(rsid) %>% slice_min(epoch) %>% mutate(type = "min_epoch"),
-    df_ml %>% group_by(rsid) %>% slice_max(epoch) %>% mutate(type = "max_epoch"),
+    df_ml %>% group_by(rsid) %>% slice_min(epoch) %>% mutate(name = "prs_start"),
+    df_ml %>% group_by(rsid) %>% slice_max(epoch) %>% mutate(name = "prs_end"),
 ) %>%
-    select(rsid, logp, type, prs_freq) %>%
-    pivot_wider(id_cols = c(rsid, logp), names_from = "type", values_from = "prs_freq") %>%
-    mutate(direction = ifelse(max_epoch > min_epoch, 1, -1)) %>%
-    mutate(signed_logp = direction * logp) %>%
+    select(rsid, name, logp, prs_freq) %>%
+    pivot_wider(names_from = "name", values_from = "prs_freq") %>%
+    mutate(delta_prs = prs_end - prs_start) %>%
+    mutate(signed_logp = ifelse(delta_prs > 0, logp, -logp)) %>%
     arrange(desc(signed_logp)) %>%
-    select(rsid, signed_logp)
+    select(rsid, delta_prs)
+
+# join the delta_prs column to the main sheet and save the result
+snps %>%
+    inner_join(snp_order, by = "rsid") %>%
+    select(-prefix) %>%
+    write_tsv(file = paste0("results/palm/", argv$dataset, "-", argv$ancestry, "-", argv$trait, "-palm_report_prs.tsv"))
 
 # apply the sort ordering, by setting the factor levels
 df_ml$rsid <- factor(df_ml$rsid, levels = snp_order$rsid)
-
-# get the Bonferroni corrected significance threshold
-bonferroni <- round(-log10(0.05 / nrow(snps)), 1)
-
-# get the maximum -log10(p.value)
-max_logp <- max(df_ml$logp)
 
 # decode the ancestry and trait names
 ancestries <- list(
@@ -135,6 +137,12 @@ limits <- df_ml %>%
 
 xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
+
+# get the Bonferroni corrected significance threshold
+bonferroni <- round(-log10(0.05 / nrow(snps)), 1)
+
+# get the maximum -log10(p.value)
+max_logp <- max(df_ml$logp)
 
 # set the colour bar breaks, ensuring that the first break is the Bonferroni threshold
 bar_breaks <- seq(0, max(max_logp, bonferroni), bonferroni)
