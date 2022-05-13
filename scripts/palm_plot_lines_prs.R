@@ -75,9 +75,7 @@ for (i in 1:nrow(snps)) {
     models <- append(models, list(model))
 }
 
-df_ml <- bind_rows(models) %>%
-    # only label the significant SNPs
-    mutate(label = ifelse(significant, rsid, NA))
+df_ml <- bind_rows(models)
 
 # sort the SNPs by the magnitude of their change in PRS
 snp_order <- bind_rows(
@@ -90,9 +88,14 @@ snp_order <- bind_rows(
     arrange(desc(delta_prs)) %>%
     select(rsid, delta_prs)
 
+# define a delta PRS threshold for labeling SNPs
+delta_prs_threshold <- 0.0025
+
 # join the delta_prs column so we can plot it as a fill colour
 df_ml <- df_ml %>% 
-    inner_join(snp_order, by = "rsid")
+    inner_join(snp_order, by = "rsid") %>%
+    # only label the SNPs above the threshold
+    mutate(label = ifelse(abs(delta_prs) > delta_prs_threshold, rsid, NA))
 
 # apply the sort ordering, by setting the factor levels
 df_ml$rsid <- factor(df_ml$rsid, levels = snp_order$rsid)
@@ -135,6 +138,19 @@ limits <- df_ml %>%
 xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
 
+# set the range of the colorbar breaks
+min_break <- round(min(df_ml$delta_prs)/delta_prs_threshold)*delta_prs_threshold
+max_break <- round(max(df_ml$delta_prs)/delta_prs_threshold)*delta_prs_threshold
+
+# set the colour bar breaks, ensuring that the first break is the delta_prs_threshold threshold
+bar_breaks <- seq(min(min_break, 0), max(max_break, delta_prs_threshold), delta_prs_threshold)
+bar_labels <- sprintf("%.4f", bar_breaks)
+
+# define a rescaling function which caps the upper range of the colorbar at the Bonferroni threshold
+show_significant <- function(x, to = c(0, 1), from = NULL) {
+    ifelse(x < delta_prs_threshold, scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), delta_prs_threshold)), 1)
+}
+
 plt <- df_ml %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = prs_freq, group = rsid)) +
@@ -157,8 +173,8 @@ plt <- df_ml %>%
     xlab("kyr BP") +
 
     # set the colour scales
-    scale_fill_viridis_c(option = "plasma", end = 0.85, alpha = 0.9) +
-    scale_color_viridis_c(option = "plasma", end = 0.85) +
+    scale_fill_viridis_c(option = "plasma", rescaler = show_significant, breaks = bar_breaks, labels = bar_labels, end = 0.85, alpha = 0.9) +
+    scale_color_viridis_c(option = "plasma", rescaler = show_significant, end = 0.85) +
 
     # hide these legends
     guides(color = "none") +
