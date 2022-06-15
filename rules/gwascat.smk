@@ -37,3 +37,14 @@ rule gwascat_genome_wide_significant:
         col=lambda wildcards, input: gzip.open(input[0], "rb").readline().split(b"\t").index(b"P-VALUE") + 1,
     shell:
         r"gunzip -c {input} | awk -F'\t' 'NR==1 || ${params.col} < {GWASCAT_PVALUE} {{print $0}}' | gzip > {output}"
+
+
+rule convert_gwas_catalog_metadata:
+    input:
+        tsv="data/targets/gwas-association-accessionId_{accession}.tsv",
+    output:
+        tsv="data/targets/gwas_{accession}.tsv",
+    shell:
+        "Rscript scripts/convert_gwas_catalog.R"
+        " --gwas {input.tsv}"
+        " --output {output.tsv}"
