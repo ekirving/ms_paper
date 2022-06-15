@@ -68,7 +68,10 @@ traits <- list(
     "ms" = "Multiple sclerosis",
     "ra" = "Rheumatoid arthritis",
     "ibd" = "Inflammatory bowel disease",
-    "celiac" = "Celiac disease"
+    "celiac" = "Celiac disease",
+    "t1d" = "Type 1 diabetes",
+    "t2d" = "Type 2 diabetes",
+    "skinp" = "Skin pigmentation"
 )
 
 plot_title <- traits[[argv$trait]]

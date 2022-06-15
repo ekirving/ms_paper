@@ -22,6 +22,9 @@ data/relate/
 data/targets/*_palm.tsv
 data/targets/*_positions.tsv
 data/targets/*_variants.tsv
+data/targets/gwas_skinp.tsv
+data/targets/gwas_t1d.tsv
+data/targets/gwas_t2d.tsv
 doi_10.6078_D11M62__v3
 ms-*.log
 nohup*

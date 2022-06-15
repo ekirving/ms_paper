@@ -20,7 +20,7 @@ include: "rules/palm.smk"
 
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
-TRAITS = ["ms", "ibd", "ra", "celiac"]
+TRAITS = ["ms", "ibd", "ra", "celiac", "t1d", "t2d", "skinp"]
 
 
 def all_clues_plots(_):
@@ -47,7 +47,7 @@ def all_clues_plots(_):
 rule all:
     input:
         # plot all the CLUES models
-        # all_clues_plots,
+        all_clues_plots,
         # run PALM and plot all the traits
         expand(
             [
