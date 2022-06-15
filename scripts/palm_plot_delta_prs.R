@@ -69,38 +69,38 @@ ancestry_colors <- c(
     "ANA" = "#a6d854"
 )
 
-plt <- ggplot(snps, aes(x = ancestry, y = delta_prs)) + 
+plt <- ggplot(snps, aes(x = ancestry, y = delta_prs)) +
     # add a red line at the zero mark
-    geom_hline(yintercept=0, color="red") +
-    
+    geom_hline(yintercept = 0, color = "red") +
+
     # density plot of the distribution
-    ggdist::stat_halfeye(aes(fill=ancestry), adjust = .5, width = .6, .width = 0, justification = -.3, point_colour = NA) + 
-    
-    # boxplot of the distribution 
+    ggdist::stat_halfeye(aes(fill = ancestry), adjust = .5, width = .6, .width = 0, justification = -.3, point_colour = NA) +
+
+    # boxplot of the distribution
     geom_boxplot(width = .25, outlier.shape = NA) +
-    
+
     # jittered scatter plot of the distribution
-    geom_point(aes(colour=ancestry), size = 1.3, alpha = .3, position = position_jitter(seed = 1, width = .03)) +
-    
+    geom_point(aes(colour = ancestry), size = 1.3, alpha = .3, position = position_jitter(seed = 1, width = .03)) +
+
     # flip the plot from vertical to horizontal
     coord_flip() +
 
     # ancestry_colors
-    
+
     labs(
         title = plot_title,
         fill = "Ancestry"
     ) +
     ylab("Δ PRS per SNP") +
     xlab("Ancestry painting") +
-    
+
     # set the colour scales
-    scale_fill_manual(values=ancestry_colors) +
-    scale_color_manual(values=ancestry_colors) +
-    
+    scale_fill_manual(values = ancestry_colors) +
+    scale_color_manual(values = ancestry_colors) +
+
     # hide these legends
     guides(color = "none") +
-    
+
     # basic styling
     theme_bw() +
     theme(

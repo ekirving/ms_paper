@@ -39,14 +39,93 @@ snps <- head(snps, n = 5)
 models <- list()
 for (i in 1:nrow(snps)) {
     # load the diploid pan-ancestry models
-    read_table(paste0(snps[i, ]$prefix, "-ALL.ancient"), col_names = c("generations", "hom_ref", "het", "hom_alt"), col_types = cols()) %>%
-        mutate(ancestry = "ALL", rsid = snps[i, ]$rsid)
+    model <- read_table(paste0(snps[i, ]$prefix, "-ALL.ancient"), col_names = c("generations", "hom_ref", "het", "hom_alt"), col_types = cols()) %>%
+        mutate(ancestry = "ALL", rsid = snps[i, ]$rsid) %>%
+        select(generations, ancestry, rsid)
+
+    # double the count of ALL ancestries as they are diploid and the others are haploid
+    model <- bind_rows(model, model)
+
+    models <- append(models, list(model))
 }
 
 for (i in 1:nrow(snps)) {
     for (ancestry in c("ANA", "CHG", "EHG", "WHG")) {
         # load the CLUES genotype files
-        read_table(paste0(snps[i, ]$prefix, "-", ancestry, ".ancient"), col_names = c("generations", "hom_ref", "hom_alt"), col_types = cols()) %>%
-            mutate(ancestry = ancestry, rsid = snps[i, ]$rsid)
+        model <- read_table(paste0(snps[i, ]$prefix, "-", ancestry, ".ancient"), col_names = c("generations", "hom_ref", "hom_alt"), col_types = cols()) %>%
+            mutate(ancestry = ancestry, rsid = snps[i, ]$rsid) %>%
+            select(generations, ancestry, rsid)
+
+        models <- append(models, list(model))
     }
 }
+
+# merge all the data together
+samples <- bind_rows(models) %>%
+    mutate(age = round(generations * argv$gen_time))
+
+traits <- list(
+    "ms" = "Multiple sclerosis",
+    "ra" = "Rheumatoid arthritis",
+    "ibd" = "Inflammatory bowel disease",
+    "celiac" = "Celiac disease"
+)
+
+plot_title <- traits[[argv$trait]]
+
+ancestry_colors <- c(
+    "ALL" = "#66c2a5",
+    "WHG" = "#fc8d62",
+    "EHG" = "#8da0cb",
+    "CHG" = "#e78ac3",
+    "ANA" = "#a6d854"
+)
+
+# plt <-
+ggplot(samples, aes(x = ancestry, y = age)) +
+    # add a red line at the zero mark
+    geom_hline(yintercept = 0, color = "red") +
+
+    # density plot of the distribution
+    ggdist::stat_halfeye(aes(fill = ancestry), adjust = .5, width = .6, .width = 0, justification = -.3, point_colour = NA) +
+
+    # boxplot of the distribution
+    geom_boxplot(width = .25, outlier.shape = NA) +
+
+    # jittered scatter plot of the distribution
+    # geom_point(aes(colour=ancestry), size = 1.3, alpha = .3, position = position_jitter(seed = 1, width = .03)) +
+    geom_point(aes(colour = ancestry), shape = 95, size = 10, alpha = .2) +
+
+    # flip the plot from vertical to horizontal
+    coord_flip() +
+
+    # ancestry_colors
+
+    labs(
+        title = plot_title,
+        fill = "Ancestry"
+    ) +
+    ylab("Δ PRS per SNP") +
+    xlab("Ancestry painting") +
+
+    # set the colour scales
+    scale_fill_manual(values = ancestry_colors) +
+    scale_color_manual(values = ancestry_colors) +
+
+    # hide these legends
+    guides(color = "none") +
+
+    # basic styling
+    theme_bw() +
+    theme(
+        # legend.position = "none",
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()
+    )
+
+plt
+
+# save the plot
+ggsave(filename = argv$output, plt, width = 12, height = 8)

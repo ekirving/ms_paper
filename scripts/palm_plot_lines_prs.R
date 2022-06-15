@@ -92,7 +92,7 @@ snp_order <- bind_rows(
 delta_prs_threshold <- 0.0025
 
 # join the delta_prs column so we can plot it as a fill colour
-df_ml <- df_ml %>% 
+df_ml <- df_ml %>%
     inner_join(snp_order, by = "rsid") %>%
     # only label the SNPs above the threshold
     mutate(label = ifelse(abs(delta_prs) > delta_prs_threshold, rsid, NA))
@@ -139,8 +139,8 @@ xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
 
 # set the range of the colorbar breaks
-min_break <- round(min(df_ml$delta_prs)/delta_prs_threshold)*delta_prs_threshold
-max_break <- round(max(df_ml$delta_prs)/delta_prs_threshold)*delta_prs_threshold
+min_break <- round(min(df_ml$delta_prs) / delta_prs_threshold) * delta_prs_threshold
+max_break <- round(max(df_ml$delta_prs) / delta_prs_threshold) * delta_prs_threshold
 
 # set the colour bar breaks, ensuring that the first break is the delta_prs_threshold threshold
 bar_breaks <- seq(min(min_break, 0), max(max_break, delta_prs_threshold), delta_prs_threshold)

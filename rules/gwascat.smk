@@ -16,6 +16,9 @@ import gzip
 
 
 rule gwascat_fetch:
+    """
+    Download a recent build of the GWAS Catalog
+    """
     output:
         "data/gwascat/gwas_catalog_v1.0.2-associations_e105_r2022-02-21.tsv.gz",
     shell:
@@ -23,6 +26,9 @@ rule gwascat_fetch:
 
 
 rule gwascat_genome_wide_significant:
+    """
+    Filter the GWAS Catalog to only retain genome-wide significant associations (i.e., p<5e-8)
+    """
     input:
         "data/gwascat/gwas_catalog_v1.0.2-associations_e105_r2022-02-21.tsv.gz",
     output:

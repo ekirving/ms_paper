@@ -106,6 +106,8 @@ df_prob <- df_prob %>%
     summarise(density = sum(density), .groups = "drop") %>%
     left_join(bins, by = "bin")
 
+# TODO save the data so we can use it elsewhere
+
 # decode the ancestry and trait names
 ancestries <- list(
     "ALL" = "All ancestries",

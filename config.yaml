@@ -5,6 +5,7 @@ samples:
     reference: GRCh37
     metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv
     genotypes: data/Ancestral_paths_new/ancestral_paths_merged_filtered.bcf
+    # TODO run the non-imputed version
     is_likelihood: False
 
 # list of chroms in GRCh37
