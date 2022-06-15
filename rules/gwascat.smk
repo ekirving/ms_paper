@@ -80,3 +80,19 @@ rule convert_t2d_metadata:
         "Rscript scripts/convert_t2d_metadata.R"
         " --gwas {input.tsv}"
         " --output {output.tsv}"
+
+
+rule convert_skinp_metadata:
+    """
+    Convert the GWAS metadata from (Ju and Mathieson, 2021), for Skin Pigmentation 
+
+    https://doi.org/10.1073/pnas.2009227118
+    """
+    input:
+        tsv="data/targets/Ju_and_Mathieson_2021_S1b.tsv",
+    output:
+        tsv="data/targets/gwas_skinp.tsv",
+    shell:
+        "Rscript scripts/convert_skinp_metadata.R"
+        " --gwas {input.tsv}"
+        " --output {output.tsv}"
