@@ -48,3 +48,14 @@ rule convert_gwas_catalog_metadata:
         "Rscript scripts/convert_gwas_catalog.R"
         " --gwas {input.tsv}"
         " --output {output.tsv}"
+
+
+rule convert_t1d_metadata:
+    input:
+        tsv="data/targets/Robertson_et_al_2021_ST7.tsv",
+    output:
+        tsv="data/targets/gwas_t1d.tsv",
+    shell:
+        "Rscript scripts/convert_t1d_metadata.R"
+        " --gwas {input.tsv}"
+        " --output {output.tsv}"
