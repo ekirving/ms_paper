@@ -91,12 +91,6 @@ snp_order <- bind_rows(
     arrange(desc(signed_logp)) %>%
     select(rsid, delta_prs)
 
-# join the delta_prs column to the main sheet and save the result
-snps %>%
-    inner_join(snp_order, by = "rsid") %>%
-    select(-prefix) %>%
-    write_tsv(file = paste0("results/palm/", argv$dataset, "-", argv$ancestry, "-", argv$trait, "-palm_report_prs.tsv"))
-
 # apply the sort ordering, by setting the factor levels
 df_ml$rsid <- factor(df_ml$rsid, levels = snp_order$rsid)
 

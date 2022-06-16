@@ -36,8 +36,8 @@ def all_clues_plots(_):
         snp = pd.read_table(meta_tsv)
 
         for row in snp.itertuples():
-            rsid = row.SNP
-            variant = f"{row.CHR}:{row.BP}:{row.ancestral_allele}:{row.derived_allele}"
+            rsid = row.rsid
+            variant = f"{row.chrom}:{row.pos}:{row.ancestral_allele}:{row.derived_allele}"
 
             files += [f"results/clues/{rsid}/ancestral_paths_new-{variant}-{ancestry}.png" for ancestry in ANCESTRIES]
 
@@ -51,7 +51,7 @@ rule all:
         # run PALM and plot all the traits
         expand(
             [
-                "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_trajectory.png",
+                # "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_trajectory.png",
                 "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-pval.png",
                 "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-prs.png",
                 "results/palm/ancestral_paths_new-{trait}-delta_prs.png",

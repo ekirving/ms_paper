@@ -31,8 +31,8 @@ rule reference_metadata:
     shell:
         "awk 'NR>1 {{ print $1\"\\t\"$2 }}' {input.tsv} > {output.pos} && "
         "bcftools view --regions-file {output.pos} {input.vcf} | "
-        r" bcftools query --format '%CHROM\t%POS\t%REF\t%ALT\t%INFO/AA\n' | "
-        r" sed 's/|||//' | tr [a-z] [A-Z] > {output.var}"
+        r" bcftools query --format '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%INFO/AA\n' | "
+        r" sed 's/|||//' | tr [acgt] [ACGT] > {output.var}"
 
 
 checkpoint palm_metadata:
@@ -40,7 +40,6 @@ checkpoint palm_metadata:
     Convert the GWAS metadata into PALM input format
     """
     input:
-        # TODO make this a config call
         tsv="data/targets/gwas_{trait}.tsv",
         var="data/targets/gwas_{trait}_{dataset}_variants.tsv",
     output:
@@ -164,6 +163,19 @@ rule palm_report:
         " --output {output.tsv}"
 
 
+rule palm_report_prs:
+    input:
+        tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv",
+    output:
+        tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report_prs.tsv",
+    shell:
+        "Rscript scripts/palm_report_prs.R"
+        " --data {input.tsv}"
+        " --dataset {wildcards.dataset}"
+        " --ancestry {wildcards.ancestry}"
+        " --output {output.tsv}"
+
+
 rule palm_plot_trajectory:
     """
     Plot the PALM trajectory as a raster of the joint posterior densities of all SNPs
@@ -174,7 +186,7 @@ rule palm_plot_trajectory:
     output:
         png="results/palm/{dataset}-{ancestry}-{trait}-palm_trajectory.png",
     resources:
-        mem_mb=40 * 1024,
+        mem_mb=64 * 1024,
     shell:
         "Rscript scripts/palm_plot_trajectory.R"
         " --tsv {input.tsv}"
@@ -216,7 +228,7 @@ rule palm_plot_delta_prs:
         chg_json="results/palm/{dataset}-CHG-{trait}-palm.json",
         ehg_json="results/palm/{dataset}-EHG-{trait}-palm.json",
         whg_json="results/palm/{dataset}-WHG-{trait}-palm.json",
-        all_tsv="results/palm/{dataset}-ALL-{trait}-palm_report_prs.tsv",  # TODO make a separate rule to produce this
+        all_tsv="results/palm/{dataset}-ALL-{trait}-palm_report_prs.tsv",
         ana_tsv="results/palm/{dataset}-ANA-{trait}-palm_report_prs.tsv",
         chg_tsv="results/palm/{dataset}-CHG-{trait}-palm_report_prs.tsv",
         ehg_tsv="results/palm/{dataset}-EHG-{trait}-palm_report_prs.tsv",

@@ -19,12 +19,17 @@ p <- add_argument(p, "--output", help = "Output file", default = "data/targets/g
 
 argv <- parse_args(p)
 
-gwas <- read_tsv(argv$gwas, col_types = cols())
-vars <- read_tsv(argv$variants, col_names = c("CHR", "BP", "REF", "ALT", "ANC"), col_types = cols())
+gwas <- read_tsv(argv$gwas, col_types = cols(), na = c("", "NA", "-"))
+vars <- read_tsv(argv$variants, col_names = c("CHR", "BP", "ID", "REF", "ALT", "ANC"), col_types = cols())
 
 data <- gwas %>%
     # join the variant metadata (this drops any SNPs that are not in the callset)
     inner_join(vars, by = c("CHR", "BP")) %>%
+    # fill any missing rsIDs
+    separate(col = ID, into = c("rsid", "chr_pos"), sep = ";", fill = "left") %>%
+    mutate(SNP = coalesce(SNP, rsid)) %>%
+    select(-rsid) %>%
+    # add the extra columns
     mutate(
         # our SNPs are already LP-pruned
         ld_block = row_number(),
