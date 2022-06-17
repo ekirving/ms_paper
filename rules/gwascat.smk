@@ -37,3 +37,19 @@ rule gwascat_genome_wide_significant:
         col=lambda wildcards, input: gzip.open(input[0], "rb").readline().split(b"\t").index(b"P-VALUE") + 1,
     shell:
         r"gunzip -c {input} | awk -F'\t' 'NR==1 || ${params.col} < {GWASCAT_PVALUE} {{print $0}}' | gzip > {output}"
+
+
+rule convert_ms_metadata:
+    """
+    Convert the GWAS metadata from (International Multiple Sclerosis Genetics Consortium, 2019), for Multiple sclerosis 
+
+    https://doi.org/10.1126/science.aav7188
+    """
+    input:
+        tsv="data/targets/ms_snps_final.csv",
+    output:
+        tsv="data/targets/gwas_ms.tsv",
+    shell:
+        "Rscript scripts/convert_ms_metadata.R"
+        " --gwas {input.tsv}"
+        " --output {output.tsv}"
