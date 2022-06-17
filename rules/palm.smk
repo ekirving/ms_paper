@@ -106,7 +106,10 @@ def palm_quad_fit(wildcards):
         block, pos = snp["ld_block"], snp["variant"].split(":")[1]
         files.append(f"results/palm/{dataset}/{ancestry}/{trait}/ld_{block}/bp{pos}.quad_fit.npy")
 
-    return {"tsv": "data/targets/gwas_{trait}_{dataset}_palm.tsv", "quad_fit": files}
+    # make sure that all the SNP metadata has been built, as we rely on this later
+    json = expand("data/metadata/GRCh37/{rsid}.json", rsid=meta["rsid"])
+
+    return {"tsv": "data/targets/gwas_{trait}_{dataset}_palm.tsv", "quad_fit": files, "json": json}
 
 
 # noinspection PyUnresolvedReferences
