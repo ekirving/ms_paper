@@ -125,7 +125,7 @@ rule palm_single_trait:
         "python bin/palm/palm.py"
         " --traitDir {params.dir}"
         " --metadata {input.tsv}"
-        " --maxp 5e-8"
+        " --maxp 1"
         " --B 1000"
         " 1> {output.txt}"
         " 2> {log}"
