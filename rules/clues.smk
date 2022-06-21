@@ -22,7 +22,7 @@ CHROM = r"(\d+|X|Y|MT)"
 wildcard_constraints:
     # `chr:pos:ref:alt`
     variant="\d+:\d+:[ACGT]:[ACGT]",
-    rsid="rs\d+",
+    rsid="rs\d+|chr\d+:\d+",
 
 
 rule clues_ancient_samples:
