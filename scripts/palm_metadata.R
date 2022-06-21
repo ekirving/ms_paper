@@ -27,7 +27,7 @@ data <- gwas %>%
     inner_join(vars, by = c("CHR", "BP")) %>%
     # fill any missing rsIDs
     separate(col = ID, into = c("rsid", "chr_pos"), sep = ";", fill = "left") %>%
-    mutate(SNP = coalesce(SNP, rsid)) %>%
+    mutate(SNP = ifelse(grepl("rs[0-9]+", SNP), SNP, rsid)) %>%
     select(-rsid) %>%
     # add the extra columns
     mutate(
