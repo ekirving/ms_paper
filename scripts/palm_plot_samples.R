@@ -12,6 +12,9 @@ quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
 quiet(library(jsonlite)) # v1.8.0
 
+# load the helper functions
+source("scripts/clues_utils.R")
+
 # get the command line arguments
 p <- arg_parser("Plot the density of the sampling and ancestry painting over time")
 p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
@@ -64,22 +67,7 @@ for (i in 1:nrow(snps)) {
 samples <- bind_rows(models) %>%
     mutate(age = round(generations * argv$gen_time))
 
-traits <- list(
-    "ms" = "Multiple sclerosis",
-    "ra" = "Rheumatoid arthritis",
-    "ibd" = "Inflammatory bowel disease",
-    "celiac" = "Celiac disease"
-)
-
 plot_title <- traits[[argv$trait]]
-
-ancestry_colors <- c(
-    "ALL" = "#66c2a5",
-    "WHG" = "#fc8d62",
-    "EHG" = "#8da0cb",
-    "CHG" = "#e78ac3",
-    "ANA" = "#a6d854"
-)
 
 # plt <-
 ggplot(samples, aes(x = ancestry, y = age)) +

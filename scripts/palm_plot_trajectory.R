@@ -108,22 +108,6 @@ df_prob <- df_prob %>%
 
 # TODO save the data so we can use it elsewhere
 
-# decode the ancestry and trait names
-ancestries <- list(
-    "ALL" = "All ancestries",
-    "ANA" = "Anatolian Farmers",
-    "CHG" = "Caucasus Hunter-gatherers",
-    "WHG" = "Western Hunter-gatherers",
-    "EHG" = "Eastern Hunter-gatherers"
-)
-
-traits <- list(
-    "ms" = "Multiple sclerosis",
-    "ra" = "Rheumatoid arthritis",
-    "ibd" = "Inflammatory bowel disease",
-    "celiac" = "Celiac disease"
-)
-
 # add the model results to the plot title
 plot_title <- paste0(
     traits[[argv$trait]],

@@ -100,22 +100,6 @@ df_ml <- df_ml %>%
 # apply the sort ordering, by setting the factor levels
 df_ml$rsid <- factor(df_ml$rsid, levels = snp_order$rsid)
 
-# decode the ancestry and trait names
-ancestries <- list(
-    "ALL" = "All ancestries",
-    "ANA" = "Anatolian Farmers",
-    "CHG" = "Caucasus Hunter-gatherers",
-    "WHG" = "Western Hunter-gatherers",
-    "EHG" = "Eastern Hunter-gatherers"
-)
-
-traits <- list(
-    "ms" = "Multiple sclerosis",
-    "ra" = "Rheumatoid arthritis",
-    "ibd" = "Inflammatory bowel disease",
-    "celiac" = "Celiac disease"
-)
-
 # add the model results to the plot title
 plot_title <- paste0(
     traits[[argv$trait]],

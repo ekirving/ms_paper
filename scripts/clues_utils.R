@@ -36,3 +36,23 @@ clues_load_data <- function(prefix) {
 
     model
 }
+
+traits <- list(
+    "ms" = "Multiple sclerosis",
+    "ms_auto" = "Multiple sclerosis (autosomal non-MHC)",
+    "ms_mhc" = "Multiple sclerosis (MHC SNPs)",
+    "ms_auto_mhc" = "Multiple sclerosis (autosomal + MHC SNPs)",
+    "ms_auto_mhc_sS" = "Multiple sclerosis (auto + MHC + sS SNPs)",
+    "ms_auto_mhc_sS_wS" = "Multiple sclerosis (all SNPs)",
+    "ra" = "Rheumatoid arthritis",
+    "ibd" = "Inflammatory bowel disease",
+    "celiac" = "Celiac disease"
+)
+
+ancestry_colors <- c(
+    "ALL" = "#66c2a5",
+    "WHG" = "#fc8d62",
+    "EHG" = "#8da0cb",
+    "CHG" = "#e78ac3",
+    "ANA" = "#a6d854"
+)
