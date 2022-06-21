@@ -72,19 +72,19 @@ rule convert_ms_autosome_metadata:
         sS="data/targets/Patsopoulos_et_al_2019_ST14_sS.tsv",
         wS="data/targets/Patsopoulos_et_al_2019_ST14_wS.tsv",
     output:
-        auto="data/targets/gwas_ms_auto.tsv",
-        mhc="data/targets/gwas_ms_mhc.tsv",
-        sig="data/targets/gwas_ms_auto_mhc.tsv",
-        sug="data/targets/gwas_ms_auto_mhc_sS.tsv",
-        all="data/targets/gwas_ms_auto_mhc_sS_wS.tsv",
+        auto="data/targets/gwas_ms-auto.tsv",
+        mhc="data/targets/gwas_ms-mhc.tsv",
+        sig="data/targets/gwas_ms-auto-mhc.tsv",
+        sug="data/targets/gwas_ms-auto-mhc-sS.tsv",
+        all="data/targets/gwas_ms-auto-mhc-sS-wS.tsv",
     shell:
         "Rscript scripts/convert_Patsopoulos_metadata.R"
-        " --auto data/targets/Patsopoulos_et_al_2019_ST7.tsv"
-        " --mhc data/targets/Patsopoulos_et_al_2019_ST11.tsv"
-        " --sS data/targets/Patsopoulos_et_al_2019_ST14_sS.tsv"
-        " --wS data/targets/Patsopoulos_et_al_2019_ST14_wS.tsv"
-        " --out-auto data/targets/gwas_ms_auto.tsv"
-        " --out-mhc data/targets/gwas_ms_mhc.tsv"
-        " --out-sig data/targets/gwas_ms_auto_mhc.tsv"
-        " --out-sug data/targets/gwas_ms_auto_mhc_sS.tsv"
-        " --out-all data/targets/gwas_ms_auto_mhc_sS_wS.tsv"
+        " --auto {input.auto}"
+        " --mhc {input.mhc}"
+        " --sS {input.sS}"
+        " --wS {input.wS}"
+        " --out-auto {output.auto}"
+        " --out-mhc {output.mhc}"
+        " --out-sig {output.sig}"
+        " --out-sug {output.sug}"
+        " --out-all {output.all}"

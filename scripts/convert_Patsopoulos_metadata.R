@@ -17,11 +17,11 @@ p <- add_argument(p, "--auto", help = "Genome-wide significant autosomal SNPs", 
 p <- add_argument(p, "--mhc", help = "MHC SNPs, classical model", default = "data/targets/Patsopoulos_et_al_2019_ST11.tsv")
 p <- add_argument(p, "--sS", help = "Strongly suggestive SNPs", default = "data/targets/Patsopoulos_et_al_2019_ST14_sS.tsv")
 p <- add_argument(p, "--wS", help = "Weakly suggestive SNPs", default = "data/targets/Patsopoulos_et_al_2019_ST14_wS.tsv")
-p <- add_argument(p, "--out-auto", help = "Output autosomal SNPs", default = "data/targets/gwas_ms_auto.tsv")
-p <- add_argument(p, "--out-mhc", help = "Output MHC SNPs", default = "data/targets/gwas_ms_mhc.tsv")
-p <- add_argument(p, "--out-sig", help = "Output significant SNPs", default = "data/targets/gwas_ms_auto_mhc.tsv")
-p <- add_argument(p, "--out-sug", help = "Output significant + suggestive SNPs", default = "data/targets/gwas_ms_auto_mhc_sS.tsv")
-p <- add_argument(p, "--out-all", help = "Output all SNPs", default = "data/targets/gwas_ms_auto_mhc_sS_wS.tsv")
+p <- add_argument(p, "--out-auto", help = "Output autosomal SNPs", default = "data/targets/gwas_ms-auto.tsv")
+p <- add_argument(p, "--out-mhc", help = "Output MHC SNPs", default = "data/targets/gwas_ms-mhc.tsv")
+p <- add_argument(p, "--out-sig", help = "Output significant SNPs", default = "data/targets/gwas_ms-auto-mhc.tsv")
+p <- add_argument(p, "--out-sug", help = "Output significant + suggestive SNPs", default = "data/targets/gwas_ms-auto-mhc-sS.tsv")
+p <- add_argument(p, "--out-all", help = "Output all SNPs", default = "data/targets/gwas_ms-auto-mhc-sS-wS.tsv")
 
 argv <- parse_args(p)
 

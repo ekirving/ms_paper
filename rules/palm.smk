@@ -14,10 +14,6 @@ Rules for detecting polygenic selection with PALM
 """
 
 
-wildcard_constraints:
-    trait="[^_]+",
-
-
 rule reference_metadata:
     """
     Extract the REF, ALT and ancestral alleles from the dataset VCF

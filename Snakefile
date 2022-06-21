@@ -13,6 +13,12 @@ import pandas as pd
 configfile: "config.yaml"
 
 
+wildcard_constraints:
+    ancestry="[A-Z]{3}",
+    dataset="[^-]+",
+    trait="[^_]+",
+
+
 include: "rules/gwascat.smk"
 include: "rules/variants.smk"
 include: "rules/clues.smk"
@@ -20,7 +26,7 @@ include: "rules/palm.smk"
 
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
-TRAITS = ["ms", "ibd", "ra", "celiac", "ms_auto", "ms_mhc", "ms_auto_mhc", "ms_auto_mhc_sS", "ms_auto_mhc_sS_wS"]
+TRAITS = ["ms", "ibd", "ra", "celiac", "ms-auto", "ms-mhc", "ms-auto-mhc", "ms-auto-mhc-sS", "ms-auto-mhc-sS-wS"]
 
 
 def all_clues_plots(_):

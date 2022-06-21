@@ -39,11 +39,11 @@ clues_load_data <- function(prefix) {
 
 traits <- list(
     "ms" = "Multiple sclerosis",
-    "ms_auto" = "Multiple sclerosis (autosomal non-MHC)",
-    "ms_mhc" = "Multiple sclerosis (MHC SNPs)",
-    "ms_auto_mhc" = "Multiple sclerosis (autosomal + MHC SNPs)",
-    "ms_auto_mhc_sS" = "Multiple sclerosis (auto + MHC + sS SNPs)",
-    "ms_auto_mhc_sS_wS" = "Multiple sclerosis (all SNPs)",
+    "ms-auto" = "Multiple sclerosis (autosomal non-MHC)",
+    "ms-mhc" = "Multiple sclerosis (MHC SNPs)",
+    "ms-auto-mhc" = "Multiple sclerosis (autosomal + MHC SNPs)",
+    "ms-auto-mhc-sS" = "Multiple sclerosis (auto + MHC + sS SNPs)",
+    "ms-auto-mhc-sS-wS" = "Multiple sclerosis (all SNPs)",
     "ra" = "Rheumatoid arthritis",
     "ibd" = "Inflammatory bowel disease",
     "celiac" = "Celiac disease"
