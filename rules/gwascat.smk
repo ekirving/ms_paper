@@ -53,3 +53,38 @@ rule convert_ms_metadata:
         "Rscript scripts/convert_ms_metadata.R"
         " --gwas {input.tsv}"
         " --output {output.tsv}"
+
+
+rule convert_ms_autosome_metadata:
+    """
+    Convert the four different SNP ascertainments from Patsopoulos et. al. 2019 
+
+    1. Genome-wide significant autosomal SNPs (n=200)
+    2. MHC SNPs, classical model (n=32)
+    3. Strongly suggestive SNPs [p < 1e-5] (n=117)
+    4. Weakly suggestive SNPs (n=299)
+
+    https://doi.org/10.1126/science.aav7188
+    """
+    input:
+        auto="data/targets/Patsopoulos_et_al_2019_ST7.tsv",
+        mhc="data/targets/Patsopoulos_et_al_2019_ST11.tsv",
+        sS="data/targets/Patsopoulos_et_al_2019_ST14_sS.tsv",
+        wS="data/targets/Patsopoulos_et_al_2019_ST14_wS.tsv",
+    output:
+        auto="data/targets/gwas_ms_auto.tsv",
+        mhc="data/targets/gwas_ms_mhc.tsv",
+        sig="data/targets/gwas_ms_auto_mhc.tsv",
+        sug="data/targets/gwas_ms_auto_mhc_sS.tsv",
+        all="data/targets/gwas_ms_auto_mhc_sS_wS.tsv",
+    shell:
+        "Rscript scripts/convert_Patsopoulos_metadata.R"
+        " --auto data/targets/Patsopoulos_et_al_2019_ST7.tsv"
+        " --mhc data/targets/Patsopoulos_et_al_2019_ST11.tsv"
+        " --sS data/targets/Patsopoulos_et_al_2019_ST14_sS.tsv"
+        " --wS data/targets/Patsopoulos_et_al_2019_ST14_wS.tsv"
+        " --out-auto data/targets/gwas_ms_auto.tsv"
+        " --out-mhc data/targets/gwas_ms_mhc.tsv"
+        " --out-sig data/targets/gwas_ms_auto_mhc.tsv"
+        " --out-sug data/targets/gwas_ms_auto_mhc_sS.tsv"
+        " --out-all data/targets/gwas_ms_auto_mhc_sS_wS.tsv"
