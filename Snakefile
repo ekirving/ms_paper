@@ -20,7 +20,7 @@ include: "rules/palm.smk"
 
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
-TRAITS = ["ms", "ibd", "ra", "celiac"]
+TRAITS = ["ms", "ibd", "ra", "celiac", "ms_auto", "ms_mhc", "ms_auto_mhc", "ms_auto_mhc_sS", "ms_auto_mhc_sS_wS"]
 
 
 def all_clues_plots(_):
@@ -47,11 +47,10 @@ def all_clues_plots(_):
 rule all:
     input:
         # plot all the CLUES models
-        # all_clues_plots,
+        all_clues_plots,
         # run PALM and plot all the traits
         expand(
             [
-                # "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_trajectory.png",
                 "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-pval.png",
                 "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-prs.png",
                 "results/palm/ancestral_paths_new-{trait}-delta_prs.png",
