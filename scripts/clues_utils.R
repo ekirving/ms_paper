@@ -44,6 +44,7 @@ traits <- list(
     "ms-auto-mhc" = "Multiple sclerosis (autosomal + MHC SNPs)",
     "ms-auto-mhc-sS" = "Multiple sclerosis (auto + MHC + sS SNPs)",
     "ms-auto-mhc-sS-wS" = "Multiple sclerosis (all SNPs)",
+    "ms-mr" = "Multiple sclerosis (Shams et al., 2022)",
     "ra" = "Rheumatoid arthritis",
     "ibd" = "Inflammatory bowel disease",
     "celiac" = "Celiac disease"

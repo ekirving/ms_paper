@@ -26,7 +26,7 @@ include: "rules/palm.smk"
 
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
-TRAITS = ["ms", "ibd", "ra", "celiac", "ms-auto", "ms-mhc", "ms-auto-mhc", "ms-auto-mhc-sS", "ms-auto-mhc-sS-wS"]
+TRAITS = ["ms", "ibd", "ra", "celiac", "ms-auto", "ms-mhc", "ms-auto-mhc", "ms-auto-mhc-sS", "ms-auto-mhc-sS-wS", "ms-mr"]
 
 
 def all_clues_plots(_):

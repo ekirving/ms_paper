@@ -55,7 +55,7 @@ rule convert_ms_metadata:
         " --output {output.tsv}"
 
 
-rule convert_ms_autosome_metadata:
+rule convert_ms_patsopoulos_metadata:
     """
     Convert the four different SNP ascertainments from Patsopoulos et. al. 2019 
 
@@ -88,3 +88,19 @@ rule convert_ms_autosome_metadata:
         " --out-sig {output.sig}"
         " --out-sug {output.sug}"
         " --out-all {output.all}"
+
+
+rule convert_ms_shams_metadata:
+    """
+    Convert the metadata from Shams et al., 2022
+    
+    https://doi.org/10.1093/brain/awac092
+    """
+    input:
+        tsv="data/targets/Shams_et_al_2022_S15.tsv",
+    output:
+        tsv="data/targets/gwas_ms-mr.tsv",
+    shell:
+        "Rscript scripts/convert_Shams_metadata.R"
+        " --gwas {input.tsv}"
+        " --output {output.tsv}"
