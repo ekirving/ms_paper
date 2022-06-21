@@ -38,8 +38,10 @@ fine <- bind_rows(
         SNP = `Effect`,
         effect_allele = `A1 effect`,
         other_allele = `A2 effect`,
-        P = `P effect conditional`, # The p-value of the "Effect" variant in the conditional model, i.e. the one that includes all variants from previous steps.
-        OR = `OR effect conditional`, # The OR of the A1 allele of the "Effect" variant in the conditional model, i.e. the one that includes all variants from previous steps.
+        P = `P (joined)`, # The p-value of the joint analysis (discovery + MS Chip + ImmunoChip) for the "SNP discovery" variant
+        OR = `OR (joined)`, # The OR of the joint analysis (discovery + MS Chip + ImmunoChip) for the A1 allele of the "SNP discovery" variant
+        # P = `P effect conditional`, # The p-value of the "Effect" variant in the conditional model, i.e. the one that includes all variants from previous steps.
+        # OR = `OR effect conditional`, # The OR of the A1 allele of the "Effect" variant in the conditional model, i.e. the one that includes all variants from previous steps.
         type,
     )
 
