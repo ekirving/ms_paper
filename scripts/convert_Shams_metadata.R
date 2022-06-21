@@ -20,6 +20,6 @@ argv <- parse_args(p)
 
 data <- read_tsv(argv$gwas, col_types = cols()) %>%
     # fetch all the expected columns
-    select(CHR, BP, SNP, effect_allele = EA, other_allele = OA, P, beta = `log(OR)`, SE)
+    select(CHR, BP, SNP, effect_allele = EA, other_allele = OA, P, beta = `log(OR)`, se = SE)
 
 write_tsv(data, argv$output)
