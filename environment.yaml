@@ -3,6 +3,7 @@ channels:
   - bioconda
 dependencies:
   - bioconda::bcftools=1.15
+  - bioconda::plink=1.90b6.21
   - bioconda::pysam=0.18.0
   - bioconda::snakefmt=0.6.0
   - bioconda::snakemake=6.12.3

@@ -93,7 +93,7 @@ rule convert_ms_patsopoulos_metadata:
 rule convert_ms_shams_metadata:
     """
     Convert the metadata from Shams et al., 2022
-    
+
     https://doi.org/10.1093/brain/awac092
     """
     input:

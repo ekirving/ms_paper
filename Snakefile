@@ -19,6 +19,8 @@ wildcard_constraints:
     trait="[^_]+",
 
 
+include: "rules/dbsnp.smk"
+include: "rules/proxy-snps.smk"
 include: "rules/gwascat.smk"
 include: "rules/variants.smk"
 include: "rules/clues.smk"
@@ -26,7 +28,18 @@ include: "rules/palm.smk"
 
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
-TRAITS = ["ms", "ibd", "ra", "celiac", "ms-auto", "ms-mhc", "ms-auto-mhc", "ms-auto-mhc-sS", "ms-auto-mhc-sS-wS", "ms-mr"]
+TRAITS = [
+    "ms",
+    "ms-auto",
+    "ms-mhc",
+    "ms-auto-mhc",
+    "ms-auto-mhc-sS",
+    "ms-auto-mhc-sS-wS",
+    "ms-mr",
+    "ibd",
+    "ra",
+    "celiac",
+]
 
 
 def all_clues_plots(_):

@@ -10,6 +10,7 @@ __pycache__
 bak/
 benchmarks/
 bin/
+data/1000g/
 data/Ancestral_paths_new
 data/clues/
 data/ensembl/
