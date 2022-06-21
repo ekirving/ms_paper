@@ -49,6 +49,15 @@ traits <- list(
     "celiac" = "Celiac disease"
 )
 
+# decode the ancestry and trait names
+ancestries <- list(
+    "ALL" = "All ancestries",
+    "ANA" = "Anatolian Farmers",
+    "CHG" = "Caucasus Hunter-gatherers",
+    "WHG" = "Western Hunter-gatherers",
+    "EHG" = "Eastern Hunter-gatherers"
+)
+
 ancestry_colors <- c(
     "ALL" = "#66c2a5",
     "WHG" = "#fc8d62",
