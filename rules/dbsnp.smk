@@ -13,7 +13,7 @@ Rules to fetch the dbSNP database
 """
 
 
-rule reference_grch38_assembly_report:
+rule reference_grch37_assembly_report:
     """
     Fetch the GRCh37 assembly report
     """

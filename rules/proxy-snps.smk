@@ -63,8 +63,8 @@ rule filter_1000g_populations:
         tbi=temp("data/1000g/vcf/1000G_phase3-chr{chr}-FIN_GBR_TSI.vcf.gz.tbi"),
     threads: 4
     shell:
-        "bcftools view --threads {threads} --samples-file {input.list} --output-type u {input.vcf} | "
-        "bcftools annotate --threads {threads} --annotations {input.dbsnp} -c ID --output-type z --output {output.vcf} && "
+        "bcftools annotate --threads {threads} --annotations {input.dbsnp} --columns ID --output-type u {input.vcf} | "
+        "bcftools view --threads {threads} --samples-file {input.list} --output-type z --output {output.vcf} && "
         "bcftools index --tbi --threads {threads} {output.vcf}"
 
 
