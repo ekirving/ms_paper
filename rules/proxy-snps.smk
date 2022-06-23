@@ -6,6 +6,8 @@ __copyright__ = "Copyright 2022, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
+import pandas as pd
+
 
 """
 Rules for finding SNPs in high LD with missing GWAS tag SNPs
@@ -85,3 +87,71 @@ rule plink_convert:
         prefix="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI",
     shell:
         "plink --make-bed --vcf {input.vcf} --out {params.prefix} &> {log}"
+
+
+rule plink_pairwise_ld:
+    """
+    Calculate pairwise LD between each SNP and all other SNPs within 1Mb
+    """
+    input:
+        bed="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bed",
+        bim="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bim",
+        fam="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.fam",
+    output:
+        ld=temp("data/1000g/ld/1000G_phase3-chr{chr}-{rsid}.ld"),
+    log:
+        log="data/1000g/ld/1000G_phase3-chr{chr}-{rsid}.log",
+    params:
+        out="data/1000g/ld/1000G_phase3-chr{chr}-{rsid}",
+    shell:
+        "plink"
+        " --bed {input.bed}"
+        " --bim {input.bim}"
+        " --fam {input.fam}"
+        " --r2"
+        " --ld-snp {wildcards.rsid}"
+        " --ld-window-kb 1000"
+        " --ld-window 99999"
+        " --ld-window-r2 0 "
+        " --out {params.out}"
+        "&> {log}"
+
+
+def concatenate_pairwise_ld_input(wildcards):
+    """
+    List all the SNPs for which we need to calculate the pair-wise LD
+    """
+    # noinspection PyUnresolvedReferences
+    gwas_tsv = checkpoints.gwas_metadata.get(trait=wildcards.trait).output.tsv
+
+    snp = pd.read_table(gwas_tsv)
+
+    files = [f"data/1000g/ld/1000G_phase3-chr{row.CHR}-{row.SNP}.ld" for row in snp.itertuples()]
+
+    return files
+
+
+rule concatenate_pairwise_ld:
+    """
+    Concatenate the LD tables into a single sheet
+    """
+    input:
+        concatenate_pairwise_ld_input,
+    output:
+        tsv="data/targets/gwas_{trait}_ld.tsv",
+    shell:
+        "head -n1 {input[0]} > {output.tsv} && "
+        "tail -n +2 -q {input} >> {output.tsv}"
+
+
+rule list_callable_sites:
+    """
+    Make a list of all the callable sites in the current dataset
+    """
+    input:
+        vcf=lambda wildcards: config["samples"][wildcards.dataset]["genotypes"],
+    output:
+        tsv="data/sites/{dataset}_sites.tsv.gz"
+    shell:
+        "bcftools query --print-header --format '%CHROM\t%POS\t%REF\t%ALT\n' {input.vcf} | "
+        "bgzip -c > {output.tsv}"

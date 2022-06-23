@@ -104,3 +104,15 @@ rule convert_ms_shams_metadata:
         "Rscript scripts/convert_Shams_metadata.R"
         " --gwas {input.tsv}"
         " --output {output.tsv}"
+
+
+checkpoint gwas_metadata:
+    """
+    Wrap the different sources of GWAS metadata, so we can access the list of SNPs as a checkpoint 
+    """
+    input:
+        tsv="data/targets/gwas_{trait}.tsv",
+    output:
+        tsv=temp("data/targets/gwas_{trait}_static.tsv"),
+    shell:
+        "cp {input} {output}"

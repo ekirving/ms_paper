@@ -46,7 +46,7 @@ rule reference_dbsnp_b155_reheader:
     output:
         vcf="data/dbsnp/GRCh37.dbSNP155.vcf.gz",
         tbi="data/dbsnp/GRCh37.dbSNP155.vcf.gz.tbi",
-        txt="data/GCF_000001405.39_GRCh37.p13_assembly_report.chroms",
+        txt=temp("data/GCF_000001405.25_GRCh37.p13_assembly_report.chroms"),
     shell:
         "grep -v '^#' {input.txt} | awk -v FS='\\t' '{{ if ($2==\"assembled-molecule\") {{ print $7, $1 }} else {{ print $7, $5 }} }}' | grep -vw 'na' > {output.txt} && "
         "bcftools annotate --rename-chrs {output.txt} -Oz -o {output.vcf} {input.vcf} && "

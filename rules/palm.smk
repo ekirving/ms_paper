@@ -33,10 +33,11 @@ rule reference_metadata:
 
 checkpoint palm_metadata:
     """
-    Convert the GWAS metadata into PALM input format
+    Convert the GWAS metadata into PALM input format, and replace any missing SNPs with proxy-SNPs in high LD
     """
     input:
         tsv="data/targets/gwas_{trait}.tsv",
+        ld="data/targets/gwas_{trait}_ld.tsv",
         var="data/targets/gwas_{trait}_{dataset}_variants.tsv",
     output:
         tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
