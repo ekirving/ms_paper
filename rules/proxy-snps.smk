@@ -138,10 +138,10 @@ rule concatenate_pairwise_ld:
     input:
         concatenate_pairwise_ld_input,
     output:
-        tsv="data/targets/gwas_{trait}_ld.tsv",
+        tsv="data/targets/gwas_{trait}_ld.tsv.gz",
     shell:
-        "head -n1 {input[0]} > {output.tsv} && "
-        "tail -n +2 -q {input} >> {output.tsv}"
+        "head -n1 {input[0]} | gzip -c > {output.tsv} && "
+        "tail -n +2 -q {input} | gzip -c >> {output.tsv}"
 
 
 rule list_callable_sites:
