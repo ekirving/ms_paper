@@ -74,8 +74,13 @@ fixed <- fine %>%
 fine <- bind_rows(fine %>% filter(grepl("rs[0-9]+", SNP)), fixed)
 
 # remove a few rsIDs that are not present in 1000G
+missing <- c("rs4820955", "rs12832171", "rs67934705", "rs10936182", "rs34723276", "rs200866143", "rs35218683", 
+             "rs67476479", "rs28393281", "rs798251", "rs71433431", "rs61913627", "rs71314176", "rs7327127", 
+             "rs7454108", "rs200531028", "rs1049079", "rs184012272", "rs36182614", "rs4648812", "rs73620658", 
+             "rs72978161", "rs138483081", "rs28444818", "rs766848979", "rs865838653")
+
 fine <- fine %>%
-    filter(!SNP %in% c("rs4820955", "rs12832171", "rs67934705", "rs10936182", "rs34723276", "rs200866143", "rs35218683"))
+    filter(!SNP %in% missing)
 
 # handle the MHC SNPs from the classical model
 mhc <- read_tsv(argv$mhc, col_types = cols()) %>% mutate(CHR = 6)
