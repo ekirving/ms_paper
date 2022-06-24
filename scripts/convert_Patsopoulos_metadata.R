@@ -45,6 +45,32 @@ fine <- bind_rows(
         type,
     )
 
+get_rsid <- function(chr, pos, a1, a2) {
+    # use the Variant Effect Predictor to fetch the rsID of the SNP (which requires the non-ref allele, which we don't know)
+    json_text <- tryCatch(
+        {
+            readLines(paste0("https://grch37.rest.ensembl.org/vep/human/region/", chr, ":", pos, "/", a1), warn = FALSE)
+        },
+        warning = function(e) {
+            readLines(paste0("https://grch37.rest.ensembl.org/vep/human/region/", chr, ":", pos, "/", a2), warn = FALSE)
+        }
+    )
+
+    rsid <- str_extract(paste(json_text, collapse = " "), "rs[0-9]+")[1]
+
+    return(rsid)
+}
+
+# fill in any missing rsIDs, as we need them for the rest of the pipeline
+fixed <- fine %>%
+    filter(!grepl("rs[0-9]+", SNP)) %>%
+    # for each row, fetch the rsID by calling the Ensembl web API
+    rowwise() %>%
+    mutate(SNP = get_rsid(CHR, BP, effect_allele, other_allele))
+
+# merge the data back together
+fine <- bind_rows(fine %>% filter(grepl("rs[0-9]+", SNP)), fixed)
+
 # handle the MHC SNPs from the classical model
 mhc <- read_tsv(argv$mhc, col_types = cols()) %>% mutate(CHR = 6)
 

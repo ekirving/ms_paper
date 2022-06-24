@@ -21,6 +21,7 @@ data/metadata/
 data/neo.impute
 data/neo.likelihoods
 data/relate/
+data/sites/
 data/targets/*_palm.tsv
 data/targets/*_positions.tsv
 data/targets/*_variants.tsv
