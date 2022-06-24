@@ -66,7 +66,9 @@ fixed <- fine %>%
     filter(!grepl("rs[0-9]+", SNP)) %>%
     # for each row, fetch the rsID by calling the Ensembl web API
     rowwise() %>%
-    mutate(SNP = get_rsid(CHR, BP, effect_allele, other_allele))
+    mutate(SNP = get_rsid(CHR, BP, effect_allele, other_allele)) %>%
+    # drop any associations that do not have an rsID
+    filter(!is.na(SNP))
 
 # merge the data back together
 fine <- bind_rows(fine %>% filter(grepl("rs[0-9]+", SNP)), fixed)
