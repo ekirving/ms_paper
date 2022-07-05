@@ -108,13 +108,13 @@ rule plink_pairwise_ld:
         " --bed {input.bed}"
         " --bim {input.bim}"
         " --fam {input.fam}"
-        " --r2"
+        " --r2 in-phase"
         " --ld-snp {wildcards.rsid}"
         " --ld-window-kb 1000"
         " --ld-window 99999"
-        " --ld-window-r2 0 "
+        " --ld-window-r2 0"
         " --out {params.out}"
-        "&> {log}"
+        " &> {log}"
 
 
 def concatenate_pairwise_ld_input(wildcards):
