@@ -153,5 +153,5 @@ rule list_callable_sites:
     output:
         tsv="data/sites/{dataset}_sites.tsv.gz"
     shell:
-        "bcftools query --print-header --format '%CHROM\t%POS\t%REF\t%ALT\n' {input.vcf} | "
-        "bgzip -c > {output.tsv}"
+        r"bcftools query --print-header --format '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%INFO/AA\n' {input.vcf} | "
+        r"sed 's/|||//' | tr [acgt] [ACGT] | bgzip -c > {output.tsv}"
