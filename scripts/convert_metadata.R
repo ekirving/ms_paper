@@ -13,7 +13,7 @@ quiet(library(tidyverse)) # v1.3.1
 
 # get the command line arguments
 p <- arg_parser("Convert the metadata for Multiple sclerosis")
-p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/ms_snps_final.csv")
+p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/ms_snps_final_discovery_0.7_combined.csv")
 p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_ms.tsv")
 
 argv <- parse_args(p)

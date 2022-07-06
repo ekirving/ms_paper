@@ -47,7 +47,7 @@ traits <- list(
     "ms-mr" = "Multiple sclerosis (Shams et al., 2022)",
     "ra" = "Rheumatoid arthritis",
     "ibd" = "Inflammatory bowel disease",
-    "celiac" = "Celiac disease"
+    "cd" = "Celiac disease"
 )
 
 # decode the ancestry and trait names

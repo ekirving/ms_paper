@@ -46,11 +46,39 @@ rule convert_ms_metadata:
     https://doi.org/10.1126/science.aav7188
     """
     input:
-        tsv="data/targets/ms_snps_final.csv",
+        tsv="data/targets/ms_snps_final_discovery_0.7_combined.csv",
     output:
         tsv="data/targets/gwas_ms.tsv",
     shell:
-        "Rscript scripts/convert_ms_metadata.R"
+        "Rscript scripts/convert_metadata.R"
+        " --gwas {input.tsv}"
+        " --output {output.tsv}"
+
+
+rule convert_cd_metadata:
+    """
+    Convert the GWAS metadata for Celiac disease 
+    """
+    input:
+        tsv="data/targets/cd_snps_final_0.7_combined.csv",
+    output:
+        tsv="data/targets/gwas_cd.tsv",
+    shell:
+        "Rscript scripts/convert_metadata.R"
+        " --gwas {input.tsv}"
+        " --output {output.tsv}"
+
+
+rule convert_ra_metadata:
+    """
+    Convert the GWAS metadata for  
+    """
+    input:
+        tsv="data/targets/ra_snps_final_0.7_combined.csv",
+    output:
+        tsv="data/targets/gwas_ra.tsv",
+    shell:
+        "Rscript scripts/convert_metadata.R"
         " --gwas {input.tsv}"
         " --output {output.tsv}"
 
