@@ -14,37 +14,21 @@ Rules for detecting polygenic selection with PALM
 """
 
 
-rule reference_metadata:
-    """
-    Extract the REF, ALT and ancestral alleles from the dataset VCF
-    """
-    input:
-        vcf=lambda wildcards: config["samples"][wildcards.dataset]["genotypes"],
-        tsv="data/targets/gwas_{trait}.tsv",
-    output:
-        pos=temp("data/targets/gwas_{trait}_{dataset}_positions.tsv"),
-        var=temp("data/targets/gwas_{trait}_{dataset}_variants.tsv"),
-    shell:
-        "awk 'NR>1 {{ print $1\"\\t\"$2 }}' {input.tsv} > {output.pos} && "
-        "bcftools view --regions-file {output.pos} {input.vcf} | "
-        r" bcftools query --format '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%INFO/AA\n' | "
-        r" sed 's/|||//' | tr [acgt] [ACGT] > {output.var}"
-
-
 checkpoint palm_metadata:
     """
     Convert the GWAS metadata into PALM input format, and replace any missing SNPs with proxy-SNPs in high LD
     """
     input:
-        tsv="data/targets/gwas_{trait}.tsv",
-        ld="data/targets/gwas_{trait}_ld.tsv",
-        var="data/targets/gwas_{trait}_{dataset}_variants.tsv",
+        gwas="data/targets/gwas_{trait}.tsv",
+        ld="data/targets/gwas_{trait}_ld.tsv.gz",
+        sites="data/sites/{dataset}_sites.tsv.gz",
     output:
         tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
     shell:
         "Rscript scripts/palm_metadata.R"
-        " --gwas {input.tsv}"
-        " --variants {input.var}"
+        " --gwas {input.gwas}"
+        " --ld {input.ld}"
+        " --sites {input.sites}"
         " --output {output.tsv}"
 
 

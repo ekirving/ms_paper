@@ -151,7 +151,7 @@ rule list_callable_sites:
     input:
         vcf=lambda wildcards: config["samples"][wildcards.dataset]["genotypes"],
     output:
-        tsv="data/sites/{dataset}_sites.tsv.gz"
+        tsv="data/sites/{dataset}_sites.tsv.gz",
     shell:
         r"bcftools query --print-header --format '%CHROM\t%POS\t%ID\t%REF\t%ALT\t%INFO/AA\n' {input.vcf} | "
         r"sed 's/|||//' | tr [acgt] [ACGT] | bgzip -c > {output.tsv}"
