@@ -31,28 +31,28 @@ proxy <- ld %>%
     inner_join(sites, by = c("PROXY_CHR" = "chrom", "PROXY_BP" = "pos")) %>%
     # pick the LD SNP with the highest R^2
     group_by(GWAS_SNP) %>%
-    slice_max(R2, with_ties=TRUE) %>%
+    slice_max(R2, with_ties = TRUE) %>%
     # break R^2 ties by choosing the closest SNP
     mutate(distance = abs(GWAS_BP - PROXY_BP)) %>%
     group_by(GWAS_SNP) %>%
-    slice_min(distance, with_ties=FALSE) %>%
+    slice_min(distance, with_ties = FALSE) %>%
     ungroup() %>%
     # enforce a minimum R^2 threshold
     filter(R2 >= argv$min_ld) %>%
     # split the phase block from plink into individual alleles
-    separate(col=PHASE, into=c("PHASE_A1", "PHASE_A2"), sep="/") %>%
-    separate(col=PHASE_A1, into=c("GWAS_A1", "PROXY_A1"), sep=c(1)) %>%
-    separate(col=PHASE_A2, into=c("GWAS_A2", "PROXY_A2"), sep=c(1))
+    separate(col = PHASE, into = c("PHASE_A1", "PHASE_A2"), sep = "/") %>%
+    separate(col = PHASE_A1, into = c("GWAS_A1", "PROXY_A1"), sep = c(1)) %>%
+    separate(col = PHASE_A2, into = c("GWAS_A2", "PROXY_A2"), sep = c(1))
 
 data <- proxy %>%
-    inner_join(gwas, by=c("GWAS_CHR" = "CHR", "GWAS_BP" = "BP", "GWAS_SNP" = "SNP")) %>%
+    inner_join(gwas, by = c("GWAS_CHR" = "CHR", "GWAS_BP" = "BP", "GWAS_SNP" = "SNP")) %>%
     # rename the old effect and other alleles
-    rename(GWAS_EA=effect_allele, GWAS_OA=other_allele) %>%
+    rename(GWAS_EA = effect_allele, GWAS_OA = other_allele) %>%
     # map the GWAS alleles onto the proxy alleles
-    mutate(effect_allele=ifelse(GWAS_EA==GWAS_A1, PROXY_A1, PROXY_A2)) %>%
-    mutate(other_allele=ifelse(GWAS_OA==GWAS_A1, PROXY_A1, PROXY_A2)) %>%
+    mutate(effect_allele = ifelse(GWAS_EA == GWAS_A1, PROXY_A1, PROXY_A2)) %>%
+    mutate(other_allele = ifelse(GWAS_OA == GWAS_A1, PROXY_A1, PROXY_A2)) %>%
     # rename the proxy columns
-    rename_with(~str_remove(., 'PROXY_')) %>%
+    rename_with(~ str_remove(., "PROXY_")) %>%
     # sort the SNPs
     arrange(CHR, BP) %>%
     # add the extra columns
