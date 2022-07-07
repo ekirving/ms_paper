@@ -24,12 +24,14 @@ checkpoint palm_metadata:
         sites="data/sites/{dataset}_sites.tsv.gz",
     output:
         tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
+    log:
+        log="data/targets/gwas_{trait}_{dataset}_palm.log",
     shell:
         "Rscript scripts/palm_metadata.R"
         " --gwas {input.gwas}"
         " --ld {input.ld}"
         " --sites {input.sites}"
-        " --output {output.tsv}"
+        " --output {output.tsv} &> {log}"
 
 
 def clues_quad_fit(wildcards):
