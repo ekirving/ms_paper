@@ -38,16 +38,22 @@ clues_load_data <- function(prefix) {
 }
 
 traits <- list(
+    "cd" = "Celiac disease",
+    "cd-auto" = "Celiac disease (autosomal, non-MHC)",
+    "cd-mhc" = "Celiac disease (MHC only)",
+    "ibd" = "Inflammatory bowel disease",
+    "ibd-auto" = "Celiac disease (autosomal, non-MHC)",
+    "ibd-mhc" = "Celiac disease (MHC only)",
     "ms" = "Multiple sclerosis",
-    "ms-auto" = "Multiple sclerosis (autosomal non-MHC)",
-    "ms-mhc" = "Multiple sclerosis (MHC SNPs)",
+    "ms-auto" = "Multiple sclerosis (autosomal, non-MHC)",
     "ms-auto-mhc" = "Multiple sclerosis (autosomal + MHC SNPs)",
     "ms-auto-mhc-sS" = "Multiple sclerosis (auto + MHC + sS SNPs)",
     "ms-auto-mhc-sS-wS" = "Multiple sclerosis (all SNPs)",
+    "ms-mhc" = "Multiple sclerosis (MHC only)",
     "ms-mr" = "Multiple sclerosis (Shams et al., 2022)",
     "ra" = "Rheumatoid arthritis",
-    "ibd" = "Inflammatory bowel disease",
-    "cd" = "Celiac disease"
+    "ra-auto" = "Rheumatoid arthritis (autosomal, non-MHC)",
+    "ra-mhc" = "Rheumatoid arthritis (MHC only)"
 )
 
 # decode the ancestry and trait names

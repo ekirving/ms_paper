@@ -13,6 +13,10 @@ import pandas as pd
 Rules for detecting polygenic selection with PALM  
 """
 
+MHC_CHROM = 6
+MHC_START = 28477797
+MHC_FINISH = 33448354
+
 
 checkpoint palm_metadata:
     """

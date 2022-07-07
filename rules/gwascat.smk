@@ -83,39 +83,39 @@ rule convert_ra_metadata:
         " --output {output.tsv}"
 
 
-rule convert_ms_patsopoulos_metadata:
-    """
-    Convert the four different SNP ascertainments from Patsopoulos et. al. 2019 
-
-    1. Genome-wide significant autosomal SNPs (n=200)
-    2. MHC SNPs, classical model (n=32)
-    3. Strongly suggestive SNPs [p < 1e-5] (n=117)
-    4. Weakly suggestive SNPs (n=299)
-
-    https://doi.org/10.1126/science.aav7188
-    """
-    input:
-        auto="data/targets/Patsopoulos_et_al_2019_ST7.tsv",
-        mhc="data/targets/Patsopoulos_et_al_2019_ST11.tsv",
-        sS="data/targets/Patsopoulos_et_al_2019_ST14_sS.tsv",
-        wS="data/targets/Patsopoulos_et_al_2019_ST14_wS.tsv",
-    output:
-        auto="data/targets/gwas_ms-auto.tsv",
-        mhc="data/targets/gwas_ms-mhc.tsv",
-        sig="data/targets/gwas_ms-auto-mhc.tsv",
-        sug="data/targets/gwas_ms-auto-mhc-sS.tsv",
-        all="data/targets/gwas_ms-auto-mhc-sS-wS.tsv",
-    shell:
-        "Rscript scripts/convert_Patsopoulos_metadata.R"
-        " --auto {input.auto}"
-        " --mhc {input.mhc}"
-        " --sS {input.sS}"
-        " --wS {input.wS}"
-        " --out-auto {output.auto}"
-        " --out-mhc {output.mhc}"
-        " --out-sig {output.sig}"
-        " --out-sug {output.sug}"
-        " --out-all {output.all}"
+# rule convert_ms_patsopoulos_metadata:
+#     """
+#     Convert the four different SNP ascertainments from Patsopoulos et. al. 2019
+#
+#     1. Genome-wide significant autosomal SNPs (n=200)
+#     2. MHC SNPs, classical model (n=32)
+#     3. Strongly suggestive SNPs [p < 1e-5] (n=117)
+#     4. Weakly suggestive SNPs (n=299)
+#
+#     https://doi.org/10.1126/science.aav7188
+#     """
+#     input:
+#         auto="data/targets/Patsopoulos_et_al_2019_ST7.tsv",
+#         mhc="data/targets/Patsopoulos_et_al_2019_ST11.tsv",
+#         sS="data/targets/Patsopoulos_et_al_2019_ST14_sS.tsv",
+#         wS="data/targets/Patsopoulos_et_al_2019_ST14_wS.tsv",
+#     output:
+#         auto="data/targets/gwas_ms-auto.tsv",
+#         mhc="data/targets/gwas_ms-mhc.tsv",
+#         sig="data/targets/gwas_ms-auto-mhc.tsv",
+#         sug="data/targets/gwas_ms-auto-mhc-sS.tsv",
+#         all="data/targets/gwas_ms-auto-mhc-sS-wS.tsv",
+#     shell:
+#         "Rscript scripts/convert_Patsopoulos_metadata.R"
+#         " --auto {input.auto}"
+#         " --mhc {input.mhc}"
+#         " --sS {input.sS}"
+#         " --wS {input.wS}"
+#         " --out-auto {output.auto}"
+#         " --out-mhc {output.mhc}"
+#         " --out-sig {output.sig}"
+#         " --out-sug {output.sug}"
+#         " --out-all {output.all}"
 
 
 rule convert_ms_shams_metadata:
@@ -132,6 +132,20 @@ rule convert_ms_shams_metadata:
         "Rscript scripts/convert_Shams_metadata.R"
         " --gwas {input.tsv}"
         " --output {output.tsv}"
+
+
+rule gwas_metadata_mhc:
+    """
+    Split the MHC and non-MHC SNPs into two files, so we can compare results  
+    """
+    input:
+        gwas="data/targets/gwas_{trait}.tsv",
+    output:
+        mhc="data/targets/gwas_{trait}-mhc.tsv",
+        auto="data/targets/gwas_{trait}-auto.tsv",
+    shell:
+        "awk 'NR==1 || ($1=={MHC_CHROM} && $2>={MHC_START} && $2<={MHC_FINISH})' {input.gwas} > {output.mhc} && "
+        "awk 'NR==1 || ($1!={MHC_CHROM} || $2< {MHC_START} || $2> {MHC_FINISH})' {input.gwas} > {output.auto}"
 
 
 checkpoint gwas_metadata:
