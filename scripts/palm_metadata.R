@@ -111,4 +111,8 @@ data <- data %>%
     rename(pval = P, rsid = SNP, chrom = CHR, pos = BP, ref = REF, alt = ALT) %>%
     select(ld_block, variant, chrom, pos, rsid, ref, alt, ancestral_allele, derived_allele, beta, se, pval)
 
+if (nrow(gwas) != nrow(data)) {
+    print(paste0("WARN: Removed ", nrow(gwas) - nrow(data), " SNPs with invalid metadata (bad p-value or no standard error)"))
+}
+
 write_tsv(data, argv$output)
