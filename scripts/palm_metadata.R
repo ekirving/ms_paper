@@ -91,6 +91,9 @@ if (argv$proxy) {
 data <- data %>%
     # sort the SNPs
     arrange(CHR, BP) %>%
+    # fix any cases of zero p-values, due to very large negative exponents
+    mutate(P = ifelse(P != 0, P, .Machine$double.xmin)) %>%
+    mutate(se = ifelse(se > 0, se, abs(beta / qnorm(P / 2)))) %>%
     # add the extra columns
     mutate(
         # our SNPs are already LP-pruned
@@ -106,13 +109,7 @@ data <- data %>%
         # PALM assumes that betas measure the effect of the ALT allele
         beta = ifelse(effect_allele == ALT, beta, -beta)
     ) %>%
-    # remove any SNPs without a valid p-value or standard error for the association
-    filter(P != 0 & se != 0) %>%
     rename(pval = P, rsid = SNP, chrom = CHR, pos = BP, ref = REF, alt = ALT) %>%
     select(ld_block, variant, chrom, pos, rsid, ref, alt, ancestral_allele, derived_allele, beta, se, pval)
-
-if (nrow(gwas) != nrow(data)) {
-    print(paste0("WARN: Removed ", nrow(gwas) - nrow(data), " SNPs with invalid metadata (bad p-value or no standard error)"))
-}
 
 write_tsv(data, argv$output)
