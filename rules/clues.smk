@@ -72,13 +72,13 @@ rule clues_inference_ancient:
         daf=lambda wildcards, input: open(str(input.freq)).read().strip(),
         flg=lambda wildcards: "ancientSamps" if wildcards.ancestry == "ALL" else "ancientHaps",
     shell:
-        "cd bin/clues/ && python inference.py"
+        "python bin/clues/inference.py"
         " --lik"
         " --popFreq {params.daf}"
-        " --coal ../../{input.coal}"
-        " --{params.flg} ../../{input.anct}"
-        " --timeBins ../../{input.bins}"
-        " --out ../../{params.out} &> ../../{log}"
+        " --coal {input.coal}"
+        " --{params.flg} {input.anct}"
+        " --timeBins {input.bins}"
+        " --out {params.out} &> {log}"
 
 
 rule clues_parse_log:
