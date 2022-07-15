@@ -29,15 +29,12 @@ include: "rules/palm.smk"
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 TRAITS = [
-    "ms",
-    "ms-mhc",
-    "ms-auto",
-    "ra",
-    "ra-mhc",
-    "ra-auto",
-    "cd",
-    "cd-mhc",
-    "cd-auto",
+    "celiac-UKB-r0.05-kb250",
+    "celiac-UKB-r0.1-kb1000",
+    "ms-r0.05-kb250",
+    "ms-r0.1-kb1000",
+    "ra-r0.05-kb250",
+    "ra-r0.1-kb1000",
 ]
 
 

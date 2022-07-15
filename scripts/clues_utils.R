@@ -38,22 +38,12 @@ clues_load_data <- function(prefix) {
 }
 
 traits <- list(
-    "cd" = "Celiac disease",
-    "cd-auto" = "Celiac disease (autosomal, non-MHC)",
-    "cd-mhc" = "Celiac disease (MHC only)",
-    "ibd" = "Inflammatory bowel disease",
-    "ibd-auto" = "Celiac disease (autosomal, non-MHC)",
-    "ibd-mhc" = "Celiac disease (MHC only)",
-    "ms" = "Multiple sclerosis",
-    "ms-auto" = "Multiple sclerosis (autosomal, non-MHC)",
-    "ms-auto-mhc" = "Multiple sclerosis (autosomal + MHC SNPs)",
-    "ms-auto-mhc-sS" = "Multiple sclerosis (auto + MHC + sS SNPs)",
-    "ms-auto-mhc-sS-wS" = "Multiple sclerosis (all SNPs)",
-    "ms-mhc" = "Multiple sclerosis (MHC only)",
-    "ms-mr" = "Multiple sclerosis (Shams et al., 2022)",
-    "ra" = "Rheumatoid arthritis",
-    "ra-auto" = "Rheumatoid arthritis (autosomal, non-MHC)",
-    "ra-mhc" = "Rheumatoid arthritis (MHC only)"
+    "celiac-UKB-r0.05-kb250" = "Celiac disease (R2 < 0.05; window 250 kb)",
+    "celiac-UKB-r0.1-kb1000" = "Celiac disease (R2 < 0.1; window 1000 kb)",
+    "ms-r0.05-kb250" = "Multiple sclerosis (R2 < 0.05; window 250 kb)",
+    "ms-r0.1-kb1000" = "Multiple sclerosis (R2 < 0.1; window 1000 kb)",
+    "ra-r0.05-kb250" = "Rheumatoid arthritis (R2 < 0.05; window 250 kb)",
+    "ra-r0.1-kb1000" = "Rheumatoid arthritis (R2 < 0.1; window 1000 kb)",
 )
 
 # decode the ancestry and trait names
