@@ -14,7 +14,6 @@ quiet(library(tidyverse)) # v1.3.1
 # get the command line arguments
 p <- arg_parser("Convert the GWAS metadata into PALM input format")
 p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/gwas_ms.tsv")
-p <- add_argument(p, "--ld", help = "Pairwise LD for finging proxy SNPs", default = "data/targets/gwas_ms_ld.tsv.gz")
 p <- add_argument(p, "--sites", help = "List of callable sites in the current dataset", default = "data/sites/ancestral_paths_new_sites.tsv.gz")
 p <- add_argument(p, "--proxy", help = "Should we replace missing GWAS SNPs with proxies", flag = TRUE)
 p <- add_argument(p, "--min-ld", help = "Minimum LD threhold for proxy variants", default = 0.7)
@@ -23,7 +22,6 @@ p <- add_argument(p, "--output", help = "Output file", default = "data/targets/g
 argv <- parse_args(p)
 
 gwas <- read_tsv(argv$gwas, col_types = cols(), na = c("", "NA", "-"))
-ld <- read_table(argv$ld, col_types = cols(), col_names = c("GWAS_CHR", "GWAS_BP", "GWAS_SNP", "PROXY_CHR", "PROXY_BP", "PROXY_SNP", "PHASE", "R2", "blank"), skip = 1) %>% select(-blank)
 sites <- read_tsv(argv$sites, col_types = cols(), col_names = c("chrom", "pos", "id", "REF", "ALT", "ancestral_allele"), skip = 1) %>% select(-id)
 
 if (argv$proxy) {
