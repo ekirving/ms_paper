@@ -43,7 +43,7 @@ traits <- list(
     "ms-r0.05-kb250" = "Multiple sclerosis (R2 < 0.05; window 250 kb)",
     "ms-r0.1-kb1000" = "Multiple sclerosis (R2 < 0.1; window 1000 kb)",
     "ra-r0.05-kb250" = "Rheumatoid arthritis (R2 < 0.05; window 250 kb)",
-    "ra-r0.1-kb1000" = "Rheumatoid arthritis (R2 < 0.1; window 1000 kb)",
+    "ra-r0.1-kb1000" = "Rheumatoid arthritis (R2 < 0.1; window 1000 kb)"
 )
 
 # decode the ancestry and trait names
