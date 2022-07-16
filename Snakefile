@@ -68,5 +68,5 @@ rule all:
                 "results/palm/ancestral_paths_new-{trait}-delta_prs.png",
             ],
             ancestry=ANCESTRIES,
-            trait=TRAITS,
+            trait=config["trait"],
         ),
