@@ -172,7 +172,8 @@ plt <- df_ml %>%
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
-        panel.background = element_blank()
+        panel.background = element_blank(),
+        plot.title = element_text(size=11)
     )
 
 # save the plot
