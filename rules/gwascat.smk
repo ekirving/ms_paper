@@ -39,6 +39,17 @@ rule gwascat_genome_wide_significant:
         r"gunzip -c {input} | awk -F'\t' 'NR==1 || ${params.col} < {GWASCAT_PVALUE} {{print $0}}' | gzip > {output}"
 
 
+rule gwascat_ontology:
+    input:
+        tsv="data/gwascat/gwas_catalog_significant.tsv.gz",
+    output:
+        tsv="data/gwascat/gwas_catalog_significant_ontology.tsv.gz",
+    shell:
+        "python scripts/gwascat_ontology.py"
+        " --tsv {input.tsv}"
+        " --output {output.tsv}"
+
+
 rule convert_ms_metadata:
     """
     Convert the GWAS metadata from (International Multiple Sclerosis Genetics Consortium, 2019), for Multiple sclerosis 

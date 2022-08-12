@@ -17,6 +17,8 @@ MHC_CHROM = 6
 MHC_START = 28477797
 MHC_FINISH = 33448354
 
+ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
+
 
 checkpoint palm_metadata:
     """
@@ -136,7 +138,10 @@ rule palm_parse_txt:
         " --out {output.json}"
 
 
-rule palm_report:
+rule palm_ancestry_report:
+    """
+    Make a PALM report, summarising all the models for this ancestry
+    """
     input:
         tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
         json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
@@ -150,7 +155,10 @@ rule palm_report:
         " --output {output.tsv}"
 
 
-rule palm_report_prs:
+rule palm_ancestry_report_prs:
+    """
+    Calculate the change in PRS for each SNP and add it to the report
+    """
     input:
         tsv="results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv",
     output:
@@ -161,6 +169,19 @@ rule palm_report_prs:
         " --dataset {wildcards.dataset}"
         " --ancestry {wildcards.ancestry}"
         " --output {output.tsv}"
+
+
+rule palm_report_prs:
+    """
+    Concatenate all the ancestry specific PALM reports together
+    """
+    input:
+        expand("results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv", ancestry=ANCESTRIES, allow_missing=True),
+    output:
+        tsv="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
+    shell:
+        "head -n1 {input[0]} > {output.tsv} && "
+        "tail -n +2 -q {input} >> {output.tsv}"
 
 
 rule palm_plot_trajectory:
