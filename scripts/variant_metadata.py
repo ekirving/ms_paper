@@ -106,7 +106,7 @@ def variant_metadata(rsid, var_file, vep_file, gwas_file, output_file):
     ancestral = mapping.get("ancestral_allele")
 
     # use the Ensembl annotation
-    alleles = mapping.get("allele_string").split("/")
+    alleles = mapping.get("allele_string", "").split("/")
 
     if ancestral is None or len(alleles) > 2:
         derived = None
