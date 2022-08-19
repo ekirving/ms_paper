@@ -29,7 +29,6 @@ include: "rules/palm.smk"
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 TRAITS = [
-    "cd-all",
     "ms-all",
     "ra-all",
 ]
