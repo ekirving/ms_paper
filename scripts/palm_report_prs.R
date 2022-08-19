@@ -16,7 +16,7 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Add an extra column to the PALM report that contains the delta PRS for each SNP")
-p <- add_argument(p, "--data", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
+p <- add_argument(p, "--data", help = "PALM report", default = "results/palm.fine/ancestral_paths_new-ALL-ms-palm_report.tsv")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report_prs.tsv")
@@ -77,11 +77,19 @@ snp_order <- bind_rows(
     select(rsid, name, logp, prs_freq) %>%
     pivot_wider(names_from = "name", values_from = "prs_freq") %>%
     mutate(delta_prs = prs_end - prs_start) %>%
-    select(rsid, delta_prs)
+    mutate(snp_effect = ifelse(delta_prs > 0, "increasing_risk", "decreasing_risk")) %>%
+    select(rsid, delta_prs, snp_effect)
 
 # join the delta_prs column to the main sheet
 snps <- snps %>%
     inner_join(snp_order, by = "rsid") %>%
-    select(-prefix)
+    select(-prefix) %>%
+    mutate(
+        snp_description = paste(
+            ifelse(s > 0, "positively_selected", "negatively_selected"),
+            ifelse((alt == derived_allele & beta > 0) | (alt == ancestral_allele & beta < 0), "risk_allele", "protective_allele"),
+            sep = "_"
+        )
+    )
 
 write_tsv(snps, argv$output)
