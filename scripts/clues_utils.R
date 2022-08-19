@@ -37,6 +37,35 @@ clues_load_data <- function(prefix) {
     model
 }
 
+clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NULL) {
+
+    # load the model
+    model <- clues_load_data(prefix) %>% mutate(rsid = rsid, ancestry = ancestry)
+
+    # extract the maximum posterior trajectory
+    traj <- model %>%
+        group_by(epoch) %>%
+        top_n(1, density) %>%
+        ungroup() %>%
+        arrange(epoch)
+
+    # apply a little smoothing to the jagged steps in the trajectory
+    if (smooth) {
+        traj$freq <- rollapply(c(traj$freq, rep_len(NA, smooth - 1)), width = smooth, by = 1, FUN = mean, na.rm = TRUE, align = "left")
+    }
+
+    if (!is.null(ancestral)) {
+        metadata <- fromJSON(file = paste0("variants/metadata/GRCh37/", rsid, ".json"))
+
+        # re-polarise, if necessary
+        if (metadata$ancestral != ancestral) {
+            traj$freq <- 1 - traj$freq
+        }
+    }
+
+    traj
+}
+
 traits <- list(
     "cd-all" = "Celiac disease (all genome-wide significant)",
     "celiac-UKB-r0.05-kb250" = "Celiac disease (r^2 < 0.05; window 250 kb)",
@@ -64,4 +93,13 @@ ancestry_colors <- c(
     "EHG" = "#8da0cb",
     "CHG" = "#e78ac3",
     "ANA" = "#a6d854"
+)
+
+# color brewer https://colorbrewer2.org/#type=qualitative&scheme=Paired&n=10
+snp_colors <- c(
+    "#1f78b4",
+    "#33a02c",
+    "#e31a1c",
+    "#ff7f00",
+    "#6a3d9a"
 )
