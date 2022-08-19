@@ -40,7 +40,10 @@ def all_clues_plots(_):
     """
     files = []
 
-    for trait in TRAITS:
+    trait = config.get("trait", False)
+    traits = [trait] if trait else TRAITS
+
+    for trait in traits:
         # noinspection PyUnresolvedReferences
         meta_tsv = checkpoints.palm_metadata.get(dataset="ancestral_paths_new", trait=trait).output.tsv
 
