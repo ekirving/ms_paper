@@ -51,10 +51,6 @@ def query_ensembl_api(reference, rsid, json_file, mode=ENSEMBL_VAR, attempts=0):
             time.sleep(ENSEMBL_RETRY_WAIT * attempts)
             query_ensembl_api(reference, rsid, json_file, mode, attempts + 1)
             return
-
-        elif r.status_code == 400:
-            # some rsIDs might not exist in this particular assembly
-            pass
         else:
             r.raise_for_status()
 
