@@ -29,8 +29,8 @@ include: "rules/palm.smk"
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 TRAITS = [
-    "ms-all",
-    "ra-all",
+    "ms-r0.05-kb250",
+    "ra-r0.05-kb250",
 ]
 
 
@@ -68,7 +68,10 @@ rule all:
                 "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-pval.png",
                 "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-prs.png",
                 "results/palm/ancestral_paths_new-{trait}-delta_prs.png",
+                "results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv",
             ],
             ancestry=ANCESTRIES,
             trait=config.get("trait", TRAITS),
         ),
+        # make a report for each trait using the "all genome-wide SNPs" ascertainments
+        expand("results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv", trait=["ms-all", "ra-all"]),
