@@ -16,7 +16,7 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Add an extra column to the PALM report that contains the delta PRS for each SNP")
-p <- add_argument(p, "--data", help = "PALM report", default = "results/palm.fine/ancestral_paths_new-ALL-ms-palm_report.tsv")
+p <- add_argument(p, "--data", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report_prs.tsv")
@@ -69,7 +69,7 @@ for (i in 1:nrow(snps)) {
 
 df_ml <- bind_rows(models)
 
-# calculate the delta PRS for each SNP (i.e., the difference between the staring and ending frequency, weighted by the scaled effect size)
+# calculate the delta PRS for each SNP (i.e., the difference between the starting and ending frequency, weighted by the scaled effect size)
 snp_order <- bind_rows(
     df_ml %>% group_by(rsid) %>% slice_min(epoch) %>% mutate(name = "prs_start"),
     df_ml %>% group_by(rsid) %>% slice_max(epoch) %>% mutate(name = "prs_end"),
