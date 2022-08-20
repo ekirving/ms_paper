@@ -176,7 +176,7 @@ rule palm_report_prs:
     Concatenate all the ancestry specific PALM reports together
     """
     input:
-        expand("results/palm/{dataset}-{ancestry}-{trait}-palm_report.tsv", ancestry=ANCESTRIES, allow_missing=True),
+        expand("results/palm/{dataset}-{ancestry}-{trait}-palm_report_prs.tsv", ancestry=ANCESTRIES, allow_missing=True),
     output:
         tsv="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
     shell:
