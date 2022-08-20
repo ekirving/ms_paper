@@ -86,7 +86,7 @@ snps <- snps %>%
     select(-prefix) %>%
     mutate(
         snp_description = paste(
-            ifelse(s > 0, "positively_selected", "negatively_selected"),
+            ifelse(s > 0, "rising", "falling"),
             ifelse((alt == derived_allele & beta > 0) | (alt == ancestral_allele & beta < 0), "risk_allele", "protective_allele"),
             sep = "_"
         )
