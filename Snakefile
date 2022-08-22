@@ -22,6 +22,7 @@ wildcard_constraints:
 include: "rules/dbsnp.smk"
 include: "rules/proxy-snps.smk"
 include: "rules/gwascat.smk"
+include: "rules/ukbb.smk"
 include: "rules/variants.smk"
 include: "rules/clues.smk"
 include: "rules/palm.smk"
