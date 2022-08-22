@@ -25,6 +25,7 @@ include: "rules/gwascat.smk"
 include: "rules/variants.smk"
 include: "rules/clues.smk"
 include: "rules/palm.smk"
+include: "rules/compare.smk"
 
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]

@@ -19,7 +19,7 @@ source("scripts/clues_utils.R")
 p <- arg_parser("Compare associations between trait associated SNPs and all other traits in the GWAS catalog")
 p <- add_argument(p, "--catalog", help = "GWAS catalog", default = "data/gwascat/gwas_catalog_significant_ontology.tsv.gz")
 p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv")
-# p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_ms.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "results/compare_gwas_catalog-ancestral_paths_new-ms-all.png")
 
 argv <- parse_args(p)
 
@@ -85,20 +85,19 @@ xlabels <- round(xbreaks * gen_time / 1000)
 plt <- traj %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = freq)) +
-    
+
     # plot the maximum posterior trajectory
     geom_line(aes(color = rsid), cex = 1, na.rm = TRUE) +
-    
+
     # diplay as a grid
     facet_grid(trait ~ ancestry) +
-    
+
     # print the labels
     geom_dl(aes(label = rsid, color = rsid), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
 
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0.03))) +
     scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 230))) +
-
     ylab("DAF") +
     xlab("kyr BP") +
 
@@ -125,4 +124,4 @@ num_ancestries <- palm %>%
     length()
 
 # save the plot
-ggsave("pleiotropy.png", plt, width = num_ancestries * 3, height = num_traits * 2, limitsize = FALSE)
+ggsave(argv$output, plt, width = num_ancestries * 3, height = num_traits * 2, limitsize = FALSE)
