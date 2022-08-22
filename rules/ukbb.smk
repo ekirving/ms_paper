@@ -59,11 +59,11 @@ rule ukbb_nealelab_md5:
     input:
         tsv="data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv",
     output:
-        md5="data/ukbb/nealelab/gwas/{trait}.gwas.imputed_v3.{sex}.tsv.bgz.md5",
+        md5="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz.md5",
     params:
-        bgz="data/ukbb/nealelab/gwas/{trait}.gwas.imputed_v3.{sex}.tsv.bgz",
+        bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
     shell:
-        """awk -F'\\t' '$1=="{wildcards.trait}" && $4=="{wildcards.sex}" {{print $9" {params.bgz}"}}' {input.tsv} > {output.md5}"""
+        """awk -F'\\t' '$1=="{wildcards.pheno}" && $4=="{wildcards.sex}" {{print $9" {params.bgz}"}}' {input.tsv} > {output.md5}"""
 
 
 rule ukbb_nealelab_gwas:
@@ -74,11 +74,11 @@ rule ukbb_nealelab_gwas:
     """
     input:
         tsv="data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv",
-        md5="data/ukbb/nealelab/gwas/{trait}.gwas.imputed_v3.{sex}.tsv.bgz.md5",
+        md5="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz.md5",
     output:
-        bgz="data/ukbb/nealelab/gwas/{trait}.gwas.imputed_v3.{sex}.tsv.bgz",
+        bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
     shell:
-        """awk -F'\\t' '$1=="{wildcards.trait}" && $4=="{wildcards.sex}" {{print $7}}' {input.tsv} | """
+        """awk -F'\\t' '$1=="{wildcards.pheno}" && $4=="{wildcards.sex}" {{print $7}}' {input.tsv} | """
         """xargs wget --quiet -O {output.bgz} && md5sum --status --check {input.md5}"""
 
 
@@ -87,9 +87,9 @@ rule ukbb_nealelab_gwas_significant:
     Extract the genome-wide significant GWAS variants from the meta analysis group (`pval` < 5e-8)
     """
     input:
-        bgz="data/ukbb/nealelab/gwas/{trait}.gwas.imputed_v3.{sex}.tsv.bgz",
+        bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
     output:
-        bgz="data/ukbb/nealelab/gwas/{trait}.gwas.imputed_v3.{sex}.significant.tsv.bgz",
+        bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.significant.tsv.bgz",
     threads: 4
     shell:
         "bgzip --decompress --stdout --threads {threads} {input.bgz} | "
@@ -102,12 +102,12 @@ def ukbb_nealelab_all_phenotypes(wildcards):
     Return a list of all the phenotype association files for the NealeLab UKBB GWAS
     """
     # noinspection PyUnresolvedReferences
-    traits_tsv = checkpoints.ukbb_nealelab_phenotypes.get(sex=wildcards.sex).output.bgz
+    pheno_tsv = checkpoints.ukbb_nealelab_phenotypes.get(sex=wildcards.sex).output.bgz
 
-    traits = pd.read_table(traits_tsv, compression="gzip")["phenotype"].unique()
+    phenotypes = pd.read_table(pheno_tsv, compression="gzip")["phenotype"].unique()
 
     return expand(
-        "data/ukbb/nealelab/gwas/{trait}.gwas.imputed_v3.{sex}.significant.tsv.bgz", trait=traits, sex=wildcards.sex
+        "data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.significant.tsv.bgz", pheno=phenotypes, sex=wildcards.sex
     )
 
 
