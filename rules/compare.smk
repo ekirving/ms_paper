@@ -54,7 +54,7 @@ def merge_all_filtered_phenotypes_input(wildcards):
     # noinspection PyUnresolvedReferences
     pheno_tsv = checkpoints.ukbb_nealelab_phenotypes.get(sex=wildcards.sex).output.bgz
 
-    phenotypes = pd.read_table(pheno_tsv, compression="gzip")["phenotype"].unique()[1:3]
+    phenotypes = pd.read_table(pheno_tsv, compression="gzip")["phenotype"].unique()
 
     return expand(
         "results/palm/ukbb/{dataset}-{trait}.{pheno}.gwas.imputed_v3.{sex}.significant.tsv",
