@@ -27,13 +27,13 @@ palm <- read_tsv(argv$palm, col_types = cols())
 selected_snps <- palm %>%
     filter(significant == TRUE) %>%
     # UKBB uses `{chr}:{pos}:{ref}:{alt}` as the variant ID
-    mutate(variant=paste(chrom, pos, ref, alt, sep=":")) %>%
+    mutate(variant = paste(chrom, pos, ref, alt, sep = ":")) %>%
     pull(variant) %>%
     unique()
 
 # get the UKBB associations for the significant SNPs only
 ukbb <- ukbb %>%
     filter(variant %in% selected_snps) %>%
-    mutate(phenotype=argv$pheno, .before=1)
+    mutate(phenotype = argv$pheno, .before = 1)
 
 write_tsv(ukbb, argv$output)
