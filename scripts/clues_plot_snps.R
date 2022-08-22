@@ -48,7 +48,6 @@ traj <- bind_rows(models)
 
 gen_time <- 28
 max_age <- 13665
-smooth <- 10
 
 # constrain the extent of the plotting
 xmin <- round(-max_age / gen_time)

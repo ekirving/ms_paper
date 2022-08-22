@@ -9,7 +9,9 @@ quiet <- function(x) {
     suppressMessages(suppressWarnings(x))
 }
 quiet(library(tidyverse)) # v1.3.1
+quiet(library(jsonlite)) # v1.8.0
 quiet(library(RcppCNPy)) # v0.2.11
+quiet(library(zoo)) # v1.8_10
 
 clues_load_data <- function(prefix) {
 

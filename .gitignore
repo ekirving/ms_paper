@@ -1,5 +1,6 @@
 *-commands.sh
 *.list
+*.png
 *.xlsx
 *.zip
 *_mismatchs.tsv
