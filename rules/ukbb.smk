@@ -6,6 +6,8 @@ __copyright__ = "Copyright 2021, University of Copenhagen"
 __email__ = "evan.irvingpease@gmail.com"
 __license__ = "MIT"
 
+import gzip
+
 """
 NealeLab UKBB GWAS
 
@@ -90,10 +92,12 @@ rule ukbb_nealelab_gwas_significant:
         bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
     output:
         bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.significant.tsv.bgz",
+    params:
+        col=lambda wildcards, input: gzip.open(input[0], "r").readline().decode().strip().split("\t").index("pval") + 1,
     threads: 4
     shell:
         "bgzip --decompress --stdout --threads {threads} {input.bgz} | "
-        "awk -F'\\t' 'NR==1 || $13 < {UKBB_PVALUE} {{print $0}}' | "
+        "awk -F'\\t' 'NR==1 || ${params.col} < {UKBB_PVALUE} {{print $0}}' | "
         "bgzip --stdout --threads {threads} > {output.bgz}"
 
 
