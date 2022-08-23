@@ -33,7 +33,7 @@ rule ukbb_nealelab_variants:
     see https://docs.google.com/spreadsheets/d/1kvPoupSzsSFBNSztMzl04xMoSC3Kcx3CrjVf4yBmESU/edit?ts=5b5f17db#gid=227859291
     """
     input:
-        tsv="data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv",
+        tsv=ancient("data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv"),
     output:
         bgz="data/ukbb/nealelab/variants.tsv.bgz",
     shell:
@@ -47,7 +47,7 @@ checkpoint ukbb_nealelab_phenotypes:
     see https://docs.google.com/spreadsheets/d/1kvPoupSzsSFBNSztMzl04xMoSC3Kcx3CrjVf4yBmESU/edit?ts=5b5f17db#gid=227859291
     """
     input:
-        tsv="data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv",
+        tsv=ancient("data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv"),
     output:
         bgz="data/ukbb/nealelab/phenotypes.{sex}.tsv.bgz",
     shell:
@@ -59,7 +59,7 @@ rule ukbb_nealelab_gwas_md5:
     Fetch the md5sum for the Per-phenotype file
     """
     input:
-        tsv="data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv",
+        tsv=ancient("data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv"),
     output:
         md5="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz.md5",
     params:
@@ -75,7 +75,7 @@ rule ukbb_nealelab_gwas:
     see https://docs.google.com/spreadsheets/d/1kvPoupSzsSFBNSztMzl04xMoSC3Kcx3CrjVf4yBmESU/edit?ts=5b5f17db#gid=227859291
     """
     input:
-        tsv="data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv",
+        tsv=ancient("data/ukbb/nealelab/UKBB_GWAS_Imputed_v3_Manifest_201807.tsv"),
         md5="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz.md5",
     output:
         bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
