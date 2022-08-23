@@ -20,6 +20,7 @@ p <- arg_parser("Compare associations between trait associated SNPs and all othe
 p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/compare/ukbb/ancestral_paths_new-ms-all.both_sexes.significant.tsv.gz")
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
 p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv")
+p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "focal")
 p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_new-ms-all-ukbb.png")
 
 argv <- parse_args(p)
@@ -59,6 +60,16 @@ models <- list()
 for (i in 1:nrow(snps)) {
     # load the CLUES trajectory
     model <- clues_trajectory(snps[i, ]$rsid, snps[i, ]$ancestry, snps[i, ]$prefix) %>% mutate(variant = snps[i, ]$variant)
+
+    # handle the polarization
+    if (argv$polarize == "focal" && snps[i, ]$flip) {
+        # use the `flip` flag in the PALM metadata to polarize by risk in the focal trait
+        model <- model %>% mutate(freq = 1.0 - freq, rsid = paste0(rsid, ":", snps[i, ]$focal_allele))
+    } else {
+        # otherwise we're using ancestral state polarization
+        model <- model %>% mutate(rsid = paste0(rsid, ":", snps[i, ]$derived_allele))
+    }
+
     models <- append(models, list(model))
 }
 
