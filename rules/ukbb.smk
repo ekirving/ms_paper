@@ -54,7 +54,7 @@ checkpoint ukbb_nealelab_phenotypes:
         """awk -F'\\t' '$5=="phenotypes.{wildcards.sex}.tsv.bgz" {{print $7}}' {input.tsv} | xargs wget --quiet -O {output.bgz}"""
 
 
-rule ukbb_nealelab_md5:
+rule ukbb_nealelab_gwas_md5:
     """
     Fetch the md5sum for the Per-phenotype file
     """
@@ -65,7 +65,7 @@ rule ukbb_nealelab_md5:
     params:
         bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
     shell:
-        """awk -F'\\t' '$1=="{wildcards.pheno}" && $4=="{wildcards.sex}" {{print $9" {params.bgz}"}}' {input.tsv} > {output.md5}"""
+        """awk -F'\\t' '$1=="{wildcards.pheno}" && $4=="{wildcards.sex}" {{print $9" {params.bgz}"}}' {input.tsv} | head -n1 > {output.md5}"""
 
 
 rule ukbb_nealelab_gwas:
@@ -80,7 +80,7 @@ rule ukbb_nealelab_gwas:
     output:
         bgz="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
     shell:
-        """awk -F'\\t' '$1=="{wildcards.pheno}" && $4=="{wildcards.sex}" {{print $7}}' {input.tsv} | """
+        """awk -F'\\t' '$1=="{wildcards.pheno}" && $4=="{wildcards.sex}" {{print $7}}' {input.tsv} | head -n1 | """
         """xargs wget --quiet -O {output.bgz} && md5sum --status --check {input.md5}"""
 
 
