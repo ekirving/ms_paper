@@ -34,7 +34,7 @@ snps <- palm %>%
 ukbb <- ukbb %>%
     filter(variant %in% snps) %>%
     mutate(phenotype = argv$pheno, .before = 1) %>%
-    # drop this column if it exists (so all sheets have the same columns)
-    select_if(!names(.) == "expected_case_minor_AC")
+    # standardise the columns (the NealeLab GWAS sheets have an inconsistent number of columns)
+    select_if(phenotype, variant, minor_allele, minor_AF, low_confidence_variant, n_complete_samples, AC, ytx, beta, se, tstat, pval)
 
 write_tsv(ukbb, argv$output)
