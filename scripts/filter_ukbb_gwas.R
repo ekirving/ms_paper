@@ -35,6 +35,6 @@ ukbb <- ukbb %>%
     filter(variant %in% snps) %>%
     mutate(phenotype = argv$pheno, .before = 1) %>%
     # standardise the columns (the NealeLab GWAS sheets have an inconsistent number of columns)
-    select_if(phenotype, variant, minor_allele, minor_AF, low_confidence_variant, n_complete_samples, AC, ytx, beta, se, tstat, pval)
+    select(phenotype, variant, minor_allele, minor_AF, low_confidence_variant, n_complete_samples, AC, ytx, beta, se, tstat, pval)
 
 write_tsv(ukbb, argv$output)
