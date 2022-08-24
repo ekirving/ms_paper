@@ -35,9 +35,14 @@ gwas_snps <- ukbb %>%
     unique()
 
 # get the trait name and phenotype code
-ukbb <- ukbb %>% inner_join(pheno %>%
-    mutate(trait = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
-    select(phenotype, trait), by = "phenotype")
+ukbb <- ukbb %>%
+    inner_join(
+        pheno %>%
+            # remove long and unnecessary prefix on phenotype description
+            mutate(trait = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
+            select(phenotype, trait),
+        by = "phenotype"
+    )
 
 # get the list of SNPs with marginally significant p-values in CLUES
 selected_snps <- palm %>%
@@ -74,9 +79,7 @@ for (i in 1:nrow(snps)) {
 }
 
 # load all the trajectories
-traj <- bind_rows(models) %>%
-    # join the GWAS catalog
-    inner_join(ukbb, by = "variant")
+traj <- bind_rows(models) %>% inner_join(ukbb, by = "variant")
 
 # display the ancestries in custom sorted order
 traj$ancestry <- factor(traj$ancestry, levels = c("ALL", "WHG", "EHG", "CHG", "ANA"))
