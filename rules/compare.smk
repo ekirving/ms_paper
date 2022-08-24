@@ -81,7 +81,7 @@ rule compare_ukbb:
     Compare trajectories between trait associated SNPs and all other traits in the UKBB
     """
     input:
-        ukbb="results/palm/ukbb/{dataset}-{trait}.both_sexes.significant.tsv.gz",
+        ukbb="results/compare/ukbb/{dataset}-{trait}.both_sexes.significant.tsv.gz",
         pheno="data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz",
         palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
     output:
