@@ -22,7 +22,7 @@ p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/com
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
 p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv")
 p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "focal")
-p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_newms-r0.05-kb250-ukbb.png")
+p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb.png")
 
 argv <- parse_args(p)
 
