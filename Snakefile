@@ -16,7 +16,7 @@ configfile: "config.yaml"
 wildcard_constraints:
     ancestry="[A-Z]{3}",
     dataset="[^-]+",
-    trait="[^_]+",
+    trait="(ms|ra)-.+",
 
 
 include: "rules/dbsnp.smk"
