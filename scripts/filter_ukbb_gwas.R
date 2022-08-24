@@ -33,6 +33,8 @@ snps <- palm %>%
 # only retain UKBB associations for SNPs used in the PALM analysis
 ukbb <- ukbb %>%
     filter(variant %in% snps) %>%
-    mutate(phenotype = argv$pheno, .before = 1)
+    mutate(phenotype = argv$pheno, .before = 1) %>%
+    # drop this column if it exists (so all sheets have the same columns)
+    select_if(!names(.) == "expected_case_minor_AC")
 
 write_tsv(ukbb, argv$output)
