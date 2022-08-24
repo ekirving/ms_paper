@@ -11,17 +11,18 @@ quiet <- function(x) {
 quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
 quiet(library(directlabels)) # v2021.1.13
+quiet(library(R.utils))
 
 # load the helper functions
 source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Compare associations between trait associated SNPs and all other traits in the UKBB")
-p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/compare/ukbb/ancestral_paths_new-ms-all.both_sexes.significant.tsv.gz")
+p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/compare/ukbb/ancestral_paths_new-ms-r0.05-kb250.both_sexes.significant.tsv.gz")
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
 p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv")
 p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "focal")
-p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_new-ms-all-ukbb.png")
+p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_newms-r0.05-kb250-ukbb.png")
 
 argv <- parse_args(p)
 
@@ -34,15 +35,19 @@ gwas_snps <- ukbb %>%
     pull(variant) %>%
     unique()
 
-# get the trait name and phenotype code
+# join the phenotype description to the code
 ukbb <- ukbb %>%
     inner_join(
-        pheno %>%
-            # remove long and unnecessary prefix on phenotype description
-            mutate(trait = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
-            select(phenotype, trait),
+        pheno %>% select(phenotype, description),
         by = "phenotype"
-    )
+    ) %>%
+    # remove long and unnecessary prefix on phenotype description
+    mutate(description = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
+    mutate(description = str_replace(description, "Non-cancer illness code, self-reported: ", "")) %>%
+    # capitalize first word and add phenotype code
+    mutate(description = paste0(capitalize(description), " (", phenotype, ")")) %>%
+    # for some measures, UKBB has both a `raw` and an `irnt` (inverse rank-normal transformed) phenotype
+    filter(!grepl("_raw$", phenotype))
 
 # get the list of SNPs with marginally significant p-values in CLUES
 selected_snps <- palm %>%
@@ -60,6 +65,17 @@ snps <- palm %>%
     filter(variant %in% gwas_snps) %>%
     # compose the model prefixes from the PALM metadata
     mutate(prefix = paste0("results/clues/", rsid, "/ancestral_paths_new-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", ancestry))
+
+# count the number of SNPs with significant CLUES p-values that intersect with each UKBB phenotype
+snp_count <- ukbb %>%
+    filter(variant %in% snps$variant) %>%
+    group_by(phenotype, description) %>%
+    tally(name="num_snps") %>%
+    arrange(desc(num_snps))
+
+# drop phenotypes with less than the minimum number of intersecting SNPs
+pheno_list <- snp_count %>% filter(num_snps >= 10) %>% pull(phenotype)
+ukbb <- ukbb %>% filter(phenotype %in% pheno_list)
 
 models <- list()
 for (i in 1:nrow(snps)) {
@@ -81,7 +97,9 @@ for (i in 1:nrow(snps)) {
 # load all the trajectories
 traj <- bind_rows(models) %>% inner_join(ukbb, by = "variant")
 
-# display the ancestries in custom sorted order
+
+# display the phenotypes and ancestries in custom sorted order
+traj$description <- factor(traj$description, levels = snp_count$description)
 traj$ancestry <- factor(traj$ancestry, levels = c("ALL", "WHG", "EHG", "CHG", "ANA"))
 
 gen_time <- 28
@@ -98,10 +116,10 @@ plt <- traj %>%
     ggplot(aes(x = epoch, y = freq)) +
 
     # plot the maximum posterior trajectory
-    geom_line(aes(color = rsid, alpha = density), cex = 1, na.rm = TRUE) +
+    geom_line(aes(color = rsid), cex = 1, na.rm = TRUE) +
 
     # display as a grid
-    facet_grid(trait ~ ancestry, labeller = labeller(trait = label_wrap_gen())) +
+    facet_grid(description ~ ancestry, labeller = labeller(description = label_wrap_gen())) +
 
     # print the labels
     geom_dl(aes(label = rsid, color = rsid), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
@@ -125,7 +143,7 @@ plt <- traj %>%
 
 # size the plot based on the facet dimensions
 num_traits <- traj %>%
-    pull(trait) %>%
+    pull(description) %>%
     unique() %>%
     length()
 
