@@ -22,7 +22,7 @@ p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/com
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
 p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_prs.tsv")
 p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "focal")
-p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb.png")
+p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-%03d.png")
 
 argv <- parse_args(p)
 
@@ -70,11 +70,13 @@ snps <- palm %>%
 snp_count <- ukbb %>%
     filter(variant %in% snps$variant) %>%
     group_by(phenotype, description) %>%
-    tally(name="num_snps") %>%
+    tally(name = "num_snps") %>%
     arrange(desc(num_snps))
 
 # drop phenotypes with less than the minimum number of intersecting SNPs
-pheno_list <- snp_count %>% filter(num_snps >= 10) %>% pull(phenotype)
+pheno_list <- snp_count %>%
+    filter(num_snps > 1) %>%
+    pull(phenotype)
 ukbb <- ukbb %>% filter(phenotype %in% pheno_list)
 
 models <- list()
@@ -111,46 +113,51 @@ xmax <- max(traj$epoch)
 xbreaks <- -seq(-xmax, -xmin, round(2000 / gen_time))
 xlabels <- round(xbreaks * gen_time / 1000)
 
-plt <- traj %>%
-    # plot the trajectories
-    ggplot(aes(x = epoch, y = freq)) +
-
-    # plot the maximum posterior trajectory
-    geom_line(aes(color = rsid), cex = 1, na.rm = TRUE) +
-
-    # display as a grid
-    facet_grid(description ~ ancestry, labeller = labeller(description = label_wrap_gen())) +
-
-    # print the labels
-    geom_dl(aes(label = rsid, color = rsid), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
-
-    # set the axis breaks
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0.03))) +
-    scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 230))) +
-    ylab("DAF") +
-    xlab("kyr BP") +
-
-    # basic styling
-    theme_minimal() +
-    theme(
-        legend.position = "none",
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.background = element_blank(),
-        plot.background = element_rect(fill = "white", color = "white"),
-        panel.spacing = unit(1, "lines")
-    )
-
-# size the plot based on the facet dimensions
-num_traits <- traj %>%
+# how many rows do we need to print
+num_rows <- traj %>%
     pull(description) %>%
     unique() %>%
     length()
+per_page <- 8
+num_pages <- ceiling(num_rows / per_page)
 
-num_ancestries <- traj %>%
-    pull(ancestry) %>%
-    unique() %>%
-    length()
+# how many columns
+num_cols <- 5
 
-# save the plot
-ggsave(argv$output, plt, width = num_ancestries * 3, height = num_traits * 2.3, limitsize = FALSE)
+for (page in 1:num_pages) {
+    # subset by UKBB phenotype, so we can paginate the output (or else the plot is too big to create)
+    traj_subset <- traj %>% filter(phenotype %in% pheno_list[((page - 1) * per_page):(page * per_page)])
+
+    plt <- traj_subset %>%
+        # plot the trajectories
+        ggplot(aes(x = epoch, y = freq)) +
+
+        # plot the maximum posterior trajectory
+        geom_line(aes(color = rsid), cex = 1, na.rm = TRUE) +
+
+        # display as a grid
+        facet_grid(description ~ ancestry, labeller = labeller(description = label_wrap_gen())) +
+
+        # print the labels
+        geom_dl(aes(label = rsid, color = rsid), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+
+        # set the axis breaks
+        scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0.03))) +
+        scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 230))) +
+        ylab("DAF") +
+        xlab("kyr BP") +
+
+        # basic styling
+        theme_minimal() +
+        theme(
+            legend.position = "none",
+            panel.grid.minor = element_blank(),
+            panel.border = element_blank(),
+            panel.background = element_blank(),
+            plot.background = element_rect(fill = "white", color = "white"),
+            panel.spacing = unit(1, "lines")
+        )
+
+    # save the plot
+    ggsave(sprintf(argv$output, page), plt, width = num_cols * 3, height = per_page * 2.3, limitsize = FALSE)
+}

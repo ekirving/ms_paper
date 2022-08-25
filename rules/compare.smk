@@ -85,10 +85,13 @@ rule compare_ukbb:
         pheno="data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz",
         palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
     output:
-        png="results/compare/{dataset}-{trait}-ukbb.png",
+        png="results/compare/{dataset}-{trait}-ukbb-001.png",
+    params:
+        # produces multiple PNG files
+        png="results/compare/{dataset}-{trait}-ukbb-%03d.png"
     shell:
         "Rscript scripts/compare_ukbb.R"
         " --ukbb {input.ukbb}"
         " --pheno {input.pheno}"
         " --palm {input.palm}"
-        " --output {output.png}"
+        " --output {params.png}"
