@@ -35,7 +35,7 @@ snps <- read_tsv(report_tsv, col_types = cols()) %>%
 # get the models to plot
 snps <- snps %>%
     filter(rsid %in% rsid_list) %>%
-    select(rsid, ancestry, prefix)
+    select(rsid, ancestry, significant, prefix)
 
 models <- list()
 for (i in 1:nrow(snps)) {
@@ -44,7 +44,8 @@ for (i in 1:nrow(snps)) {
 }
 
 # load all the trajectories
-traj <- bind_rows(models)
+traj <- bind_rows(models) %>%
+    inner_join(snps, by = c("rsid", "ancestry"), suffix = c("", ".focal"))
 
 gen_time <- 28
 max_age <- 13665
@@ -60,14 +61,17 @@ traj %>%
     ggplot(aes(x = epoch, y = freq)) +
 
     # plot the maximum posterior trajectory
-    geom_line(aes(color = rsid), cex = 1, na.rm = TRUE) +
+    geom_line(aes(color = rsid, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
     facet_wrap(~ancestry, nrow = 1) +
 
     # set the SNP colors
     scale_color_manual(values = snp_colors) +
 
     # print the labels
-    geom_dl(aes(label = rsid, color = rsid), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+    geom_dl(aes(label = rsid, color = rsid, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+
+    # plot non-significant trajectories as transparent
+    scale_alpha(range = c(0.3, 1)) +
 
     # set the axis breaks
     scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0))) +
