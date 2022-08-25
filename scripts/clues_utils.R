@@ -39,7 +39,7 @@ clues_load_data <- function(prefix) {
     model
 }
 
-clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NULL) {
+clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NULL, threshold = 0.08) {
 
     # load the model
     model <- clues_load_data(prefix) %>% mutate(rsid = rsid, ancestry = ancestry)
@@ -50,6 +50,21 @@ clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NU
         top_n(1, density) %>%
         ungroup() %>%
         arrange(epoch)
+
+    # trim the portion of the trajectory with low posterior density
+    if (!is.na(threshold)) {
+        # find the most recent epoch which is below the threshold
+        cutoff <- traj %>%
+            filter(density < threshold) %>%
+            group_by() %>%
+            slice_max(epoch)
+
+        if (length(cutoff$epoch)) {
+            # drop everything before that epoch
+            traj <- traj %>%
+                filter(epoch > cutoff$epoch)
+        }
+    }
 
     # apply a little smoothing to the jagged steps in the trajectory
     if (smooth) {
