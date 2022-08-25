@@ -41,11 +41,13 @@ ukbb <- ukbb %>%
         pheno %>% select(phenotype, description),
         by = "phenotype"
     ) %>%
-    # remove long and unnecessary prefix on phenotype description
+    # remove long and unnecessary prefixes
     mutate(description = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
     mutate(description = str_replace(description, "Non-cancer illness code, self-reported: ", "")) %>%
-    # capitalize first word and add phenotype code
-    mutate(description = paste0(capitalize(description), " (", phenotype, ")")) %>%
+    # add the phenotype code as a suffix
+    mutate(description = paste0(str_replace(description, phenotype, ""), " (", phenotype, ")")) %>%
+    # capitalize first word and strip whitespace
+    mutate(description = str_squish(capitalize(description))) %>%
     # for some measures, UKBB has both a `raw` and an `irnt` (inverse rank-normal transformed) phenotype
     filter(!grepl("_raw$", phenotype))
 
