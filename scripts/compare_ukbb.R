@@ -124,6 +124,16 @@ xmax <- max(traj$epoch)
 xbreaks <- -seq(-xmax, -xmin, round(2000 / gen_time))
 xlabels <- round(xbreaks * gen_time / 1000)
 
+# the approximate time (in generations) during which these ancestries existed as discrete populations
+ancestry_epochs <- tibble(
+    ancestry = c("ALL", "WHG", "EHG", "CHG", "ANA"),
+    start = c(-150, -500, -500, -800, -800),
+    finish = c(0, -250, -200, -200, -250)
+) %>%
+    # don't exceed the range of the plot
+    rowwise() %>%
+    mutate(start = max(start, xmin), finish = min(finish, xmax))
+
 # how many rows do we need to print
 num_rows <- traj %>%
     pull(description) %>%
@@ -139,18 +149,19 @@ for (page in 1:num_pages) {
     # subset by UKBB phenotype, so we can paginate the output (or else the plot is too big to create)
     traj_subset <- traj %>% filter(phenotype %in% pheno_list[((page - 1) * per_page):(page * per_page)])
 
-    plt <- traj_subset %>%
-        # plot the trajectories
-        ggplot(aes(x = epoch, y = freq)) +
+    plt <- ggplot(traj_subset) +
+
+        # shade the ancestry epoch
+        geom_rect(data = ancestry_epochs, aes(xmin = start, xmax = finish, ymin = 0, ymax = 1), alpha = 0.5, fill = "#F4F4F4") +
 
         # plot the maximum posterior trajectory
-        geom_line(aes(color = snp_label, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
+        geom_line(aes(x = epoch, y = freq, color = snp_label, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
 
         # display as a grid
         facet_grid(description ~ ancestry, labeller = labeller(description = label_wrap_gen())) +
 
         # print the labels
-        geom_dl(aes(label = snp_label, color = snp_label, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+        geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
 
         # plot non-significant trajectories as transparent
         scale_alpha(range = c(0.3, 1)) +

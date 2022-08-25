@@ -56,28 +56,39 @@ xmax <- max(traj$epoch)
 xbreaks <- -seq(-xmax, -xmin, round(2000 / gen_time))
 xlabels <- round(xbreaks * gen_time / 1000)
 
-traj %>%
-    # plot the heatmap
-    ggplot(aes(x = epoch, y = freq)) +
+# the approximate time (in generations) during which these ancestries existed as discrete populations
+ancestry_epochs <- tibble(
+    ancestry = c("ALL", "WHG", "EHG", "CHG", "ANA"),
+    start = c(-150, -500, -500, -800, -800),
+    finish = c(0, -250, -200, -200, -250)
+) %>%
+    # don't exceed the range of the plot
+    rowwise() %>%
+    mutate(start = max(start, xmin), finish = min(finish, xmax))
+
+ggplot(traj) +
+
+    # shade the ancestry epoch
+    geom_rect(data = ancestry_epochs, aes(xmin = start, xmax = finish, ymin = 0, ymax = 1), alpha = 0.5, fill = "#F4F4F4") +
 
     # plot the maximum posterior trajectory
-    geom_line(aes(color = rsid, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
+    geom_line(aes(x = epoch, y = freq, color = rsid, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
+
+    # display as a single row
     facet_wrap(~ancestry, nrow = 1) +
 
     # set the SNP colors
     scale_color_manual(values = snp_colors) +
 
     # print the labels
-    geom_dl(aes(label = rsid, color = rsid, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+    geom_dl(aes(x = epoch, y = freq, label = rsid, color = rsid, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
 
     # plot non-significant trajectories as transparent
     scale_alpha(range = c(0.3, 1)) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0))) +
+    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0.03))) +
     scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 230))) +
-
-    # labs(title = title) +
     ylab("DAF") +
     xlab("kyr BP") +
 
@@ -85,11 +96,11 @@ traj %>%
     theme_minimal() +
     theme(
         legend.position = "none",
-        # panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank(),
-        plot.background = element_rect(fill = "white", color = "white")
+        plot.background = element_rect(fill = "white", color = "white"),
+        panel.spacing = unit(1, "lines")
     )
 
 # save the plot
