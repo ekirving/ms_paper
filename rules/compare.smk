@@ -88,7 +88,7 @@ rule compare_ukbb:
         png="results/compare/{dataset}-{trait}-ukbb-001.png",
     params:
         # produces multiple PNG files
-        png="results/compare/{dataset}-{trait}-ukbb-%03d.png"
+        png="results/compare/{dataset}-{trait}-ukbb-%03d.png",
     shell:
         "Rscript scripts/compare_ukbb.R"
         " --ukbb {input.ukbb}"

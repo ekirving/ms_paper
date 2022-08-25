@@ -82,22 +82,24 @@ ukbb <- ukbb %>% filter(phenotype %in% pheno_list)
 models <- list()
 for (i in 1:nrow(snps)) {
     # load the CLUES trajectory
-    model <- clues_trajectory(snps[i, ]$rsid, snps[i, ]$ancestry, snps[i, ]$prefix) %>% mutate(variant = snps[i, ]$variant)
+    model <- clues_trajectory(snps[i, ]$rsid, snps[i, ]$ancestry, snps[i, ]$prefix)
 
     # handle the polarization
     if (argv$polarize == "focal" && snps[i, ]$flip) {
         # use the `flip` flag in the PALM metadata to polarize by risk in the focal trait
-        model <- model %>% mutate(freq = 1.0 - freq, rsid = paste0(rsid, ":", snps[i, ]$focal_allele))
+        model <- model %>% mutate(freq = 1.0 - freq, snp_label = paste0(rsid, ":", snps[i, ]$focal_allele))
     } else {
         # otherwise we're using ancestral state polarization
-        model <- model %>% mutate(rsid = paste0(rsid, ":", snps[i, ]$derived_allele))
+        model <- model %>% mutate(snp_label = paste0(rsid, ":", snps[i, ]$derived_allele))
     }
 
     models <- append(models, list(model))
 }
 
 # load all the trajectories
-traj <- bind_rows(models) %>% inner_join(ukbb, by = "variant")
+traj <- bind_rows(models) %>%
+    inner_join(snps, by = c("rsid", "ancestry"), suffix = c("", ".focal")) %>%
+    inner_join(ukbb, by = "variant", suffix = c(".focal", ".marginal"))
 
 
 # display the phenotypes and ancestries in custom sorted order
@@ -133,13 +135,16 @@ for (page in 1:num_pages) {
         ggplot(aes(x = epoch, y = freq)) +
 
         # plot the maximum posterior trajectory
-        geom_line(aes(color = rsid), cex = 1, na.rm = TRUE) +
+        geom_line(aes(color = snp_label, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
 
         # display as a grid
         facet_grid(description ~ ancestry, labeller = labeller(description = label_wrap_gen())) +
 
         # print the labels
-        geom_dl(aes(label = rsid, color = rsid), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+        geom_dl(aes(label = snp_label, color = snp_label, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+
+        # plot non-significant trajectories as transparent
+        scale_alpha(range = c(0.3, 1)) +
 
         # set the axis breaks
         scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0.03))) +
