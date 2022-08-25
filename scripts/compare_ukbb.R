@@ -71,15 +71,21 @@ snps <- palm %>%
 # count the number of SNPs with significant CLUES p-values that intersect with each UKBB phenotype
 snp_count <- ukbb %>%
     filter(variant %in% snps$variant) %>%
-    group_by(phenotype, description) %>%
+    group_by(phenotype) %>%
     tally(name = "num_snps") %>%
     arrange(desc(num_snps))
 
-# drop phenotypes with less than the minimum number of intersecting SNPs
+# get the list of phenotypes with more than 1 intersecting SNPs
 pheno_list <- snp_count %>%
     filter(num_snps > 1) %>%
     pull(phenotype)
-ukbb <- ukbb %>% filter(phenotype %in% pheno_list)
+
+ukbb <- ukbb %>%
+    inner_join(snp_count, by = "phenotype") %>%
+    # drop phenotypes with less than the minimum number of intersecting SNPs
+    filter(phenotype %in% pheno_list) %>%
+    # add the SNP count to the phenotype description
+    mutate(description = paste0(description, " [n=", num_snps, "/", length(selected_snps), "]"))
 
 models <- list()
 for (i in 1:nrow(snps)) {
