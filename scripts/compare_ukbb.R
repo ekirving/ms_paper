@@ -35,19 +35,7 @@ gwas_snps <- ukbb %>%
     pull(variant) %>%
     unique()
 
-# join the phenotype description to the code
 ukbb <- ukbb %>%
-    inner_join(
-        pheno %>% select(phenotype, description),
-        by = "phenotype"
-    ) %>%
-    # remove long and unnecessary prefixes
-    mutate(description = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
-    mutate(description = str_replace(description, "Non-cancer illness code, self-reported: ", "")) %>%
-    # add the phenotype code as a suffix
-    mutate(description = paste0(str_replace(description, phenotype, ""), " (", phenotype, ")")) %>%
-    # capitalize first word and strip whitespace
-    mutate(description = str_squish(capitalize(description))) %>%
     # for some measures, UKBB has both a `raw` and an `irnt` (inverse rank-normal transformed) phenotype
     filter(!grepl("_raw$", phenotype))
 
@@ -73,6 +61,21 @@ snp_count <- ukbb %>%
     filter(variant %in% snps$variant) %>%
     group_by(phenotype) %>%
     tally(name = "num_snps") %>%
+    # join the phenotype description to the code
+    inner_join(
+        pheno %>% select(phenotype, description),
+        by = "phenotype"
+    ) %>%
+    # remove long and unnecessary prefixes
+    mutate(description = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
+    mutate(description = str_replace(description, "Non-cancer illness code, self-reported: ", "")) %>%
+    # add the phenotype code as a suffix
+    mutate(description = paste0(str_replace(description, phenotype, ""), " [", phenotype, "]")) %>%
+    # capitalize first word and strip whitespace
+    mutate(description = str_squish(capitalize(description))) %>%
+    # add the SNP count to the phenotype description
+    mutate(description = paste0(description, " (n=", num_snps, ")")) %>%
+    # sort by the count
     arrange(desc(num_snps))
 
 # get the list of phenotypes with more than 1 intersecting SNPs
@@ -83,9 +86,7 @@ pheno_list <- snp_count %>%
 ukbb <- ukbb %>%
     inner_join(snp_count, by = "phenotype") %>%
     # drop phenotypes with less than the minimum number of intersecting SNPs
-    filter(phenotype %in% pheno_list) %>%
-    # add the SNP count to the phenotype description
-    mutate(description = paste0(description, " [n=", num_snps, "/", length(selected_snps), "]"))
+    filter(phenotype %in% pheno_list)
 
 models <- list()
 for (i in 1:nrow(snps)) {
