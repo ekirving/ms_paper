@@ -149,7 +149,7 @@ num_rows <- traj %>%
     pull(description) %>%
     unique() %>%
     length()
-per_page <- 8
+per_page <- 5
 num_pages <- ceiling(num_rows / per_page)
 
 # how many columns
@@ -196,5 +196,5 @@ for (page in 1:num_pages) {
         )
 
     # save the plot
-    ggsave(sprintf(argv$output, page), plt, width = num_cols * 3, height = num_pheno * 2.3, limitsize = FALSE)
+    ggsave(sprintf(argv$output, page), plt, width = num_cols * 3.3, height = num_pheno * 2.3, limitsize = FALSE)
 }
