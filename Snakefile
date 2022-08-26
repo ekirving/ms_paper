@@ -16,7 +16,7 @@ configfile: "config.yaml"
 wildcard_constraints:
     ancestry="[A-Z]{3}",
     dataset="[^-]+",
-    trait="(ms|ra)-.+",
+    trait="(ms|ra)-[^_]+",
 
 
 include: "rules/dbsnp.smk"
@@ -77,3 +77,9 @@ rule all:
         ),
         # make a report for each trait using the "all genome-wide SNPs" ascertainments
         expand("results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv", trait=["ms-all", "ra-all"]),
+        # plot the UKBB comparisons
+        expand(
+            "results/compare/ancestral_paths_new-{trait}-ukbb-{polarize}-001.png",
+            trait=["ms-all", "ra-all"],
+            polarize=["ancestral", "focal", "marginal"],
+        ),

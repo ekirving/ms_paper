@@ -85,13 +85,16 @@ rule compare_ukbb:
         pheno="data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz",
         palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
     output:
-        png="results/compare/{dataset}-{trait}-ukbb-001.png",
+        png="results/compare/{dataset}-{trait}-ukbb-{polarize}-001.png",
     params:
-        # produces multiple PNG files
-        png="results/compare/{dataset}-{trait}-ukbb-%03d.png",
+        # plotting script produces multiple PNG files (based on number of UKBB traits)
+        png="results/compare/{dataset}-{trait}-ukbb-{polarize}-%03d.png",
+    wildcard_constraints:
+        polarize="ancestral|focal|marginal",
     shell:
         "Rscript scripts/compare_ukbb.R"
         " --ukbb {input.ukbb}"
         " --pheno {input.pheno}"
         " --palm {input.palm}"
+        " --polarize {wildcards.polarize}"
         " --output {params.png}"
