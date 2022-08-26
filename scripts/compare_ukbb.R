@@ -92,24 +92,34 @@ models <- list()
 for (i in 1:nrow(snps)) {
     # load the CLUES trajectory
     model <- clues_trajectory(snps[i, ]$rsid, snps[i, ]$ancestry, snps[i, ]$prefix)
-
-    # handle the polarization
-    if (argv$polarize == "focal" && snps[i, ]$flip) {
-        # use the `flip` flag in the PALM metadata to polarize by risk in the focal trait
-        model <- model %>% mutate(freq = 1.0 - freq, snp_label = paste0(rsid, ":", snps[i, ]$focal_allele))
-    } else {
-        # otherwise we're using ancestral state polarization
-        model <- model %>% mutate(snp_label = paste0(rsid, ":", snps[i, ]$derived_allele))
-    }
-
     models <- append(models, list(model))
 }
 
 # load all the trajectories
 traj <- bind_rows(models) %>%
+    # and join all the metadata
     inner_join(snps, by = c("rsid", "ancestry"), suffix = c("", ".focal")) %>%
     inner_join(ukbb, by = "variant", suffix = c(".focal", ".marginal"))
 
+# both PALM and UKBB report betas for the ALT allele, and CLUES models the frequency of the derived allele
+if (argv$polarize == "focal") {
+    # polarize by the positive effect allele in the focal trait (e.g., MS or RA)
+    traj <- traj %>% mutate(flip = (alt == derived_allele & beta.focal < 0) | (alt == ancestral_allele & beta.focal > 0))
+} else if (argv$polarize == "marginal") {
+    # polarize by the positive effect allele in the UKBB marginal trait
+    traj <- traj %>% mutate(flip = (alt == derived_allele & beta.marginal < 0) | (alt == ancestral_allele & beta.marginal > 0))
+} else {
+    # the default polarization from CLUES is by ancestral/derived state
+    traj <- traj %>% mutate(flip = FALSE)
+}
+
+traj <- traj %>%
+    mutate(
+        # use the `flip` flag to polarize the trajectories
+        freq = ifelse(flip, 1.0 - freq, freq),
+        # add the focal allele to the SNP label
+        snp_label = paste0(rsid, ":", ifelse(flip, ancestral_allele, derived_allele))
+    )
 
 # display the phenotypes and ancestries in custom sorted order
 traj$description <- factor(traj$description, levels = snp_count$description)
@@ -147,7 +157,9 @@ num_cols <- 5
 
 for (page in 1:num_pages) {
     # subset by UKBB phenotype, so we can paginate the output (or else the plot is too big to create)
-    traj_subset <- traj %>% filter(phenotype %in% pheno_list[((page - 1) * per_page):(page * per_page)])
+    pheno_subset <- pheno_list[((page - 1) * per_page):(page * per_page)]
+    traj_subset <- traj %>% filter(phenotype %in% pheno_subset)
+    num_pheno <- length(pheno_subset[!is.na(pheno_subset)])
 
     plt <- ggplot(traj_subset) +
 
@@ -184,5 +196,5 @@ for (page in 1:num_pages) {
         )
 
     # save the plot
-    ggsave(sprintf(argv$output, page), plt, width = num_cols * 3, height = per_page * 2.3, limitsize = FALSE)
+    ggsave(sprintf(argv$output, page), plt, width = num_cols * 3, height = num_pheno * 2.3, limitsize = FALSE)
 }
