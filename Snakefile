@@ -80,6 +80,6 @@ rule all:
         # plot the UKBB comparisons
         expand(
             "results/compare/ancestral_paths_new-{trait}-ukbb-{polarize}-001.png",
-            trait=["ms-all", "ra-all"],
+            trait=TRAITS,
             polarize=["ancestral", "focal", "marginal"],
         ),
