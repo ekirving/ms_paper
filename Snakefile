@@ -71,6 +71,7 @@ rule all:
                 "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-prs.png",
                 "results/palm/ancestral_paths_new-{trait}-delta_prs.png",
                 "results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv",
+                "results/palm/ancestral_paths_new-{trait}-scatter.png",
             ],
             ancestry=ANCESTRIES,
             trait=config.get("trait", TRAITS),

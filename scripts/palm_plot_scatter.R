@@ -34,14 +34,14 @@ palm <- read_tsv(argv$palm, col_types = cols()) %>%
 ymin <- floor(min(palm$delta_prs) / delta_prs_threshold) * delta_prs_threshold
 ymax <- ceiling(max(palm$delta_prs) / delta_prs_threshold) * delta_prs_threshold
 
-ggplot(palm, aes(x=logp, y=delta_prs, colour=ancestry)) +
-    geom_point(aes(shape=significant)) +
-    geom_smooth(aes(fill=ancestry), method='lm', formula="y ~ x", fullrange=TRUE) +
+plt <- ggplot(palm, aes(x = logp, y = delta_prs, colour = ancestry)) +
+    geom_point(aes(shape = significant)) +
+    geom_smooth(aes(fill = ancestry), method = "lm", formula = "y ~ x", fullrange = TRUE) +
     # Add auto-positioned text
     geom_text_repel(
         aes(label = label),
-        size = 9/.pt, # font size 9 pt
-        point.padding = 0.3, 
+        size = 9 / .pt, # font size 9 pt
+        point.padding = 0.3,
         box.padding = 0.7,
         min.segment.length = 0,
         max.overlaps = 1000,
@@ -54,13 +54,12 @@ ggplot(palm, aes(x=logp, y=delta_prs, colour=ancestry)) +
     scale_fill_manual(values = ancestry_colors) +
     scale_color_manual(values = ancestry_colors) +
     scale_shape_manual(values = c(1, 20)) +
-    
+
     # set the axis breaks
     scale_y_continuous(limits = c(ymin, ymax), breaks = seq(ymin, ymax, delta_prs_threshold)) +
-    
     ylab("Δ PRS per SNP") +
     xlab("Directional -log10(pval)") +
-    
+
     # basic styling
     theme_minimal() +
     theme(
@@ -73,5 +72,4 @@ ggplot(palm, aes(x=logp, y=delta_prs, colour=ancestry)) +
     )
 
 # save the plot
-ggsave(argv$output, width = 16, height = 4)
-
+ggsave(argv$output, plot = plt, width = 16, height = 4) %>% suppressWarnings()

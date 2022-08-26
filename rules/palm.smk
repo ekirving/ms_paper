@@ -260,3 +260,17 @@ rule palm_plot_delta_prs:
         " --ehg-tsv {input.ehg_tsv}"
         " --whg-tsv {input.whg_tsv}"
         " --output {output.png}"
+
+
+rule palm_plot_scatter:
+    """
+    Plot a scatter plot of -log10(pval) vs delra_prs
+    """
+    input:
+        tsv="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
+    output:
+        png="results/palm/{dataset}-{trait}-scatter.png",
+    shell:
+        "Rscript scripts/palm_plot_scatter.R "
+        " --palm {input.tsv}"
+        " --output {output.png}"
