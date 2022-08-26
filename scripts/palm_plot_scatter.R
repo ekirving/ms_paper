@@ -45,6 +45,7 @@ plt <- ggplot(palm, aes(x = logp, y = delta_prs, colour = ancestry)) +
         box.padding = 0.7,
         min.segment.length = 0,
         max.overlaps = 1000,
+        bg.color = "white"
     ) +
 
     # display as a single row
