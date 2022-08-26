@@ -11,7 +11,7 @@ quiet <- function(x) {
 quiet(library(argparser)) # v0.6
 quiet(library(tidyverse)) # v1.3.1
 quiet(library(directlabels)) # v2021.1.13
-quiet(library(R.utils))
+quiet(library(R.utils)) # v2.12.0
 
 # load the helper functions
 source("scripts/clues_utils.R")
