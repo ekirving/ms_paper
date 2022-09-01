@@ -9,6 +9,7 @@ __email__ = "ajstern@berkeley.edu"
 
 import argparse
 import json
+import warnings
 from math import ceil
 
 import numpy as np
@@ -75,6 +76,9 @@ for epoch, s in params["epochs"].items():
     )
 
 subtitle += "\n" + "\n".join(data)
+
+# ignore MatplotlibDeprecation warnings
+warnings.filterwarnings("ignore")
 
 plt.pcolormesh(epochs[:-1], freqs, np.exp(logpost)[:, :])
 plt.suptitle(label["title"], x=0.6, fontsize=18)
