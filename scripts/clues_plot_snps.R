@@ -23,9 +23,14 @@ source("scripts/clues_utils.R")
 # rsid_list <- c("rs3129934", "rs3135391", "rs3135388", "rs3129889", "rs9271366")
 
 # TB SNPs
-report_tsv <- "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv"
-output_png <- "TB-SNPs.png"
-rsid_list <- c("rs422951", "rs3135363", "rs3806156", "rs2395162", "rs9268530", "rs2596472", "rs2844494")
+# report_tsv <- "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv"
+# output_png <- "TB-SNPs.png"
+# rsid_list <- c("rs422951", "rs3135363", "rs3806156", "rs2395162", "rs9268530", "rs2596472", "rs2844494")
+
+# TB Meta-GWAS SNPs
+report_tsv <- "results/palm/ancestral_paths_new-ra-all-palm_report_prs.tsv"
+output_png <- "TB-metaGWAS-SNPs.png"
+rsid_list <- c("rs2858331", "rs2857106", "rs2856993")
 
 # load the report, with all the results
 snps <- read_tsv(report_tsv, col_types = cols()) %>%
