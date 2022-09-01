@@ -85,14 +85,11 @@ clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NU
 
 traits <- list(
     "cd-all" = "Celiac disease (all genome-wide significant)",
-    "celiac-UKB-r0.05-kb250" = "Celiac disease (r^2 < 0.05; window 250 kb)",
-    "celiac-UKB-r0.1-kb1000" = "Celiac disease (r^2 < 0.1; window 1000 kb)",
+    "cd-r0.05-kb250" = "Celiac disease (r^2 < 0.05; window 250 kb)",
     "ms-all" = "Multiple sclerosis (all genome-wide significant)",
     "ms-r0.05-kb250" = "Multiple sclerosis (r^2 < 0.05; window 250 kb)",
-    "ms-r0.1-kb1000" = "Multiple sclerosis (r^2 < 0.1; window 1000 kb)",
     "ra-all" = "Rheumatoid arthritis (all genome-wide significant)",
     "ra-r0.05-kb250" = "Rheumatoid arthritis (r^2 < 0.05; window 250 kb)",
-    "ra-r0.1-kb1000" = "Rheumatoid arthritis (r^2 < 0.1; window 1000 kb)"
 )
 
 # decode the ancestry and trait names
