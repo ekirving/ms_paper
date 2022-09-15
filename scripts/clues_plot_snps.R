@@ -23,6 +23,12 @@ source("scripts/clues_utils.R")
 # output_png <- "DRB1-15-01.png"
 # rsid_list <- c("rs3129934", "rs3135391", "rs3135388", "rs3129889", "rs9271366")
 
+# # DRB1*04:01 tag SNPs
+# description <- "DRB1*04:01"
+# report_tsv <- "results/palm/ancestral_paths_new-ra-all-palm_report_prs.tsv"
+# output_png <- "DRB1-04:01.png"
+# rsid_list <- c("rs660895", "rs6910071", "rs3817964")
+
 # # TB SNPs
 # description <- "Tuberculosis (TB)"
 # report_tsv <- "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv"
@@ -34,6 +40,7 @@ description <- "Tuberculosis (TB) - MetaGWAS SNPs"
 report_tsv <- "results/palm/ancestral_paths_new-ra-all-palm_report_prs.tsv"
 output_png <- "TB-metaGWAS-SNPs.png"
 rsid_list <- c("rs2858331", "rs2857106", "rs2856993")
+rsid_list <- c("rs10245298", "rs10497744", "rs10515787", "rs10738171", "rs10956514", "rs11031728", "rs11031731", "rs11041435", "rs11041441", "rs11041442", "rs11041443", "rs11041444", "rs11041451", "rs111299137", "rs111718686", "rs111930050", "rs112848051", "rs113399573", "rs113551974", "rs1136744", "rs114204347", "rs114472823", "rs114538034", "rs115752743", "rs12362545", "rs12437118", "rs141823983", "rs144861045", "rs146049519", "rs150158763", "rs17061034", "rs17205212", "rs17394081", "rs17590261", "rs181393949", "rs188872", "rs191177369", "rs191199007", "rs191695775", "rs200554917", "rs2008560", "rs200953013", "rs2057178", "rs2269497", "rs2273061", "rs2307058", "rs2326344", "rs2621322", "rs2647071", "rs28383206", "rs28383310", "rs28383311", "rs28383323", "rs2856993", "rs2857106", "rs28578990", "rs2858331", "rs28680981", "rs358793", "rs369917557", "rs373685708", "rs376144936", "rs41541115", "rs41553512", "rs4240897", "rs4331426", "rs4348560", "rs4461087", "rs4576509", "rs4696852", "rs4733781", "rs57294695", "rs57640649", "rs58809711", "rs59979761", "rs6053639", "rs6071980", "rs6114027", "rs61321957", "rs61890220", "rs6588110", "rs6786408", "rs6913309", "rs6985962", "rs7029867", "rs71510656", "rs73226617", "rs73401332", "rs73401358", "rs73403123", "rs73409538", "rs73423701", "rs73642961", "rs76827747", "rs77924639", "rs79165841", "rs79298537", "rs79456496", "rs8006139", "rs80154958", "rs80234155", "rs80282780", "rs916943", "rs9365798", "rs9897835")
 
 # load the palm report, with all the results
 palm <- read_tsv(report_tsv, col_types = cols())
@@ -106,14 +113,15 @@ ggplot(traj) +
     scale_color_manual(values = snp_colors) +
 
     # print the labels
-    geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+    geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), 
+            method = list(dl.trans(x = x + 0.1), "last.qp", cex = 1.1), na.rm = TRUE) +
 
     # plot non-significant trajectories as transparent
     scale_alpha(range = c(0.3, 1)) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0.03))) +
-    scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 230))) +
+    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.05, 0.03))) +
+    scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 300))) +
     ylab("DAF") +
     xlab("kyr BP") +
 
@@ -125,8 +133,9 @@ ggplot(traj) +
         panel.border = element_blank(),
         panel.background = element_blank(),
         plot.background = element_rect(fill = "white", color = "white"),
-        panel.spacing = unit(1, "lines")
+        panel.spacing = unit(1, "lines"),
+        text = element_text(size = 14)
     )
 
 # save the plot
-ggsave(output_png, width = 16, height = 4)
+ggsave(output_png, width = 16, height = 4*.9)
