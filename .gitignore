@@ -2,6 +2,7 @@
 *.list
 *.pdf
 *.png
+*.txt
 *.xlsx
 *.zip
 *_mismatchs.tsv
@@ -32,9 +33,9 @@ data/targets/*_positions.tsv
 data/targets/*_variants.tsv
 data/targets/gwas_*.tsv
 data/ukbb/
-doi_10.6078_D11M62__v3
 ms-*.log
 nohup*
 results/
+supplement/
 tmp/
 ~*
