@@ -1,2 +1,2 @@
 # ms
-Polygenic adaptation analysis for multiple sclerosis (MS)
+Polygenic selection analysis for multiple sclerosis (MS)
