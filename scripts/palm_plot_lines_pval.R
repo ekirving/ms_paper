@@ -18,9 +18,9 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Plot the trajectory of the polygenic risk score as stacked lines")
-p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
-p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new-ALL-ms-palm.json")
-p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
+p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-r0.05-kb250-palm_report.tsv")
+p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new-ALL-ms-r0.05-kb250-palm.json")
+p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms-r0.05-kb250")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
@@ -149,11 +149,11 @@ plt <- df_ml %>%
     geom_dl(aes(label = label, color = logp), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 0.60), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
-    scale_x_continuous(limits = c(-limits$xmax, limits$xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 55))) +
+    scale_y_continuous(limits = c(0, 0.43), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
+    scale_x_continuous(limits = c(-limits$xmax, limits$xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 80))) +
     labs(
         title = plot_title,
-        fill = "-log10(p.value)"
+        fill = "-log10(p)"
     ) +
     ylab("Scaled PRS") +
     xlab("kyr BP") +
@@ -177,4 +177,4 @@ plt <- df_ml %>%
     )
 
 # save the plot
-ggsave(filename = argv$output, plt, width = 12, height = 8)
+ggsave(filename = "fig5a.png", plt, width = 550, height = 800, units="cm")

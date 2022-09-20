@@ -85,7 +85,7 @@ max_age <- 13665
 # constrain the extent of the plotting
 xmin <- round(-max_age / gen_time)
 xmax <- max(traj$epoch)
-xbreaks <- -seq(-xmax, -xmin, round(2000 / gen_time))
+xbreaks <- -seq(-xmax, -xmin, round(4000 / gen_time))
 xlabels <- round(xbreaks * gen_time / 1000)
 
 # the approximate time (in generations) during which these ancestries existed as discrete populations
@@ -101,40 +101,41 @@ ancestry_epochs <- tibble(
 ggplot(traj) +
 
     # shade the ancestry epoch
-    geom_rect(data = ancestry_epochs, aes(xmin = start, xmax = finish, ymin = 0, ymax = 1), alpha = 0.5, fill = "#F4F4F4") +
+    geom_rect(data = ancestry_epochs, aes(xmin = start, xmax = finish, ymin = 0, ymax = .4), alpha = 0.5, fill = "#F4F4F4") +
 
     # plot the maximum posterior trajectory
     geom_line(aes(x = epoch, y = freq, color = snp_label, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
 
     # display as a grid
-    facet_grid(description ~ ancestry, labeller = labeller(description = label_wrap_gen())) +
+    facet_grid(~ ancestry, labeller = labeller(description = label_wrap_gen())) +
 
     # set the SNP colors
     scale_color_manual(values = snp_colors) +
 
-    # print the labels
-    geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), 
-            method = list(dl.trans(x = x + 0.1), "last.qp", cex = 1.1), na.rm = TRUE) +
+    # # print the labels
+    # geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), 
+    #         method = list(dl.trans(x = x + 0.1), "last.qp"), na.rm = TRUE) +
 
     # plot non-significant trajectories as transparent
-    scale_alpha(range = c(0.3, 1)) +
+    scale_alpha(range = c(0.3, 1), guide = 'none') +
+    labs(color=description) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.05, 0.03))) +
-    scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 300))) +
+    scale_y_continuous(limits = c(0, .4), breaks = seq(0, 1, .2), position = "left") + #, expand = expansion(add = c(0.05, 0.03))) +
+    scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels) + # expand = expansion(add = c(0, 300))) +
     ylab("DAF") +
     xlab("kyr BP") +
 
     # basic styling
     theme_minimal() +
     theme(
-        legend.position = "none",
+        # legend.position = "none",
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank(),
         plot.background = element_rect(fill = "white", color = "white"),
         panel.spacing = unit(1, "lines"),
-        text = element_text(size = 14)
+        text = element_text(size = 10)
     )
 
 # save the plot
