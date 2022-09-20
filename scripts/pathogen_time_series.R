@@ -38,7 +38,7 @@ xbreaks <- seq(xmin, xmax, BIN_SIZE)
 xlabels <- round(xbreaks / BIN_SIZE)
 
 plt <- ggplot(binned, aes(x=bin, y=freq)) +
-    geom_jitter() +
+    geom_point() +
     geom_smooth(method = "loess", formula = "y ~ x", fullrange = TRUE, se = FALSE) +
     facet_wrap(~species, ncol=3) +
     
