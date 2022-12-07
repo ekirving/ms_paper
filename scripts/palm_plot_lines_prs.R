@@ -18,9 +18,9 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Plot the trajectory of the polygenic risk score as stacked lines")
-p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
-p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new-ALL-ms-palm.json")
-p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
+p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-r0.05-kb250-palm_report.tsv")
+p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new-ALL-ms-r0.05-kb250-palm.json")
+p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms-r0.05-kb250")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
@@ -122,6 +122,12 @@ limits <- df_ml %>%
 xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
 
+# get the maximum scaled PRS
+max_prs <- df_ml %>% group_by(epoch) %>% summarise(prs=sum(prs_freq)) %>% pull(prs) %>% max()
+
+# determine a sensible y-axis limit
+ylimit <- ceiling(max_prs * 10) / 10
+
 # set the range of the colorbar breaks
 min_break <- round(min(df_ml$delta_prs) / delta_prs_threshold) * delta_prs_threshold
 max_break <- round(max(df_ml$delta_prs) / delta_prs_threshold) * delta_prs_threshold
@@ -130,7 +136,7 @@ max_break <- round(max(df_ml$delta_prs) / delta_prs_threshold) * delta_prs_thres
 bar_breaks <- seq(min(min_break, 0), max(max_break, delta_prs_threshold), delta_prs_threshold)
 bar_labels <- sprintf("%.4f", bar_breaks)
 
-# define a rescaling function which caps the upper range of the colorbar at the Bonferroni threshold
+# define a rescaling function which caps the upper range of the colorbar at the delta_prs threshold
 show_significant <- function(x, to = c(0, 1), from = NULL) {
     ifelse(x < delta_prs_threshold, scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), delta_prs_threshold)), 1)
 }
@@ -141,14 +147,13 @@ plt <- df_ml %>%
 
     # plot the maximum likelihood trajectories as stacked lines
     geom_area(aes(fill = delta_prs, color = delta_prs), position = "stack", stat = "identity", outline.type = "full") +
-    # geom_line(aes(color = delta_prs), position = "stack") +
 
     # label the ends of each line
     geom_dl(aes(label = label, color = delta_prs), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 0.60), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
-    scale_x_continuous(limits = c(-limits$xmax, limits$xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 55))) +
+    scale_y_continuous(limits = c(0, ylimit), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
+    scale_x_continuous(limits = c(-limits$xmax, limits$xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 80))) +
     labs(
         title = plot_title,
         fill = "Δ PRS"

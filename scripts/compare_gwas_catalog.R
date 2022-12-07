@@ -64,7 +64,7 @@ snps <- palm %>%
 models <- list()
 for (i in 1:nrow(snps)) {
     # load the CLUES trajectory
-    model <- clues_trajectory(snps[i, ]$rsid, snps[i, ]$ancestry, snps[i, ]$prefix)
+    model <- clues_trajectory(snps[i, ]$rsid, snps[i, ]$ancestry, snps[i, ]$prefix, threshold = 0.08)
     models <- append(models, list(model))
 }
 

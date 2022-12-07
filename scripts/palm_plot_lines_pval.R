@@ -122,6 +122,12 @@ bonferroni <- round(-log10(0.05 / nrow(snps)), 1)
 # get the maximum -log10(p.value)
 max_logp <- max(df_ml$logp)
 
+# get the maximum scaled PRS
+max_prs <- df_ml %>% group_by(epoch) %>% summarise(prs=sum(prs_freq)) %>% pull(prs) %>% max()
+
+# determine a sensible y-axis limit
+ylimit <- ceiling(max_prs * 10) / 10
+
 # set the colour bar breaks, ensuring that the first break is the Bonferroni threshold
 bar_breaks <- seq(0, max(max_logp, bonferroni), bonferroni)
 bar_labels <- sprintf("%.1f", bar_breaks)
@@ -132,24 +138,18 @@ show_significant <- function(x, to = c(0, 1), from = NULL) {
     ifelse(x < bonferroni, scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), bonferroni)), 1)
 }
 
-# define a rescaling function which caps the lower range of the colorbar at the Bonferroni threshold
-# show_significant <- function(x, to = c(0, 1), from = NULL) {
-#     ifelse(x < bonferroni, 0, scales::rescale(x, to = to, from = c(bonferroni, max(x, na.rm = TRUE))))
-# }
-
 plt <- df_ml %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = prs_freq, group = rsid)) +
 
     # plot the maximum likelihood trajectories as stacked lines
     geom_area(aes(fill = logp, color = logp), position = "stack", stat = "identity", outline.type = "full") +
-    # geom_line(aes(color = logp), position = "stack") +
 
     # label the ends of each line
     geom_dl(aes(label = label, color = logp), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), position = "stack", na.rm = TRUE) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, 0.43), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
+    scale_y_continuous(limits = c(0, ylimit), breaks = seq(0, 1, .05), expand = c(0, 0), position = "right") +
     scale_x_continuous(limits = c(-limits$xmax, limits$xmin), breaks = -xbreaks, labels = xlabels, expand = expansion(add = c(1, 80))) +
     labs(
         title = plot_title,
@@ -177,4 +177,4 @@ plt <- df_ml %>%
     )
 
 # save the plot
-ggsave(filename = "fig5a.png", plt, width = 550, height = 800, units="cm")
+ggsave(filename = argv$output, plt, width = 12, height = 8)

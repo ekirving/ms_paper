@@ -39,7 +39,7 @@ clues_load_data <- function(prefix) {
     model
 }
 
-clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NULL, threshold = 0.08) {
+clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NULL, threshold = NA) {
 
     # load the model
     model <- clues_load_data(prefix) %>% mutate(rsid = rsid, ancestry = ancestry)
