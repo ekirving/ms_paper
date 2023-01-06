@@ -70,7 +70,8 @@ subtitle += " | " + ancestries[args.ancestry]
 data = []
 for epoch, s in params["epochs"].items():
     # convert the log-likelihood ratio into a p-value
-    params["p.value"] = chi2.sf(params["logLR"], 1)
+    # https://en.wikipedia.org/wiki/Wilks%27_theorem
+    params["p.value"] = chi2.sf(2 * params["logLR"], 1)
     data.append(
         "logLR = {:.2f} | p = {:.2e} | epoch = {} | s = {:.5f}".format(params["logLR"], params["p.value"], epoch, s)
     )

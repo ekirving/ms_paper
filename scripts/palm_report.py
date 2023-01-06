@@ -78,7 +78,9 @@ def palm_report(data_tsv, dataset, ancestry, output):
     # convert to a df
     df = pd.DataFrame(rows)
     df["chrom"] = df.chrom.astype("int64")
-    df["p.value"] = df["logLR"].apply(lambda logLR: chi2.sf(logLR, 1))
+    # convert the log-likelihood ratio into a p-value
+    # https://en.wikipedia.org/wiki/Wilks%27_theorem
+    df["p.value"] = df["logLR"].apply(lambda logLR: chi2.sf(2 * logLR, 1))
     df["significant"] = df["p.value"].apply(lambda p: p <= bonferroni)
     df.to_csv(output, sep="\t", index=False)
 
