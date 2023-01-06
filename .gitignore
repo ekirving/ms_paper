@@ -33,6 +33,7 @@ data/targets/*_positions.tsv
 data/targets/*_variants.tsv
 data/targets/gwas_*.tsv
 data/ukbb/
+data/finngen/
 ms-*.log
 nohup*
 results/
