@@ -126,7 +126,29 @@ def concatenate_pairwise_ld_input(wildcards):
 
     snp = pd.read_table(gwas_tsv)
 
-    files = [f"data/1000g/ld/1000G_phase3-chr{row.CHR}-{row.SNP}.ld" for row in snp.itertuples()]
+    # drop SNPs that are not present in the 1000G callset
+    missing = [
+        "rs736160",
+        "rs2853952",
+        "rs372968977",
+        "rs28637341",
+        "rs1610628",
+        "rs376236557",
+        "rs28480108",
+        "rs9689804",
+        "rs9258716",
+        "rs59396305",
+        "rs28693951",
+        "rs9277575",
+        "rs67375766",
+        "rs1631950",
+        "rs55873403",
+        "rs34341880",
+    ]
+
+    files = [
+        f"data/1000g/ld/1000G_phase3-chr{row.CHR}-{row.SNP}.ld" for row in snp.itertuples() if row.SNP not in missing
+    ]
 
     return files
 
