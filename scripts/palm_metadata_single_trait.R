@@ -13,12 +13,12 @@ quiet(library(tidyverse)) # v1.3.1
 
 # get the command line arguments
 p <- arg_parser("Convert the GWAS metadata into PALM input format")
-p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/gwas_ms.tsv")
-p <- add_argument(p, "--ld", help = "Pairwise LD for finging proxy SNPs", default = "data/targets/gwas_ms_ld.tsv.gz")
+p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/gwas_ms-r0.05-kb250.tsv")
+p <- add_argument(p, "--ld", help = "Pairwise LD for finding proxy SNPs", default = "data/targets/gwas_ms-r0.05-kb250-r0.05-kb250_ld.tsv.gz")
 p <- add_argument(p, "--sites", help = "List of callable sites in the current dataset", default = "data/sites/ancestral_paths_new_sites.tsv.gz")
-p <- add_argument(p, "--proxy", help = "Should we replace missing GWAS SNPs with proxies", flag = TRUE)
-p <- add_argument(p, "--min-ld", help = "Minimum LD threhold for proxy variants", default = 0.7)
-p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_ms_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--proxy", help = "Should we replace missing GWAS SNPs with proxies", flag = FALSE)
+p <- add_argument(p, "--min-ld", help = "Minimum LD threshold for proxy variants", default = 0.7)
+p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_ms-r0.05-kb250_ancestral_paths_new_palm.tsv")
 
 argv <- parse_args(p)
 

@@ -84,5 +84,6 @@ rule all:
         expand(
             "results/compare/ancestral_paths_new-{trait}-ukbb-{polarize}-001.png",
             trait=TRAITS,
+            biobank=["ukbb", "finngen"],
             polarize=["ancestral", "focal", "marginal"],
         ),

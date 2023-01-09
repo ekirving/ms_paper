@@ -26,13 +26,14 @@ checkpoint palm_metadata:
     """
     input:
         gwas="data/targets/gwas_{trait}.tsv",
+        # ld="data/targets/gwas_{trait}_ld.tsv.gz",
         sites="data/sites/{dataset}_sites.tsv.gz",
     output:
         tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
     log:
         log="data/targets/gwas_{trait}_{dataset}_palm.log",
     shell:
-        "Rscript scripts/palm_metadata.R"
+        "Rscript scripts/palm_metadata_single_trait.R"
         " --gwas {input.gwas}"
         " --sites {input.sites}"
         " --output {output.tsv} &> {log}"

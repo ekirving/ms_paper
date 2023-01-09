@@ -47,7 +47,7 @@ rule filter_ukbb_gwas:
         " --output {output.tsv}"
 
 
-def merge_all_filtered_phenotypes_input(wildcards):
+def merge_all_ukbb_filtered_phenotypes_input(wildcards):
     """
     Return a list of all the phenotype association files for the NealeLab UKBB GWAS
     """
@@ -63,12 +63,12 @@ def merge_all_filtered_phenotypes_input(wildcards):
     )
 
 
-rule merge_all_filtered_phenotypes:
+rule merge_all_ukbb_filtered_phenotypes:
     """
     Merge all the filtered UKBB association files
     """
     input:
-        merge_all_filtered_phenotypes_input,
+        merge_all_ukbb_filtered_phenotypes_input,
     output:
         tsv="results/compare/ukbb/{dataset}-{trait}.{sex}.significant.tsv.gz",
     shell:
@@ -94,6 +94,72 @@ rule compare_ukbb:
     shell:
         "Rscript scripts/compare_ukbb.R"
         " --ukbb {input.ukbb}"
+        " --pheno {input.pheno}"
+        " --palm {input.palm}"
+        " --polarize {wildcards.polarize}"
+        " --output {params.png}"
+
+
+rule filter_finngen_gwas:
+    """
+    Filter the FinnGen GWAS file to retain only the SNPs with a significant selection test in the CLUES analysis
+    """
+    input:
+        finngen="data/finngen/gwas/finngen_R8_{pheno}.significant.tsv.bgz",
+        palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
+    output:
+        tsv=temp("results/compare/finngen/{dataset}-{trait}.{pheno}.significant.tsv"),
+    shell:
+        "Rscript scripts/filter_finngen_gwas.R"
+        " --pheno {wildcards.pheno}"
+        " --finngen {input.finngen}"
+        " --palm {input.palm}"
+        " --output {output.tsv}"
+
+
+def merge_all_finngen_filtered_phenotypes_input(wildcards):
+    """
+    Return a list of all the phenotype association files for the FinnGen GWAS
+    """
+    # noinspection PyUnresolvedReferences
+    pheno_tsv = checkpoints.finngen_phenotypes.get().output.tsv
+
+    phenotypes = pd.read_table(pheno_tsv)["phenocode"].unique()
+
+    return expand("results/compare/finngen/{dataset}-{trait}.{pheno}.significant.tsv", pheno=phenotypes, **wildcards)
+
+
+rule merge_all_finngen_filtered_phenotypes:
+    """
+    Merge all the filtered FinnGen association files
+    """
+    input:
+        merge_all_finngen_filtered_phenotypes_input,
+    output:
+        tsv="results/compare/finngen/{dataset}-{trait}.significant.tsv.gz",
+    shell:
+        "head -n1 {input[0]} | gzip -c > {output.tsv} && "
+        "tail -n +2 -q {input} | gzip -c >> {output.tsv}"
+
+
+rule compare_finngen:
+    """
+    Compare trajectories between trait associated SNPs and all other traits in the FinnGen
+    """
+    input:
+        finngen="results/compare/finngen/{dataset}-{trait}.significant.tsv.gz",
+        pheno="data/finngen/finngen_R8_manifest.tsv",
+        palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
+    output:
+        png="results/compare/{dataset}-{trait}-finngen-{polarize}-001.png",
+    params:
+        # plotting script produces multiple PNG files (based on number of FinnGen traits)
+        png="results/compare/{dataset}-{trait}-finngen-{polarize}-%03d.png",
+    wildcard_constraints:
+        polarize="ancestral|focal|marginal",
+    shell:
+        "Rscript scripts/compare_finngen.R"
+        " --finngen {input.finngen}"
         " --pheno {input.pheno}"
         " --palm {input.palm}"
         " --polarize {wildcards.polarize}"
