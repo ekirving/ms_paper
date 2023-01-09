@@ -59,7 +59,9 @@ for (i in 1:nrow(snps)) {
         mutate(
             rsid = snps[i, ]$rsid,
             logp = -log10(snps[i, ]$p.value),
-            significant = snps[i, ]$significant
+            significant = snps[i, ]$significant,
+            chrom = snps[i, ]$chrom,
+            pos = snps[i, ]$pos
         )
 
     if (snps[i, ]$flip) {
@@ -76,8 +78,8 @@ for (i in 1:nrow(snps)) {
 }
 
 df_ml <- bind_rows(models) %>%
-    # only label the significant SNPs
-    mutate(label = ifelse(significant, rsid, NA))
+    # only label the significant SNPs (and add a dagger to SNPs in the HLA) 
+    mutate(label = ifelse(significant, ifelse(chrom == 6 & pos >= 28477797 & pos <= 33448354, paste0(rsid, "†"), rsid), NA))
 
 # sort the SNPs by their -log10(p) and the direction of the effect (positive on top)
 snp_order <- bind_rows(

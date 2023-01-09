@@ -59,7 +59,9 @@ for (i in 1:nrow(snps)) {
         mutate(
             rsid = snps[i, ]$rsid,
             logp = -log10(snps[i, ]$p.value),
-            significant = snps[i, ]$significant
+            significant = snps[i, ]$significant,
+            chrom = snps[i, ]$chrom,
+            pos = snps[i, ]$pos
         )
 
     if (snps[i, ]$flip) {
@@ -95,7 +97,7 @@ delta_prs_threshold <- 0.0025
 df_ml <- df_ml %>%
     inner_join(snp_order, by = "rsid") %>%
     # only label the SNPs above the threshold
-    mutate(label = ifelse(abs(delta_prs) > delta_prs_threshold, rsid, NA))
+    mutate(label = ifelse(abs(delta_prs) > delta_prs_threshold, ifelse(chrom == 6 & pos >= 28477797 & pos <= 33448354, paste0(rsid, "†"), rsid), NA))
 
 # apply the sort ordering, by setting the factor levels
 df_ml$rsid <- factor(df_ml$rsid, levels = snp_order$rsid)
