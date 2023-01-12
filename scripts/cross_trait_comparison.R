@@ -17,14 +17,14 @@ cd_all <- read_tsv("results/palm/ancestral_paths_new-cd-all-palm_report_prs.tsv"
 
 traits <- bind_rows(ms_all, ra_all, cd_all)
 
-overlap <- traits %>% 
+overlap <- traits %>%
     filter(significant) %>%
     group_by(rsid) %>%
     summarise(num_traits = n_distinct(trait)) %>%
     filter(num_traits > 1) %>%
     pull(rsid)
 
-cross <- traits %>% 
+cross <- traits %>%
     filter(rsid %in% overlap) %>%
     select(variant, chrom, pos, rsid, ancestry, snp_effect, trait) %>%
     pivot_wider(names_from = trait, values_from = snp_effect)

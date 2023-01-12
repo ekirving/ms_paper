@@ -125,7 +125,11 @@ xbreaks <- seq(limits$xmin, limits$xmax + 1, round(1000 / argv$gen_time))
 xlabels <- round(xbreaks * argv$gen_time / 1000)
 
 # get the maximum scaled PRS
-max_prs <- df_ml %>% group_by(epoch) %>% summarise(prs=sum(prs_freq)) %>% pull(prs) %>% max()
+max_prs <- df_ml %>%
+    group_by(epoch) %>%
+    summarise(prs = sum(prs_freq)) %>%
+    pull(prs) %>%
+    max()
 
 # determine a sensible y-axis limit
 ylimit <- ceiling(max_prs * 10) / 10

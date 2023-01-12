@@ -27,7 +27,7 @@ p <- add_argument(p, "--output", help = "Output file", default = "results/compar
 argv <- parse_args(p)
 
 finngen <- read_tsv(argv$finngen, col_types = cols())
-pheno <- read_tsv(argv$pheno, col_types = cols()) %>% rename(phenotype=phenocode, description=name)
+pheno <- read_tsv(argv$pheno, col_types = cols()) %>% rename(phenotype = phenocode, description = name)
 palm <- read_tsv(argv$palm, col_types = cols())
 
 # get the list of all genome-wide significant SNPs from the FinnGen that intersect this trait

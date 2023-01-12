@@ -20,7 +20,9 @@ p <- add_argument(p, "--output", help = "Output file", default = "results/compar
 
 argv <- parse_args(p)
 
-finngen <- read_tsv(argv$finngen, col_types = cols()) %>% separate_rows(rsids) %>% rename(rsid=rsids, chrom=`#chrom`)
+finngen <- read_tsv(argv$finngen, col_types = cols()) %>%
+    separate_rows(rsids) %>%
+    rename(rsid = rsids, chrom = `#chrom`)
 palm <- read_tsv(argv$palm, col_types = cols())
 
 # get the list of SNPs used in the PALM analysis

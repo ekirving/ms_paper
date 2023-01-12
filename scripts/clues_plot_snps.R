@@ -107,21 +107,21 @@ ggplot(traj) +
     geom_line(aes(x = epoch, y = freq, color = snp_label, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
 
     # display as a grid
-    facet_grid(~ ancestry, labeller = labeller(description = label_wrap_gen())) +
+    facet_grid(~ancestry, labeller = labeller(description = label_wrap_gen())) +
 
     # set the SNP colors
     scale_color_manual(values = snp_colors) +
 
     # # print the labels
-    # geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), 
+    # geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)),
     #         method = list(dl.trans(x = x + 0.1), "last.qp"), na.rm = TRUE) +
 
     # plot non-significant trajectories as transparent
-    scale_alpha(range = c(0.3, 1), guide = 'none') +
-    labs(color=description) +
+    scale_alpha(range = c(0.3, 1), guide = "none") +
+    labs(color = description) +
 
     # set the axis breaks
-    scale_y_continuous(limits = c(0, .4), breaks = seq(0, 1, .2), position = "left") + #, expand = expansion(add = c(0.05, 0.03))) +
+    scale_y_continuous(limits = c(0, .4), breaks = seq(0, 1, .2), position = "left") + # , expand = expansion(add = c(0.05, 0.03))) +
     scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels) + # expand = expansion(add = c(0, 300))) +
     ylab("DAF") +
     xlab("kyr BP") +
@@ -139,4 +139,4 @@ ggplot(traj) +
     )
 
 # save the plot
-ggsave(output_png, width = 16, height = 4*.9)
+ggsave(output_png, width = 16, height = 4 * .9)

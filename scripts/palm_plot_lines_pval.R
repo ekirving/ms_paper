@@ -78,7 +78,7 @@ for (i in 1:nrow(snps)) {
 }
 
 df_ml <- bind_rows(models) %>%
-    # only label the significant SNPs (and add a dagger to SNPs in the HLA) 
+    # only label the significant SNPs (and add a dagger to SNPs in the HLA)
     mutate(label = ifelse(significant, ifelse(chrom == 6 & pos >= 28477797 & pos <= 33448354, paste0(rsid, "†"), rsid), NA))
 
 # sort the SNPs by their -log10(p) and the direction of the effect (positive on top)
@@ -125,7 +125,11 @@ bonferroni <- round(-log10(0.05 / nrow(snps)), 1)
 max_logp <- max(df_ml$logp)
 
 # get the maximum scaled PRS
-max_prs <- df_ml %>% group_by(epoch) %>% summarise(prs=sum(prs_freq)) %>% pull(prs) %>% max()
+max_prs <- df_ml %>%
+    group_by(epoch) %>%
+    summarise(prs = sum(prs_freq)) %>%
+    pull(prs) %>%
+    max()
 
 # determine a sensible y-axis limit
 ylimit <- ceiling(max_prs * 10) / 10
