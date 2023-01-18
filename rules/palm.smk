@@ -19,6 +19,14 @@ MHC_FINISH = 33448354
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 
+# minimum LD to clump SNPs into the same LD block for the joint PALM analysis
+MIN_LD = 0.3
+
+
+wildcard_constraints:
+    trait1="(ms|ra|cd)",
+    trait2="(ms|ra|cd)",
+
 
 checkpoint palm_metadata:
     """
@@ -36,6 +44,36 @@ checkpoint palm_metadata:
         "Rscript scripts/palm_metadata_single_trait.R"
         " --gwas {input.gwas}"
         " --sites {input.sites}"
+        " --output {output.tsv} &> {log}"
+
+
+checkpoint palm_metadata_multi_trait:
+    """
+    Merge the two sets of GWAS metadata using pairwise LD in the modern reference panel
+
+    To do this, we need both the independent markers for each marginal trait, as well as the full set of summary 
+    statistics for both traits, so we can output beta scores and p-values for all independent SNPs used in both traits
+    """
+    input:
+        gwas1_ind="data/targets/gwas_{trait1}-r0.05-kb250_{dataset}_palm.tsv",
+        gwas2_ind="data/targets/gwas_{trait2}-r0.05-kb250_{dataset}_palm.tsv",
+        gwas1_all="data/targets/gwas_{trait1}-full_{dataset}_palm.tsv",
+        gwas2_all="data/targets/gwas_{trait2}-full_{dataset}_palm.tsv",
+        ld="data/targets/gwas_{trait1}-r0.05-kb250_ld.tsv.gz",
+    output:
+        tsv="data/targets/gwas_{trait1}-r0.05-kb250_vs_{trait2}-r0.05-kb250_{dataset}_palm.tsv",
+    log:
+        log="data/targets/gwas_{trait1}-r0.05-kb250_vs_{trait2}-r0.05-kb250_{dataset}_palm.log",
+    shell:
+        "Rscript scripts/palm_metadata_multi_trait.R"
+        " --trait1 '{wildcards.trait1}-r0.05-kb250'"
+        " --trait2 '{wildcards.trait2}-r0.05-kb250'"
+        " --gwas1-ind {input.gwas1_ind}"
+        " --gwas2-ind {input.gwas2_ind}"
+        " --gwas1-all {input.gwas1_all}"
+        " --gwas2-all {input.gwas2_all}"
+        " --ld {input.ld}"
+        " --min-ld {MIN_LD}"
         " --output {output.tsv} &> {log}"
 
 
