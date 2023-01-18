@@ -6,10 +6,12 @@
 *.xlsx
 *.zip
 *_mismatchs.tsv
+*imsgc*
 .Rproj.user
 .snakemake
 _*
 __pycache__
+astrid/
 bak/
 benchmarks/
 bin/
@@ -18,6 +20,7 @@ data/Ancestral_paths_new
 data/clues/
 data/dbsnp/
 data/ensembl/
+data/finngen/
 data/gwascat/
 data/labels/
 data/metadata/
@@ -33,10 +36,10 @@ data/targets/*_positions.tsv
 data/targets/*_variants.tsv
 data/targets/gwas_*.tsv
 data/ukbb/
-data/finngen/
 ms-*.log
 nohup*
 results/
+scratch.*
 supplement/
 tmp/
 ~*
