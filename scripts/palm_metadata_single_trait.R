@@ -16,19 +16,19 @@ p <- arg_parser("Convert the GWAS metadata into PALM input format")
 p <- add_argument(p, "--gwas", help = "GWAS associations", default = "data/targets/gwas_ms-r0.05-kb250.tsv")
 p <- add_argument(p, "--ld", help = "Pairwise LD for finding proxy SNPs", default = "data/targets/gwas_ms-r0.05-kb250-r0.05-kb250_ld.tsv.gz")
 p <- add_argument(p, "--sites", help = "List of callable sites in the current dataset", default = "data/sites/ancestral_paths_new_sites.tsv.gz")
-p <- add_argument(p, "--proxy", help = "Should we replace missing GWAS SNPs with proxies", flag = FALSE)
+p <- add_argument(p, "--proxy", help = "Should we replace missing GWAS SNPs with proxies", flag = TRUE)
 p <- add_argument(p, "--min-ld", help = "Minimum LD threshold for proxy variants", default = 0.7)
 p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_ms-r0.05-kb250_ancestral_paths_new_palm.tsv")
 
 argv <- parse_args(p)
 
-gwas <- read_tsv(argv$gwas, col_types = cols(), na = c("", "NA", "-"))
-sites <- read_tsv(argv$sites, col_types = cols(), col_names = c("chrom", "pos", "id", "REF", "ALT", "ancestral_allele"), skip = 1) %>% select(-id)
+gwas <- read_tsv(argv$gwas, col_types = cols(CHR = "c"), na = c("", "NA", "-"))
+sites <- read_tsv(argv$sites, col_types = cols(chrom = "c"), col_names = c("chrom", "pos", "id", "REF", "ALT", "ancestral_allele"), skip = 1) %>% select(-id)
 
 if (argv$proxy) {
     print("INFO: Checking all GWAS SNPs are callable, and if not, searching for proxy SNPs...")
 
-    ld <- read_table(argv$ld, col_types = cols(), col_names = c("GWAS_CHR", "GWAS_BP", "GWAS_SNP", "PROXY_CHR", "PROXY_BP", "PROXY_SNP", "PHASE", "R2", "blank"), skip = 1) %>% select(-blank)
+    ld <- read_table(argv$ld, col_types = cols(PROXY_CHR = "c"), col_names = c("GWAS_CHR", "GWAS_BP", "GWAS_SNP", "PROXY_CHR", "PROXY_BP", "PROXY_SNP", "PHASE", "R2", "blank"), skip = 1) %>% select(-blank)
 
     # find the callable SNP in strongest LD with each GWAS SNP (this will retain the original SNP where possible)
     proxy <- ld %>%
