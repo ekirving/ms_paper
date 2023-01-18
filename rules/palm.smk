@@ -28,7 +28,7 @@ wildcard_constraints:
     trait2="(ms|ra|cd)",
 
 
-checkpoint palm_metadata:
+checkpoint palm_metadata_single_trait:
     """
     Convert the GWAS metadata into PALM input format, and replace any missing SNPs with proxy-SNPs in high LD
     """
@@ -81,10 +81,20 @@ def clues_quad_fit(wildcards):
     """
     Resolve the path to the CLUES likelihood quadratic fit
     """
-    # noinspection PyUnresolvedReferences
-    meta_tsv = checkpoints.palm_metadata.get(**wildcards).output.tsv
+    if "-vs-" in wildcards.trait:
+        trait1, trait2 = wildcards.trait.split("-vs-")
+        # noinspection PyUnresolvedReferences
+        meta_tsv = checkpoints.palm_metadata_multi_trait.get(**wildcards, trait1=trait1, trait2=trait2).output.tsv
+    else:
+        # noinspection PyUnresolvedReferences
+        meta_tsv = checkpoints.palm_metadata_single_trait.get(**wildcards).output.tsv
 
-    snp = pd.read_table(meta_tsv).set_index("ld_block", drop=False).loc[int(wildcards.block)]
+    meta = pd.read_table(meta_tsv)
+    snp = (
+        meta.loc[(meta["ld_block"] == int(wildcards.block)) & (meta["pos"] == int(wildcards.pos))]
+        .to_dict(orient="records")
+        .pop()
+    )
 
     rsid = snp["rsid"]
     dataset = wildcards.dataset
@@ -119,8 +129,13 @@ def palm_quad_fit(wildcards):
     """
     Return a list of the `.quad_fit` files for each SNP associated with the current trait
     """
-    # noinspection PyUnresolvedReferences
-    meta_tsv = checkpoints.palm_metadata.get(**wildcards).output.tsv
+    if "trait1" in wildcards:
+        # noinspection PyUnresolvedReferences
+        meta_tsv = checkpoints.palm_metadata_multi_trait.get(**wildcards).output.tsv
+    else:
+        # noinspection PyUnresolvedReferences
+        meta_tsv = checkpoints.palm_metadata_single_trait.get(**wildcards).output.tsv
+
     meta = pd.read_table(meta_tsv)
 
     dataset = wildcards.dataset
@@ -158,6 +173,33 @@ rule palm_single_trait:
         " --B 1000"
         " 1> {output.txt}"
         " 2> {log}"
+
+
+# noinspection PyUnresolvedReferences
+rule palm_multi_trait:
+    """
+    Run PALM in multi-trait mode
+    """
+    input:
+        unpack(palm_quad_fit),
+    output:
+        txt="results/palm/{dataset}-{ancestry}-{trait1}-vs-{trait2}-palm.txt",
+    log:
+        log="results/palm/{dataset}-{ancestry}-{trait1}-vs-{trait2}-palm.log",
+    params:
+        dir="results/palm/{dataset}/{ancestry}/{trait1}-vs-{trait2}/",
+    shell:
+        "python bin/palm/palm.py"
+        " --traitDir {params.dir}"
+        " --metadata {input.tsv}"
+        " --B 1000"
+        " --maxp 5e-8"
+        " --traits {wildcards.trait1},{wildcards.trait2}"
+        " 1> {output.txt}"
+        " 2> {log}"
+
+
+ruleorder: palm_multi_trait > palm_single_trait
 
 
 rule palm_parse_txt:

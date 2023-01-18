@@ -49,7 +49,7 @@ def all_clues_plots(_):
 
     for trait in traits:
         # noinspection PyUnresolvedReferences
-        meta_tsv = checkpoints.palm_metadata.get(dataset="ancestral_paths_new", trait=trait).output.tsv
+        meta_tsv = checkpoints.palm_metadata_single_trait.get(dataset="ancestral_paths_new", trait=trait).output.tsv
 
         snp = pd.read_table(meta_tsv)
 
