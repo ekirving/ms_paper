@@ -61,13 +61,13 @@ checkpoint palm_metadata_multi_trait:
         gwas2_all="data/targets/gwas_{trait2}-full_{dataset}_palm.tsv",
         ld="data/targets/gwas_{trait1}-r0.05-kb250_ld.tsv.gz",
     output:
-        tsv="data/targets/gwas_{trait1}-r0.05-kb250_vs_{trait2}-r0.05-kb250_{dataset}_palm.tsv",
+        tsv="data/targets/gwas_{trait1}-vs-{trait2}_{dataset}_palm.tsv",
     log:
-        log="data/targets/gwas_{trait1}-r0.05-kb250_vs_{trait2}-r0.05-kb250_{dataset}_palm.log",
+        log="data/targets/gwas_{trait1}-vs-{trait2}_{dataset}_palm.log",
     shell:
         "Rscript scripts/palm_metadata_multi_trait.R"
-        " --trait1 '{wildcards.trait1}-r0.05-kb250'"
-        " --trait2 '{wildcards.trait2}-r0.05-kb250'"
+        " --trait1 {wildcards.trait1}"
+        " --trait2 {wildcards.trait2}"
         " --gwas1-ind {input.gwas1_ind}"
         " --gwas2-ind {input.gwas2_ind}"
         " --gwas1-all {input.gwas1_all}"
