@@ -45,6 +45,18 @@ gwas_all <- gwas1_all %>%
 trait1 <- gwas_all %>% filter(variant %in% gwas1_ind$variant)
 trait2 <- gwas_all %>% filter(variant %in% gwas2_ind$variant)
 
+if (nrow(gwas1_ind) != nrow(trait1)) {
+    paste0("WARN: Removed ", nrow(gwas1_ind) - nrow(trait1), " SNPs for `", argv$trait1, "` not present in the `", argv$trait2, "` GWAS")
+} else {
+    paste0("INFO: All GWAS SNPs for `", argv$trait1, "` are present in the `", argv$trait2, "` GWAS")
+}
+
+if (nrow(gwas2_ind) != nrow(trait2)) {
+    paste0("WARN: Removed ", nrow(gwas2_ind) - nrow(trait2), " SNPs for `", argv$trait2, "` not present in the `", argv$trait1, "` GWAS")
+} else {
+    paste0("INFO: All GWAS SNPs for `", argv$trait2, "` are present in the `", argv$trait1, "` GWAS")
+}
+
 # determine which of the cross-GWAS SNPs are in LD with each other
 paired <- ld %>%
     # we only care about SNPs inside the 250 Kb wide LD window
