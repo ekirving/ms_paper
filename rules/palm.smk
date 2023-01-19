@@ -61,9 +61,9 @@ checkpoint palm_metadata_multi_trait:
         gwas2_all="data/targets/gwas_{trait2}-full_{dataset}_palm.tsv",
         ld="data/targets/gwas_{trait1}-r0.05-kb250_ld.tsv.gz",
     output:
-        tsv="data/targets/gwas_{trait1}-vs-{trait2}_{dataset}_palm.tsv",
+        tsv="data/targets/gwas_{trait1}~{trait2}_{dataset}_palm.tsv",
     log:
-        log="data/targets/gwas_{trait1}-vs-{trait2}_{dataset}_palm.log",
+        log="data/targets/gwas_{trait1}~{trait2}_{dataset}_palm.log",
     shell:
         "Rscript scripts/palm_metadata_multi_trait.R"
         " --trait1 {wildcards.trait1}"
@@ -81,10 +81,9 @@ def clues_quad_fit(wildcards):
     """
     Resolve the path to the CLUES likelihood quadratic fit
     """
-    if "-vs-" in wildcards.trait:
-        trait1, trait2 = wildcards.trait.split("-vs-")
+    if hasattr(wildcards, "trait1"):
         # noinspection PyUnresolvedReferences
-        meta_tsv = checkpoints.palm_metadata_multi_trait.get(**wildcards, trait1=trait1, trait2=trait2).output.tsv
+        meta_tsv = checkpoints.palm_metadata_multi_trait.get(**wildcards).output.tsv
     else:
         # noinspection PyUnresolvedReferences
         meta_tsv = checkpoints.palm_metadata_single_trait.get(**wildcards).output.tsv
@@ -121,6 +120,9 @@ rule palm_organise_clues:
         clues_quad_fit,
     output:
         quad="results/palm/{dataset}/{ancestry}/{trait}/ld_{block}/bp{pos}.quad_fit.npy",
+    wildcard_constraints:
+        # relax the constraint so we can match paired traits
+        trait="(ms|ra|cd)[-~][^_]+",
     shell:
         "cp {input[0]} {output}"
 
@@ -129,7 +131,7 @@ def palm_quad_fit(wildcards):
     """
     Return a list of the `.quad_fit` files for each SNP associated with the current trait
     """
-    if "trait1" in wildcards:
+    if hasattr(wildcards, "trait1"):
         # noinspection PyUnresolvedReferences
         meta_tsv = checkpoints.palm_metadata_multi_trait.get(**wildcards).output.tsv
     else:
@@ -140,7 +142,7 @@ def palm_quad_fit(wildcards):
 
     dataset = wildcards.dataset
     ancestry = wildcards.ancestry
-    trait = wildcards.trait
+    trait = wildcards.trait if hasattr(wildcards, "trait") else "~".join([wildcards.trait1, wildcards.trait2])
 
     files = []
     for _, snp in meta.iterrows():
@@ -150,7 +152,7 @@ def palm_quad_fit(wildcards):
     # make sure that all the SNP metadata has been built, as we rely on this later
     json = expand("data/metadata/GRCh37/{rsid}.json", rsid=meta["rsid"])
 
-    return {"tsv": "data/targets/gwas_{trait}_{dataset}_palm.tsv", "quad_fit": files, "json": json}
+    return {"quad_fit": files, "json": json}
 
 
 # noinspection PyUnresolvedReferences
@@ -160,6 +162,7 @@ rule palm_single_trait:
     """
     input:
         unpack(palm_quad_fit),
+        tsv="data/targets/gwas_{trait}_{dataset}_palm.tsv",
     output:
         txt="results/palm/{dataset}-{ancestry}-{trait}-palm.txt",
     log:
@@ -182,12 +185,13 @@ rule palm_multi_trait:
     """
     input:
         unpack(palm_quad_fit),
+        tsv="data/targets/gwas_{trait1}~{trait2}_{dataset}_palm.tsv",
     output:
-        txt="results/palm/{dataset}-{ancestry}-{trait1}-vs-{trait2}-palm.txt",
+        txt="results/palm/{dataset}-{ancestry}-{trait1}~{trait2}-palm.txt",
     log:
-        log="results/palm/{dataset}-{ancestry}-{trait1}-vs-{trait2}-palm.log",
+        log="results/palm/{dataset}-{ancestry}-{trait1}~{trait2}-palm.log",
     params:
-        dir="results/palm/{dataset}/{ancestry}/{trait1}-vs-{trait2}/",
+        dir="results/palm/{dataset}/{ancestry}/{trait1}~{trait2}/",
     shell:
         "python bin/palm/palm.py"
         " --traitDir {params.dir}"

@@ -21,7 +21,7 @@ p <- add_argument(p, "--gwas1-all", help = "All GWAS associations for trait 1", 
 p <- add_argument(p, "--gwas2-all", help = "All GWAS associations for trait 2", default = "data/targets/gwas_ra-full_ancestral_paths_new_palm.tsv")
 p <- add_argument(p, "--ld", help = "Pairwise LD for finding proxy SNPs", default = "data/targets/gwas_cd-r0.05-kb250_ld.tsv.gz")
 p <- add_argument(p, "--min-ld", help = "Minimum LD threshold for pairing variants", default = 0.3)
-p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_cd-vs-ra_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_cd~ra_ancestral_paths_new_palm.tsv")
 
 argv <- parse_args(p)
 
