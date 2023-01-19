@@ -6,4 +6,4 @@
 # License:   MIT
 
 # fetch the PALM code
-git clone git@github.com:35ajstern/palm.git --branch master bin/palm/
+git clone git@github.com:ekirving/palm.git --branch master bin/palm/
