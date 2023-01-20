@@ -78,15 +78,46 @@ rule plink_convert:
         vcf="data/1000g/vcf/1000G_phase3-chr{chr}-FIN_GBR_TSI.vcf.gz",
         tbi="data/1000g/vcf/1000G_phase3-chr{chr}-FIN_GBR_TSI.vcf.gz.tbi",
     output:
-        bed="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bed",
-        bim="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bim",
-        fam="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.fam",
+        bed=temp("data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bed"),
+        bim=temp("data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bim"),
+        fam=temp("data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.fam"),
     log:
         log="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.log",
     params:
         prefix="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI",
     shell:
-        "plink --make-bed --vcf {input.vcf} --out {params.prefix} &> {log}"
+        "plink"
+        " --make-bed"
+        " --snps-only"
+        " --set-missing-var-ids 'chr@:#'"
+        " --vcf {input.vcf}"
+        " --out {params.prefix} &> {log}"
+
+
+rule plink_merge:
+    """
+    Merge all the chromosomes back together
+    """
+    input:
+        bed=expand("data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bed", chr=config["chroms"]),
+        bim=expand("data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bim", chr=config["chroms"]),
+        fam=expand("data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.fam", chr=config["chroms"]),
+    output:
+        bed="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bed",
+        bim="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bim",
+        fam="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.fam",
+        list=temp("data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.list"),
+    log:
+        log="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.log",
+    params:
+        bed="\\n".join([f"data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI" for chr in config["chroms"]]),
+        out="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI",
+    shell:
+        "printf '{params.bed}' > {output.list} && "
+        "plink"
+        " --make-bed"
+        " --merge-list {output.list}"
+        " --out {params.out} &> {log}"
 
 
 rule plink_pairwise_ld:
@@ -94,15 +125,15 @@ rule plink_pairwise_ld:
     Calculate pairwise LD between each SNP and all other SNPs within 1Mb
     """
     input:
-        bed="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bed",
-        bim="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.bim",
-        fam="data/1000g/plink/1000G_phase3-chr{chr}-FIN_GBR_TSI.fam",
+        bed="data/1000g/plink/1000G_phase3-FIN_GBR_TSI.bed",
+        bim="data/1000g/plink/1000G_phase3-FIN_GBR_TSI.bim",
+        fam="data/1000g/plink/1000G_phase3-FIN_GBR_TSI.fam",
     output:
-        ld=temp("data/1000g/ld/1000G_phase3-chr{chr}-{rsid}.ld"),
+        ld=temp("data/1000g/ld/1000G_phase3-{rsid}.ld"),
     log:
-        log="data/1000g/ld/1000G_phase3-chr{chr}-{rsid}.log",
+        log="data/1000g/ld/1000G_phase3-{rsid}.log",
     params:
-        out="data/1000g/ld/1000G_phase3-chr{chr}-{rsid}",
+        out="data/1000g/ld/1000G_phase3-{rsid}",
     shell:
         "plink"
         " --bed {input.bed}"
@@ -146,9 +177,7 @@ def concatenate_pairwise_ld_input(wildcards):
         "rs34341880",
     ]
 
-    files = [
-        f"data/1000g/ld/1000G_phase3-chr{row.CHR}-{row.SNP}.ld" for row in snp.itertuples() if row.SNP not in missing
-    ]
+    files = [f"data/1000g/ld/1000G_phase3-{rsid}.ld" for rsid in snp["SNP"] if rsid not in missing]
 
     return files
 
