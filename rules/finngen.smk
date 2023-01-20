@@ -152,3 +152,19 @@ rule plink_clump_finngen_chr:
         " --clump-r2 {PLINK_CLUMP_R2}"
         " --clump-kb {PLINK_CLUMP_KB}"
         " --out {params.out} &> {log}"
+
+
+rule apply_finngen_clumping:
+    """
+    Apply the clumped list of statistically independent markers for each FinnGen trait
+    """
+    input:
+        gwas="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.tsv",
+        clump="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.clumped",
+    output:
+        gwas="data/targets/gwas_{pheno}-finngen.tsv",
+    shell:
+        "Rscript scripts/apply_finngen_clumping.R"
+        "  --gwas {input.gwas}"
+        "  --clump {input.clump}"
+        "  --output {output.gwas}"
