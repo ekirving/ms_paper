@@ -125,15 +125,15 @@ rule plink_pairwise_ld:
     Calculate pairwise LD between each SNP and all other SNPs within 1Mb
     """
     input:
-        bed="data/1000g/plink/1000G_phase3-FIN_GBR_TSI.bed",
-        bim="data/1000g/plink/1000G_phase3-FIN_GBR_TSI.bim",
-        fam="data/1000g/plink/1000G_phase3-FIN_GBR_TSI.fam",
+        bed="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bed",
+        bim="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bim",
+        fam="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.fam",
     output:
-        ld=temp("data/1000g/ld/1000G_phase3-{rsid}.ld"),
+        ld=temp("data/1000g/ld/1000G_phase3-chrALL-{rsid}.ld"),
     log:
-        log="data/1000g/ld/1000G_phase3-{rsid}.log",
+        log="data/1000g/ld/1000G_phase3-chrALL-{rsid}.log",
     params:
-        out="data/1000g/ld/1000G_phase3-{rsid}",
+        out="data/1000g/ld/1000G_phase3-chrALL-{rsid}",
     shell:
         "plink"
         " --bed {input.bed}"
@@ -177,7 +177,7 @@ def concatenate_pairwise_ld_input(wildcards):
         "rs34341880",
     ]
 
-    files = [f"data/1000g/ld/1000G_phase3-{rsid}.ld" for rsid in snp["SNP"] if rsid not in missing]
+    files = [f"data/1000g/ld/1000G_phase3-chrALL-{rsid}.ld" for rsid in snp["SNP"] if rsid not in missing]
 
     return files
 
