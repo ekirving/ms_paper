@@ -134,6 +134,8 @@ rule plink_pairwise_ld:
         log="data/1000g/ld/1000G_phase3-chrALL-{rsid}.log",
     params:
         out="data/1000g/ld/1000G_phase3-chrALL-{rsid}",
+    resources:
+        mem_mb=16 * 1024,
     shell:
         "plink"
         " --bed {input.bed}"
