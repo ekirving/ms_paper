@@ -23,11 +23,6 @@ ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 MIN_LD = 0.3
 
 
-wildcard_constraints:
-    trait1="(ms|ra|cd)",
-    trait2="(ms|ra|cd)",
-
-
 checkpoint palm_metadata_single_trait:
     """
     Convert the GWAS metadata into PALM input format, and replace any missing SNPs with proxy-SNPs in high LD
@@ -122,7 +117,7 @@ rule palm_organise_clues:
         quad="results/palm/{dataset}/{ancestry}/{trait}/ld_{block}/bp{pos}.quad_fit.npy",
     wildcard_constraints:
         # relax the constraint so we can match paired traits
-        trait="(ms|ra|cd)[-~][^_]+",
+        trait="[^/]+",
     shell:
         "cp {input[0]} {output}"
 

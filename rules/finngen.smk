@@ -39,7 +39,7 @@ PLINK_CLUMP_KB = 250
 
 
 wildcard_constraints:
-    pheno="[^.]+",
+    pheno="T1D",
 
 
 checkpoint finngen_phenotypes:
@@ -162,9 +162,11 @@ rule apply_finngen_clumping:
         gwas="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.tsv",
         clump="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.clumped",
     output:
-        gwas="data/targets/gwas_{pheno}-finngen.tsv",
+        gwas="data/targets/gwas_{pheno}-r0.05-kb250.tsv",
+        full="data/targets/gwas_{pheno}-full.tsv",
     shell:
         "Rscript scripts/apply_finngen_clumping.R"
         "  --gwas {input.gwas}"
         "  --clump {input.clump}"
-        "  --output {output.gwas}"
+        "  --output1 {output.gwas}"
+        "  --output2 {output.full}"
