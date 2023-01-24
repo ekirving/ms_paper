@@ -59,7 +59,7 @@ def palm_parse_txt(dataset, ancestry, trait1, trait2, palm_file, output):
             "results": results,
         }
 
-    print(json.dumps(data, indent=2))
+    json.dump(data, output, indent=2)
 
 
 if __name__ == "__main__":
