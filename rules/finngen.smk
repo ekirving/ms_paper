@@ -119,9 +119,9 @@ rule intersect_finngen_gwas:
         tsv="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.tsv",
     shell:
         "Rscript scripts/intersect_finngen_gwas.R"
-        "  --gwas1 {input.gwas1}"
-        "  --gwas2 {input.gwas2}"
-        "  --output {output.tsv}"
+        " --gwas1 {input.gwas1}"
+        " --gwas2 {input.gwas2}"
+        " --output {output.tsv}"
 
 
 rule plink_clump_finngen_chr:
@@ -166,7 +166,7 @@ rule apply_finngen_clumping:
         full="data/targets/gwas_{pheno}-full.tsv",
     shell:
         "Rscript scripts/apply_finngen_clumping.R"
-        "  --gwas {input.gwas}"
-        "  --clump {input.clump}"
-        "  --output1 {output.gwas}"
-        "  --output2 {output.full}"
+        " --gwas {input.gwas}"
+        " --clump {input.clump}"
+        " --output1 {output.gwas}"
+        " --output2 {output.full}"

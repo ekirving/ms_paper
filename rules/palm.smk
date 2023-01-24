@@ -25,7 +25,7 @@ MIN_LD = 0.3
 
 checkpoint palm_metadata_single_trait:
     """
-    Convert the GWAS metadata into PALM input format, and replace any missing SNPs with proxy-SNPs in high LD
+    Convert the GWAS metadata into PALM input format, and optionally replace any missing SNPs with proxy-SNPs in high LD
     """
     input:
         gwas="data/targets/gwas_{trait}.tsv",
