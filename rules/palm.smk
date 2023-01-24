@@ -264,6 +264,9 @@ rule palm_report_prs:
         "tail -n +2 -q {input} >> {output.tsv}"
 
 
+ruleorder: palm_ancestry_report_prs > palm_report_prs
+
+
 rule palm_plot_trajectory:
     """
     Plot the PALM trajectory as a raster of the joint posterior densities of all SNPs

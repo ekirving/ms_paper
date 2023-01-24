@@ -41,7 +41,7 @@ PLINK_CLUMP_KB = 250
 
 
 wildcard_constraints:
-    pheno="[^.]+",
+    pheno="[A-Z0-9_]+",
 
 
 checkpoint finngen_phenotypes:
