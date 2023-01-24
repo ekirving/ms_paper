@@ -9,6 +9,7 @@ __license__ = "MIT"
 import json
 
 import click
+from scipy.stats import norm
 
 
 @click.command()
@@ -24,7 +25,6 @@ def palm_parse_txt(dataset, ancestry, trait, palm_file, output):
     Parse the PALM log file to extract the information we want.
     """
     with open(palm_file) as fin:
-        data = dict()
         result = False
 
         for line in fin:
@@ -46,6 +46,7 @@ def palm_parse_txt(dataset, ancestry, trait, palm_file, output):
             "sel": sel,
             "se": se[1:-1],
             "z": z,
+            "pval": "{:.2E}".format(norm.sf(abs(float(z))) * 2),
         }
 
     json.dump(data, output, indent=2)

@@ -201,7 +201,7 @@ rule palm_multi_trait:
 ruleorder: palm_multi_trait > palm_single_trait
 
 
-rule palm_parse_txt:
+rule parse_palm_single_trait:
     """
     Convert the text output from PALM into a JSON file
     """
@@ -210,10 +210,28 @@ rule palm_parse_txt:
     output:
         json="results/palm/{dataset}-{ancestry}-{trait}-palm.json",
     shell:
-        "python scripts/palm_parse_txt.py"
+        "python scripts/parse_palm_single_trait.py"
         " --dataset {wildcards.dataset}"
         " --ancestry {wildcards.ancestry}"
         " --trait {wildcards.trait}"
+        " --palm {input.palm}"
+        " --out {output.json}"
+
+
+rule parse_palm_multi_trait:
+    """
+    Convert the text output from multi trait PALM into a JSON file
+    """
+    input:
+        palm="results/palm/{dataset}-{ancestry}-{trait1}~{trait2}-palm.txt",
+    output:
+        json="results/palm/{dataset}-{ancestry}-{trait1}~{trait2}-palm.json",
+    shell:
+        "python scripts/parse_palm_multi_trait.py"
+        " --dataset {wildcards.dataset}"
+        " --ancestry {wildcards.ancestry}"
+        " --trait1 {wildcards.trait1}"
+        " --trait2 {wildcards.trait2}"
         " --palm {input.palm}"
         " --out {output.json}"
 
