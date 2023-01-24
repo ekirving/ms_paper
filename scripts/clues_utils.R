@@ -89,7 +89,14 @@ traits <- list(
     "ms-all" = "Multiple sclerosis (all genome-wide significant)",
     "ms-r0.05-kb250" = "Multiple sclerosis (r^2 < 0.05; window 250 kb)",
     "ra-all" = "Rheumatoid arthritis (all genome-wide significant)",
-    "ra-r0.05-kb250" = "Rheumatoid arthritis (r^2 < 0.05; window 250 kb)"
+    "ra-r0.05-kb250" = "Rheumatoid arthritis (r^2 < 0.05; window 250 kb)",
+    "T1D-finngen-r0.05-kb250" = "Type1 diabetes (FinnGen) (r^2 < 0.05; window 250 kb)",
+    "K11_COELIAC-finngen-r0.05-kb250" = "Coeliac disease (FinnGen) (r^2 < 0.05; window 250 kb)",
+    "M13_ANKYLOSPON-finngen-r0.05-kb250" = "Ankylosing spondylitis (FinnGen) (r^2 < 0.05; window 250 kb)",
+    "H7_IRIDOACUTE-finngen-r0.05-kb250" = "Acute and subacute iridocyclitis (FinnGen) (r^2 < 0.05; window 250 kb)",
+    "M13_RHEUMA-finngen-r0.05-kb250" = "Rheumatoid arthritis (FinnGen) (r^2 < 0.05; window 250 kb)",
+    "L12_PSORIASIS-finngen-r0.05-kb250" = "Psoriasis (FinnGen) (r^2 < 0.05; window 250 kb)",
+    "L12_BULLOUS-finngen-r0.05-kb250" = "Bullous disorders (FinnGen) (r^2 < 0.05; window 250 kb)"
 )
 
 # decode the ancestry and trait names

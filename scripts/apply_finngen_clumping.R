@@ -15,8 +15,8 @@ quiet(library(tidyverse)) # v1.3.1
 p <- arg_parser("Filter one GWAS based on the positions in another")
 p <- add_argument(p, "--gwas", help = "The GWAS to be filtered", default = "data/finngen/clump/finngen_R8_T1D.significant.ms-full.tsv")
 p <- add_argument(p, "--clump", help = "The secondary GWAS", default = "data/finngen/clump/finngen_R8_T1D.significant.ms-full.clumped")
-p <- add_argument(p, "--output1", help = "Output file", default = "data/targets/gwas_T1D-r0.05-kb250.tsv")
-p <- add_argument(p, "--output2", help = "Output file", default = "data/targets/gwas_T1D-full.tsv")
+p <- add_argument(p, "--output1", help = "Output file", default = "data/targets/gwas_T1D-finngen-r0.05-kb250.tsv")
+p <- add_argument(p, "--output2", help = "Output file", default = "data/targets/gwas_T1D-finngen-full.tsv")
 
 argv <- parse_args(p)
 
@@ -26,13 +26,13 @@ clump <- read_table(argv$clump, col_types = cols())
 data1 <- gwas %>%
     filter(rsid %in% clump$SNP) %>%
     # fetch all the expected columns
-    select(CHR=chrom, BP=pos, SNP=rsid, effect_allele=alt, other_allele = ref, P=pval, beta, se = sebeta)
+    select(CHR = chrom, BP = pos, SNP = rsid, effect_allele = alt, other_allele = ref, P = pval, beta, se = sebeta)
 
 write_tsv(data1, argv$output1)
 
 
 data2 <- gwas %>%
     # fetch all the expected columns
-    select(CHR=chrom, BP=pos, SNP=rsid, effect_allele=alt, other_allele = ref, P=pval, beta, se = sebeta)
+    select(CHR = chrom, BP = pos, SNP = rsid, effect_allele = alt, other_allele = ref, P = pval, beta, se = sebeta)
 
 write_tsv(data2, argv$output2)

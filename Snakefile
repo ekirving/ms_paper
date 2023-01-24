@@ -32,9 +32,16 @@ include: "rules/compare.smk"
 
 ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 TRAITS = [
-    "ms-r0.05-kb250",
-    "ra-r0.05-kb250",
-    "cd-r0.05-kb250",
+    # "ms-r0.05-kb250",
+    # "ra-r0.05-kb250",
+    # "cd-r0.05-kb250",
+    "T1D-finngen-r0.05-kb250",
+    "K11_COELIAC-finngen-r0.05-kb250",
+    "M13_ANKYLOSPON-finngen-r0.05-kb250",
+    "H7_IRIDOACUTE-finngen-r0.05-kb250",
+    "M13_RHEUMA-finngen-r0.05-kb250",
+    "L12_PSORIASIS-finngen-r0.05-kb250",
+    "L12_BULLOUS-finngen-r0.05-kb250",
 ]
 
 
@@ -79,11 +86,11 @@ rule all:
             trait=config.get("trait", TRAITS),
         ),
         # make a report for each trait using the "all genome-wide SNPs" ascertainments
-        expand("results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv", trait=["ms-all", "ra-all", "cd-all"]),
+        # expand("results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv", trait=["ms-all", "ra-all", "cd-all"]),
         # plot the UKBB comparisons
-        expand(
-            "results/compare/ancestral_paths_new-{trait}-ukbb-{polarize}-001.png",
-            trait=TRAITS,
-            biobank=["ukbb", "finngen"],
-            polarize=["ancestral", "focal", "marginal"],
-        ),
+        # expand(
+        #     "results/compare/ancestral_paths_new-{trait}-ukbb-{polarize}-001.png",
+        #     trait=TRAITS,
+        #     biobank=["ukbb", "finngen"],
+        #     polarize=["ancestral", "focal", "marginal"],
+        # ),

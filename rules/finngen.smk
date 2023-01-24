@@ -40,10 +40,6 @@ PLINK_CLUMP_R2 = 0.05
 PLINK_CLUMP_KB = 250
 
 
-wildcard_constraints:
-    pheno="T1D",
-
-
 checkpoint finngen_phenotypes:
     """
     Download the FinnGen phenotype manifest file
@@ -164,8 +160,8 @@ rule apply_finngen_clumping:
         gwas="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.tsv",
         clump="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.clumped",
     output:
-        gwas="data/targets/gwas_{pheno}-r0.05-kb250.tsv",
-        full="data/targets/gwas_{pheno}-full.tsv",
+        gwas="data/targets/gwas_{pheno}-finngen-r0.05-kb250.tsv",
+        full="data/targets/gwas_{pheno}-finngen-full.tsv",
     shell:
         "Rscript scripts/apply_finngen_clumping.R"
         " --gwas {input.gwas}"
