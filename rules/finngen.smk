@@ -115,10 +115,10 @@ rule intersect_finngen_gwas:
     Find the intersections between the the FinnGen GWAS and MS
     """
     input:
-        gwas1="data/finngen/gwas/finngen_R8_{pheno}.significant.tsv.bgz",
+        gwas1="data/finngen/gwas/finngen_R8_{pheno}.tsv.bgz",
         gwas2="data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv",
     output:
-        tsv="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.tsv",
+        tsv="data/finngen/clump/finngen_R8_{pheno}.ms-full.tsv",
     shell:
         "Rscript scripts/intersect_finngen_gwas.R"
         " --gwas1 {input.gwas1}"
@@ -134,14 +134,14 @@ rule plink_clump_finngen_chr:
         bed="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bed",
         bim="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bim",
         fam="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.fam",
-        tsv="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.tsv",
+        tsv="data/finngen/clump/finngen_R8_{pheno}.ms-full.tsv",
     output:
-        clump="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.clumped",
-        nosex=temp("data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.nosex"),
+        clump="data/finngen/clump/finngen_R8_{pheno}.ms-full.clumped",
+        nosex=temp("data/finngen/clump/finngen_R8_{pheno}.ms-full.nosex"),
     log:
-        log="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.log",
+        log="data/finngen/clump/finngen_R8_{pheno}.ms-full.log",
     params:
-        out="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full",
+        out="data/finngen/clump/finngen_R8_{pheno}.ms-full",
     shell:
         "plink"
         " --bed {input.bed}"
@@ -161,8 +161,8 @@ rule apply_finngen_clumping:
     Apply the clumped list of statistically independent markers for each FinnGen trait
     """
     input:
-        gwas="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.tsv",
-        clump="data/finngen/clump/finngen_R8_{pheno}.significant.ms-full.clumped",
+        gwas="data/finngen/clump/finngen_R8_{pheno}.ms-full.tsv",
+        clump="data/finngen/clump/finngen_R8_{pheno}.ms-full.clumped",
     output:
         gwas="data/targets/gwas_{pheno}-finngen-r0.05-kb250.tsv",
         full="data/targets/gwas_{pheno}-finngen-full.tsv",
