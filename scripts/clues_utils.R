@@ -95,8 +95,7 @@ traits <- list(
     "M13_ANKYLOSPON-finngen-r0.05-kb250" = "Ankylosing spondylitis (FinnGen) (r^2 < 0.05; window 250 kb)",
     "H7_IRIDOACUTE-finngen-r0.05-kb250" = "Acute and subacute iridocyclitis (FinnGen) (r^2 < 0.05; window 250 kb)",
     "M13_RHEUMA-finngen-r0.05-kb250" = "Rheumatoid arthritis (FinnGen) (r^2 < 0.05; window 250 kb)",
-    "L12_PSORIASIS-finngen-r0.05-kb250" = "Psoriasis (FinnGen) (r^2 < 0.05; window 250 kb)",
-    "L12_BULLOUS-finngen-r0.05-kb250" = "Bullous disorders (FinnGen) (r^2 < 0.05; window 250 kb)"
+    "L12_PSORIASIS-finngen-r0.05-kb250" = "Psoriasis (FinnGen) (r^2 < 0.05; window 250 kb)"
 )
 
 # decode the ancestry and trait names

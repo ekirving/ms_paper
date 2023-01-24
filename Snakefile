@@ -41,7 +41,6 @@ TRAITS = [
     "H7_IRIDOACUTE-finngen-r0.05-kb250",
     "M13_RHEUMA-finngen-r0.05-kb250",
     "L12_PSORIASIS-finngen-r0.05-kb250",
-    "L12_BULLOUS-finngen-r0.05-kb250",
 ]
 
 
