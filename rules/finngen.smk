@@ -40,6 +40,10 @@ PLINK_CLUMP_R2 = 0.05
 PLINK_CLUMP_KB = 250
 
 
+wildcard_constraints:
+    pheno="[^.]+",
+
+
 checkpoint finngen_phenotypes:
     """
     Download the FinnGen phenotype manifest file
