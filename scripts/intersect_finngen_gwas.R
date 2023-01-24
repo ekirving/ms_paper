@@ -14,7 +14,7 @@ quiet(library(tidyverse)) # v1.3.1
 # get the command line arguments
 p <- arg_parser("Filter one GWAS based on the positions in another")
 p <- add_argument(p, "--gwas1", help = "The primary GWAS to be filtered", default = "data/finngen/gwas/finngen_R8_T1D.significant.tsv.bgz")
-p <- add_argument(p, "--gwas2", help = "The secondary GWAS", default = "data/targets/gwas_ms-full.tsv")
+p <- add_argument(p, "--gwas2", help = "The secondary GWAS", default = "data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv")
 p <- add_argument(p, "--output", help = "Output file", default = "data/finngen/gwas/finngen_R8_T1D.significant.ms-full.tsv")
 
 argv <- parse_args(p)
@@ -25,6 +25,6 @@ gwas2 <- read_tsv(argv$gwas2, col_types = cols())
 intersect <- gwas1 %>%
     separate_rows(rsids) %>%
     rename(rsid = rsids, chrom = `#chrom`) %>%
-    inner_join(gwas2 %>% select(rsid = SNP), by = "rsid")
+    inner_join(gwas2 %>% select(rsid), by = "rsid")
 
 write_tsv(intersect, argv$output)
