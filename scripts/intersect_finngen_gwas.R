@@ -25,6 +25,8 @@ gwas2 <- read_tsv(argv$gwas2, col_types = cols())
 intersect <- gwas1 %>%
     separate_rows(rsids) %>%
     rename(rsid = rsids, chrom = `#chrom`) %>%
-    inner_join(gwas2 %>% select(rsid), by = "rsid")
+    # FinnGen uses GRCh38 not GRCh37, so we need to switch the positions
+    select(-c(chrom, pos)) %>%
+    inner_join(gwas2 %>% select(rsid, chrom, pos), by = "rsid")
 
 write_tsv(intersect, argv$output)

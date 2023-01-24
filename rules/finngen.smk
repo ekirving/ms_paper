@@ -25,6 +25,8 @@ Data released to the partners: Q4 2021
 Public release: Dec 1, 2022
 
 See https://www.finngen.fi/en/access_results
+
+NOTE FinnGen uses GRCh38 not GRCh37
 """
 
 import pandas as pd
