@@ -15,7 +15,7 @@ quiet(library(tidyverse)) # v1.3.1
 p <- arg_parser("Filter one GWAS based on the positions in another")
 p <- add_argument(p, "--gwas1", help = "The primary GWAS to be filtered", default = "data/finngen/gwas/finngen_R8_T1D.significant.tsv.bgz")
 p <- add_argument(p, "--gwas2", help = "The secondary GWAS", default = "data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "data/finngen/gwas/finngen_R8_T1D.significant.ms-full.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "data/finngen/clump/finngen_R8_T1D.significant.ms-full.tsv")
 
 argv <- parse_args(p)
 
