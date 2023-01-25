@@ -8,6 +8,8 @@ __license__ = "MIT"
 
 import gzip
 
+from scripts.utils import PLINK_CLUMP_PVAL, PLINK_CLUMP_R2, PLINK_CLUMP_KB
+
 """
 NealeLab UKBB GWAS
 
@@ -123,3 +125,69 @@ rule ukbb_nealelab_download_all:
         ukbb_nealelab_all_phenotypes,
     output:
         touch("data/ukbb/nealelab/download.{sex}.done"),
+
+
+rule ukbb_intersect_gwas:
+    """
+    Find the intersections between the the UKBB GWAS and MS
+    """
+    input:
+        gwas1="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
+        gwas2="data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv",
+        vars="data/ukbb/nealelab/variants.tsv.bgz",
+    output:
+        tsv="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full.tsv",
+    shell:
+        "Rscript scripts/ukbb_intersect_gwas.R"
+        " --gwas1 {input.gwas1}"
+        " --gwas2 {input.gwas2}"
+        " --vars {input.vars}"
+        " --output {output.tsv}"
+
+
+rule ukbb_plink_clump:
+    """
+    Perform LD-based clumping using PLINK
+    """
+    input:
+        bed="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bed",
+        bim="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bim",
+        fam="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.fam",
+        tsv="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full.tsv",
+    output:
+        clump="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full.clumped",
+        nosex=temp("data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full.nosex"),
+    log:
+        log="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full.log",
+    params:
+        out="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full",
+    shell:
+        "plink"
+        " --bed {input.bed}"
+        " --bim {input.bim}"
+        " --fam {input.fam}"
+        " --clump {input.tsv}"
+        " --clump-snp-field rsid"
+        " --clump-field pval"
+        " --clump-p1 {PLINK_CLUMP_PVAL}"
+        " --clump-r2 {PLINK_CLUMP_R2}"
+        " --clump-kb {PLINK_CLUMP_KB}"
+        " --out {params.out} &> {log}"
+
+
+rule ukbb_apply_clumping:
+    """
+    Apply the clumped list of statistically independent markers for each UKBB trait
+    """
+    input:
+        gwas="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.both_sexes.ms-full.tsv",
+        clump="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.both_sexes.ms-full.clumped",
+    output:
+        gwas="data/targets/gwas_{pheno}-ukbb-r0.05-kb250.tsv",
+        full="data/targets/gwas_{pheno}-ukbb-full.tsv",
+    shell:
+        "Rscript scripts/ukbb_apply_clumping.R"
+        " --gwas {input.gwas}"
+        " --clump {input.clump}"
+        " --output1 {output.gwas}"
+        " --output2 {output.full}"
