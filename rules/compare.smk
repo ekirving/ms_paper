@@ -14,7 +14,7 @@ Rules for comparing pleiotropic associations between the focal trait (e.g., MS, 
 """
 
 
-rule compare_gwas_catalog:
+rule gwas_catalog_compare:
     """
     Compare trajectories between trait associated SNPs and all other traits in the GWAS catalog
     """
@@ -24,13 +24,13 @@ rule compare_gwas_catalog:
     output:
         png="results/compare/{dataset}-{trait}-gwas_catalog.png",
     shell:
-        "Rscript scripts/compare_gwas_catalog.R"
+        "Rscript scripts/gwas_catalog_compare.R"
         " --catalog {input.catalog}"
         " --palm {input.palm}"
         " --output {output.png}"
 
 
-rule filter_ukbb_gwas:
+rule ukbb_filter_gwas:
     """
     Filter the UKBB GWAS file to retain only the SNPs with a significant selection test in the CLUES analysis
     """
@@ -40,14 +40,14 @@ rule filter_ukbb_gwas:
     output:
         tsv=temp("results/compare/ukbb/{dataset}-{trait}.{pheno}.gwas.imputed_v3.{sex}.significant.tsv"),
     shell:
-        "Rscript scripts/filter_ukbb_gwas.R"
+        "Rscript scripts/ukbb_filter_gwas.R"
         " --pheno {wildcards.pheno}"
         " --ukbb {input.ukbb}"
         " --palm {input.palm}"
         " --output {output.tsv}"
 
 
-def merge_all_ukbb_filtered_phenotypes_input(wildcards):
+def ukbb_merge_all_filtered_phenotypes_input(wildcards):
     """
     Return a list of all the phenotype association files for the NealeLab UKBB GWAS
     """
@@ -63,12 +63,12 @@ def merge_all_ukbb_filtered_phenotypes_input(wildcards):
     )
 
 
-rule merge_all_ukbb_filtered_phenotypes:
+rule ukbb_merge_all_filtered_phenotypes:
     """
     Merge all the filtered UKBB association files
     """
     input:
-        merge_all_ukbb_filtered_phenotypes_input,
+        ukbb_merge_all_filtered_phenotypes_input,
     output:
         tsv="results/compare/ukbb/{dataset}-{trait}.{sex}.significant.tsv.gz",
     shell:
@@ -76,7 +76,7 @@ rule merge_all_ukbb_filtered_phenotypes:
         "tail -n +2 -q {input} | gzip -c >> {output.tsv}"
 
 
-rule compare_ukbb:
+rule ukbb_compare:
     """
     Compare trajectories between trait associated SNPs and all other traits in the UKBB
     """
@@ -92,7 +92,7 @@ rule compare_ukbb:
     wildcard_constraints:
         polarize="ancestral|focal|marginal",
     shell:
-        "Rscript scripts/compare_ukbb.R"
+        "Rscript scripts/ukbb_compare.R"
         " --ukbb {input.ukbb}"
         " --pheno {input.pheno}"
         " --palm {input.palm}"
@@ -100,7 +100,7 @@ rule compare_ukbb:
         " --output {params.png}"
 
 
-rule filter_finngen_gwas:
+rule finngen_filter_gwas:
     """
     Filter the FinnGen GWAS file to retain only the SNPs with a significant selection test in the CLUES analysis
     """
@@ -110,14 +110,14 @@ rule filter_finngen_gwas:
     output:
         tsv=temp("results/compare/finngen/{dataset}-{trait}.{pheno}.significant.tsv"),
     shell:
-        "Rscript scripts/filter_finngen_gwas.R"
+        "Rscript scripts/finngen_filter_gwas.R"
         " --pheno {wildcards.pheno}"
         " --finngen {input.finngen}"
         " --palm {input.palm}"
         " --output {output.tsv}"
 
 
-def merge_all_finngen_filtered_phenotypes_input(wildcards):
+def finngen_merge_all_filtered_phenotypes_input(wildcards):
     """
     Return a list of all the phenotype association files for the FinnGen GWAS
     """
@@ -129,12 +129,12 @@ def merge_all_finngen_filtered_phenotypes_input(wildcards):
     return expand("results/compare/finngen/{dataset}-{trait}.{pheno}.significant.tsv", pheno=phenotypes, **wildcards)
 
 
-rule merge_all_finngen_filtered_phenotypes:
+rule finngen_merge_all_filtered_phenotypes:
     """
     Merge all the filtered FinnGen association files
     """
     input:
-        merge_all_finngen_filtered_phenotypes_input,
+        finngen_merge_all_filtered_phenotypes_input,
     output:
         tsv="results/compare/finngen/{dataset}-{trait}.significant.tsv.gz",
     shell:
@@ -142,7 +142,7 @@ rule merge_all_finngen_filtered_phenotypes:
         "tail -n +2 -q {input} | gzip -c >> {output.tsv}"
 
 
-rule compare_finngen:
+rule finngen_compare:
     """
     Compare trajectories between trait associated SNPs and all other traits in the FinnGen
     """
@@ -158,7 +158,7 @@ rule compare_finngen:
     wildcard_constraints:
         polarize="ancestral|focal|marginal",
     shell:
-        "Rscript scripts/compare_finngen.R"
+        "Rscript scripts/finngen_compare.R"
         " --finngen {input.finngen}"
         " --pheno {input.pheno}"
         " --palm {input.palm}"

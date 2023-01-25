@@ -8,6 +8,11 @@ __license__ = "MIT"
 
 import pandas as pd
 
+# parameters for PLINK clumping
+PLINK_CLUMP_PVAL = 5e-8
+PLINK_CLUMP_R2 = 0.05
+PLINK_CLUMP_KB = 250
+
 
 def get_samples(config, dataset):
     """

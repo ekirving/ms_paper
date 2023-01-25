@@ -8,6 +8,8 @@ __license__ = "MIT"
 
 import gzip
 
+from scripts.utils import PLINK_CLUMP_PVAL, PLINK_CLUMP_R2, PLINK_CLUMP_KB
+
 """
 FinnGen GWAS
 
@@ -33,11 +35,6 @@ import pandas as pd
 
 # genome-wide significance threshold (see https://www.nature.com/articles/ejhg2015269)
 FINNGEN_PVALUE = "5e-8"
-
-# parameters for PLINK clumping
-PLINK_CLUMP_PVAL = 5e-8
-PLINK_CLUMP_R2 = 0.05
-PLINK_CLUMP_KB = 250
 
 
 wildcard_constraints:
@@ -110,7 +107,7 @@ rule finngen_download_all:
         touch("data/finngen/download.done"),
 
 
-rule intersect_finngen_gwas:
+rule finngen_intersect_gwas:
     """
     Find the intersections between the the FinnGen GWAS and MS
     """
@@ -120,15 +117,15 @@ rule intersect_finngen_gwas:
     output:
         tsv="data/finngen/clump/finngen_R8_{pheno}.ms-full.tsv",
     shell:
-        "Rscript scripts/intersect_finngen_gwas.R"
+        "Rscript scripts/finngen_intersect_gwas.R"
         " --gwas1 {input.gwas1}"
         " --gwas2 {input.gwas2}"
         " --output {output.tsv}"
 
 
-rule plink_clump_finngen_chr:
+rule finngen_plink_clump:
     """
-    Perform LD-based clumping using PLINK, for a single chromosome
+    Perform LD-based clumping using PLINK
     """
     input:
         bed="data/1000g/plink/1000G_phase3-chrALL-FIN_GBR_TSI.bed",
@@ -156,7 +153,7 @@ rule plink_clump_finngen_chr:
         " --out {params.out} &> {log}"
 
 
-rule apply_finngen_clumping:
+rule finngen_apply_clumping:
     """
     Apply the clumped list of statistically independent markers for each FinnGen trait
     """
@@ -167,7 +164,7 @@ rule apply_finngen_clumping:
         gwas="data/targets/gwas_{pheno}-finngen-r0.05-kb250.tsv",
         full="data/targets/gwas_{pheno}-finngen-full.tsv",
     shell:
-        "Rscript scripts/apply_finngen_clumping.R"
+        "Rscript scripts/finngen_apply_clumping.R"
         " --gwas {input.gwas}"
         " --clump {input.clump}"
         " --output1 {output.gwas}"
