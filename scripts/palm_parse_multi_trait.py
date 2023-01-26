@@ -39,6 +39,10 @@ def palm_parse_txt(dataset, ancestry, trait1, trait2, palm_file, output):
                 result = True
             elif result and len(words) == 6:
                 trait, sel, se, z, zmarg, r = words
+
+                # the PALM output truncates long trait names
+                trait = trait1 if trait1.startswith(trait) else trait2
+
                 results[trait] = {
                     "sel": sel,
                     "se": se[1:-1],
