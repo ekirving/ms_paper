@@ -21,8 +21,9 @@ p <- arg_parser("Compare associations between trait associated SNPs and all othe
 p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/compare/ukbb/ancestral_paths_new-ms-r0.05-kb250.both_sexes.significant.tsv.gz")
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
 p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_prs.tsv")
-p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "focal")
-p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-%03d.png")
+p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "marginal")
+p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-marginal-%03d.png")
+p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-marginal.tsv")
 
 argv <- parse_args(p)
 
@@ -61,6 +62,7 @@ snp_count <- ukbb %>%
     filter(variant %in% snps$variant) %>%
     group_by(phenotype) %>%
     tally(name = "num_snps") %>%
+    mutate(frac_snps = num_snps / length(selected_snps)) %>%
     # join the phenotype description to the code
     inner_join(
         pheno %>% select(phenotype, description),
@@ -77,6 +79,8 @@ snp_count <- ukbb %>%
     mutate(description = paste0(description, " (n=", num_snps, ")")) %>%
     # sort by the count
     arrange(desc(num_snps))
+
+write_tsv(snp_count, argv$out_tsv)
 
 # get the list of phenotypes with more than 1 intersecting SNPs
 pheno_list <- snp_count %>%
@@ -196,5 +200,5 @@ for (page in 1:num_pages) {
         )
 
     # save the plot
-    ggsave(sprintf(argv$output, page), plt, width = num_cols * 3.3, height = num_pheno * 2.3, limitsize = FALSE)
+    ggsave(sprintf(argv$out_png, page), plt, width = num_cols * 3.3, height = num_pheno * 2.3, limitsize = FALSE)
 }

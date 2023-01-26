@@ -14,6 +14,10 @@ Rules for comparing pleiotropic associations between the focal trait (e.g., MS, 
 """
 
 
+wildcard_constraints:
+    pheno="[^.]+",
+
+
 rule gwas_catalog_compare:
     """
     Compare trajectories between trait associated SNPs and all other traits in the GWAS catalog
@@ -86,6 +90,7 @@ rule ukbb_compare:
         palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
     output:
         png="results/compare/{dataset}-{trait}-ukbb-{polarize}-001.png",
+        tsv="results/compare/{dataset}-{trait}-ukbb-{polarize}.tsv",
     params:
         # plotting script produces multiple PNG files (based on number of UKBB traits)
         png="results/compare/{dataset}-{trait}-ukbb-{polarize}-%03d.png",
@@ -97,7 +102,8 @@ rule ukbb_compare:
         " --pheno {input.pheno}"
         " --palm {input.palm}"
         " --polarize {wildcards.polarize}"
-        " --output {params.png}"
+        " --out-png {params.png}"
+        " --out-tsv {output.tsv}"
 
 
 rule finngen_filter_gwas:
@@ -152,6 +158,7 @@ rule finngen_compare:
         palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
     output:
         png="results/compare/{dataset}-{trait}-finngen-{polarize}-001.png",
+        tsv="results/compare/{dataset}-{trait}-finngen-{polarize}.tsv",
     params:
         # plotting script produces multiple PNG files (based on number of FinnGen traits)
         png="results/compare/{dataset}-{trait}-finngen-{polarize}-%03d.png",
@@ -163,4 +170,5 @@ rule finngen_compare:
         " --pheno {input.pheno}"
         " --palm {input.palm}"
         " --polarize {wildcards.polarize}"
-        " --output {params.png}"
+        " --out-png {params.png}"
+        " --out-tsv {output.tsv}"

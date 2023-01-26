@@ -25,6 +25,7 @@ UKBB_PVALUE = "5e-8"
 
 
 wildcard_constraints:
+    pheno="[^.]+",
     sex="both_sexes|female|male",
 
 
