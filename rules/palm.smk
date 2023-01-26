@@ -22,6 +22,9 @@ ANCESTRIES = ["ALL", "ANA", "CHG", "WHG", "EHG"]
 # minimum LD to clump SNPs into the same LD block for the joint PALM analysis
 MIN_LD = 0.3
 
+# minimum fraction of genetic overlap between selected variants in the focal trait and a correlated trait in UKBB or FinnGen
+MIN_GWAS_OVERLAP = 0.2
+
 
 checkpoint palm_metadata_single_trait:
     """
@@ -375,3 +378,57 @@ rule palm_plot_scatter:
         "Rscript scripts/palm_plot_scatter.R "
         " --palm {input.tsv}"
         " --output {output.png}"
+
+
+def all_overlapping_traits(wildcards):
+    """
+    Run all the overlapping traits in UKBB and FinnGen
+    """
+    files = []
+
+    # noinspection PyUnresolvedReferences
+    ukbb = pd.read_table(checkpoints.ukbb_compare.get(**wildcards, polarize="marginal").output.tsv)
+    ukbb = ukbb[ukbb["frac_snps"] > MIN_GWAS_OVERLAP]
+
+    # truncate the trait name
+    trait1 = wildcards.trait.split("-")[0]
+
+    # run all the overlapping UKBB traits
+    files += expand(
+        "results/palm/{dataset}-{ancestry}-{trait1}~{pheno}-ukbb-palm.json",
+        ancestry=ANCESTRIES,
+        trait1=trait1,
+        pheno=ukbb["phenotype"],
+        allow_missing=True,
+    )
+
+    # noinspection PyUnresolvedReferences
+    finngen = pd.read_table(checkpoints.finngen_compare.get(**wildcards, polarize="marginal").output.tsv)
+    finngen = finngen[finngen["frac_snps"] > MIN_GWAS_OVERLAP]
+
+    # run all the overlapping FinnGen traits
+    files += expand(
+        "results/palm/{dataset}-{ancestry}-{trait1}~{pheno}-finngen-palm.json",
+        ancestry=ANCESTRIES,
+        trait1=trait1,
+        pheno=finngen["phenotype"],
+        allow_missing=True,
+    )
+
+    return files
+
+
+rule palm_all_overlapping_traits_report:
+    """
+    Make a PALM multi-trait report for all overlapping traits in UKBB and FinnGEN  
+    """
+    input:
+        unpack(all_overlapping_traits),
+    params:
+        models=lambda wildcards, input: [f"--model {model}" for model in input],
+    output:
+        tsv="results/palm/{dataset}-{trait}-palm_report_multi_trait.tsv",
+    shell:
+        "python scripts/palm_report_multi_trait.py"
+        " {params.models}"
+        " --output {output.tsv}"

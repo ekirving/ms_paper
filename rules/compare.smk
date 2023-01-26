@@ -80,7 +80,7 @@ rule ukbb_merge_all_filtered_phenotypes:
         "tail -n +2 -q {input} | gzip -c >> {output.tsv}"
 
 
-rule ukbb_compare:
+checkpoint ukbb_compare:
     """
     Compare trajectories between trait associated SNPs and all other traits in the UKBB
     """
@@ -148,7 +148,7 @@ rule finngen_merge_all_filtered_phenotypes:
         "tail -n +2 -q {input} | gzip -c >> {output.tsv}"
 
 
-rule finngen_compare:
+checkpoint finngen_compare:
     """
     Compare trajectories between trait associated SNPs and all other traits in the FinnGen
     """
