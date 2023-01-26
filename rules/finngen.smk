@@ -116,6 +116,9 @@ rule finngen_intersect_gwas:
         gwas2="data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv",
     output:
         tsv="data/finngen/clump/finngen_R8_{pheno}.ms-full.tsv",
+    resources:
+        # this script doesn't actually need this man RAM, but running too many concurrently causes a segmentation fault
+        mem_mb=128 * 1024,
     shell:
         "Rscript scripts/finngen_intersect_gwas.R"
         " --gwas1 {input.gwas1}"

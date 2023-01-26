@@ -138,6 +138,9 @@ rule ukbb_intersect_gwas:
         vars="data/ukbb/nealelab/variants.tsv.bgz",
     output:
         tsv="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full.tsv",
+    resources:
+        # this script doesn't actually need this man RAM, but running too many concurrently causes a segmentation fault
+        mem_mb=128 * 1024,
     shell:
         "Rscript scripts/ukbb_intersect_gwas.R"
         " --gwas1 {input.gwas1}"
