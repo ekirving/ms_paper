@@ -87,4 +87,4 @@ rule all:
             biobank=["ukbb", "finngen"],
         ),
         # make a PALM multi-trait report for all overlapping traits in UKBB and FinnGEN
-        expand("results/palm/ancestral_paths_new-{trait}-palm_report_multi_trait.tsv", trait=["ms-r0.05-kb250"])
+        expand("results/palm/ancestral_paths_new-{trait}-palm_report_multi_trait.tsv", trait=["ms-r0.05-kb250"]),

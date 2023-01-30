@@ -415,7 +415,7 @@ def all_overlapping_traits(wildcards):
         allow_missing=True,
     )
 
-    return files
+    return {"models": files}
 
 
 rule palm_all_overlapping_traits_report:
@@ -424,11 +424,15 @@ rule palm_all_overlapping_traits_report:
     """
     input:
         unpack(all_overlapping_traits),
+        ukbb="data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz",
+        finngen="data/finngen/finngen_R8_manifest.tsv",
     params:
-        models=lambda wildcards, input: [f"--model {model}" for model in input],
+        models=lambda wildcards, input: [f"--model {model}" for model in input.models],
     output:
         tsv="results/palm/{dataset}-{trait}-palm_report_multi_trait.tsv",
     shell:
         "python scripts/palm_report_multi_trait.py"
         " {params.models}"
+        " --ukbb {input.ukbb}"
+        " --finngen {input.finngen}"
         " --output {output.tsv}"
