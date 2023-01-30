@@ -15,7 +15,7 @@ configfile: "config.yaml"
 
 wildcard_constraints:
     ancestry="[A-Z]{3}",
-    dataset="ancestral_paths_new",
+    dataset="ancestral_paths_new|imputed_unfiltered",
     trait="\w+-[^_]+",
 
 

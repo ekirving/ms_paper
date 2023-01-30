@@ -23,6 +23,7 @@ data/dbsnp/
 data/ensembl/
 data/finngen/
 data/gwascat/
+data/imputed_unfiltered
 data/labels/
 data/metadata/
 data/neo.impute
