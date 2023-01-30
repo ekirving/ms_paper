@@ -1,5 +1,6 @@
 *-commands.sh
 *.list
+*.old
 *.pdf
 *.png
 *.txt

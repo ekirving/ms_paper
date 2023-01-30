@@ -80,9 +80,9 @@ rule all:
         ),
         # make a report for each trait using the "all genome-wide SNPs" ascertainments
         expand("results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv", trait=["ms-all", "ra-all", "cd-all"]),
-        # plot the UKBB comparisons
+        # plot the UKBB and FinnGen comparisons
         expand(
-            "results/compare/ancestral_paths_new-{trait}-ukbb-marginal-001.png",
+            "results/compare/ancestral_paths_new-{trait}-{biobank}-marginal-001.png",
             trait=TRAITS,
             biobank=["ukbb", "finngen"],
         ),
