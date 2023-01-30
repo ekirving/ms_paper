@@ -390,6 +390,10 @@ def all_overlapping_traits(wildcards):
     ukbb = pd.read_table(checkpoints.ukbb_compare.get(**wildcards, polarize="marginal").output.tsv)
     ukbb = ukbb[ukbb["frac_snps"] > MIN_GWAS_OVERLAP]
 
+    if wildcards.trait.startswith("ms-"):
+        # drop the MS trait code
+        ukbb = ukbb[ukbb["phenotype"] != "20002_1261"]
+
     # truncate the trait name
     trait1 = wildcards.trait.split("-")[0]
 
@@ -405,6 +409,10 @@ def all_overlapping_traits(wildcards):
     # noinspection PyUnresolvedReferences
     finngen = pd.read_table(checkpoints.finngen_compare.get(**wildcards, polarize="marginal").output.tsv)
     finngen = finngen[finngen["frac_snps"] > MIN_GWAS_OVERLAP]
+
+    if wildcards.trait.startswith("ms-"):
+        # drop the MS trait code
+        finngen = finngen[finngen["phenotype"] != "G6_MS"]
 
     # run all the overlapping FinnGen traits
     files += expand(
