@@ -172,3 +172,29 @@ checkpoint finngen_compare:
         " --polarize {wildcards.polarize}"
         " --out-png {params.png}"
         " --out-tsv {output.tsv}"
+
+
+rule finngen_upset_plot:
+    """
+    Plot the overlap between the focal GWAS and infectious disease traits
+    """
+    input:
+        finngen="results/compare/finngen/{dataset}-{trait}.significant.tsv.gz",
+        pheno="data/finngen/finngen_R8_manifest.tsv",
+        palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
+    output:
+        png="results/compare/{dataset}-{trait}-finngen-upset-{subset}.png",
+        tsv="results/compare/{dataset}-{trait}-finngen-upset-{subset}.tsv",
+    params:
+        infectious=lambda wildcards: "--infectious" if wildcards.subset == "infectious" else ""
+    wildcard_constraints:
+        subset="infectious|top",
+    shell:
+        "Rscript scripts/finngen_upset_plot.R"
+        " --trait {wildcards.trait}"
+        " --finngen {input.finngen}"
+        " --pheno {input.pheno}"
+        " --palm {input.palm}"
+        " {params.infectious}"
+        " --out-png {output.png}"
+        " --out-tsv {output.tsv}"
