@@ -106,6 +106,27 @@ checkpoint ukbb_compare:
         " --out-tsv {output.tsv}"
 
 
+rule ukbb_upset_plot:
+    """
+    Plot the overlap between the focal GWAS and infectious disease traits
+    """
+    input:
+        ukbb="results/compare/ukbb/{dataset}-{trait}.both_sexes.significant.tsv.gz",
+        pheno="data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz",
+        palm="results/palm/{dataset}-{trait}-palm_report_prs.tsv",
+    output:
+        png="results/compare/{dataset}-{trait}-ukbb-upset-top.png",
+        tsv="results/compare/{dataset}-{trait}-ukbb-upset-top.tsv",
+    shell:
+        "Rscript scripts/ukbb_upset_plot.R"
+        " --trait {wildcards.trait}"
+        " --ukbb {input.ukbb}"
+        " --pheno {input.pheno}"
+        " --palm {input.palm}"
+        " --out-png {output.png}"
+        " --out-tsv {output.tsv}"
+
+
 rule finngen_filter_gwas:
     """
     Filter the FinnGen GWAS file to retain only the SNPs with a significant selection test in the CLUES analysis
@@ -186,7 +207,7 @@ rule finngen_upset_plot:
         png="results/compare/{dataset}-{trait}-finngen-upset-{subset}.png",
         tsv="results/compare/{dataset}-{trait}-finngen-upset-{subset}.tsv",
     params:
-        infectious=lambda wildcards: "--infectious" if wildcards.subset == "infectious" else ""
+        infectious=lambda wildcards: "--infectious" if wildcards.subset == "infectious" else "",
     wildcard_constraints:
         subset="infectious|top",
     shell:
