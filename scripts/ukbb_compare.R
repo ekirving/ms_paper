@@ -22,6 +22,7 @@ p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/com
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
 p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_prs.tsv")
 p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "marginal")
+p <- add_argument(p, "--significant", help = "Ony show significant SNPs", flag = TRUE)
 p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-marginal-%03d.png")
 p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-marginal.tsv")
 
@@ -31,6 +32,9 @@ ukbb <- read_tsv(argv$ukbb, col_types = cols())
 pheno <- read_tsv(argv$pheno, col_types = cols())
 palm <- read_tsv(argv$palm, col_types = cols())
 
+# maximum number of pages to print
+MAX_PAGES <- 5
+
 # get the list of all genome-wide significant SNPs from the UKBB that intersect this trait
 gwas_snps <- ukbb %>%
     pull(variant) %>%
@@ -38,7 +42,9 @@ gwas_snps <- ukbb %>%
 
 ukbb <- ukbb %>%
     # for some measures, UKBB has both a `raw` and an `irnt` (inverse rank-normal transformed) phenotype
-    filter(!grepl("_raw$", phenotype))
+    filter(!grepl("_raw$", phenotype)) %>%
+    # drop Celiac duplicates
+    filter(!grepl("K11_COELIAC", phenotype))
 
 # get the list of SNPs with marginally significant p-values in CLUES
 selected_snps <- palm %>%
@@ -125,6 +131,12 @@ traj <- traj %>%
         snp_label = paste0(rsid, ":", ifelse(flip, ancestral_allele, derived_allele))
     )
 
+if (argv$significant) {
+    # only show significant SNPs
+    traj <- traj %>%
+        filter(significant == TRUE)
+}
+
 # display the phenotypes and ancestries in custom sorted order
 traj$description <- factor(traj$description, levels = snp_count$description)
 traj$ancestry <- factor(traj$ancestry, levels = c("ALL", "WHG", "EHG", "CHG", "ANA"))
@@ -154,37 +166,50 @@ num_rows <- traj %>%
     unique() %>%
     length()
 per_page <- 5
-num_pages <- ceiling(num_rows / per_page)
+num_pages <- min(ceiling(num_rows / per_page), MAX_PAGES)
 
 # how many columns
 num_cols <- 5
 
 for (page in 1:num_pages) {
     # subset by UKBB phenotype, so we can paginate the output (or else the plot is too big to create)
-    pheno_subset <- pheno_list[((page - 1) * per_page):(page * per_page)]
+    pheno_subset <- pheno_list[((page - 1) * per_page + 1):(page * per_page)]
     traj_subset <- traj %>% filter(phenotype %in% pheno_subset)
     num_pheno <- length(pheno_subset[!is.na(pheno_subset)])
 
     plt <- ggplot(traj_subset) +
 
         # shade the ancestry epoch
-        geom_rect(data = ancestry_epochs, aes(xmin = start, xmax = finish, ymin = 0, ymax = 1), alpha = 0.5, fill = "#F4F4F4") +
+        geom_rect(data = ancestry_epochs, aes(xmin = start, xmax = finish, ymin = 0, ymax = 1), alpha = 0.5, fill = "#F4F4F4")
 
-        # plot the maximum posterior trajectory
-        geom_line(aes(x = epoch, y = freq, color = snp_label, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
+    if (argv$significant) {
+        plt <- plt +
 
+            # plot the maximum posterior trajectory
+            geom_line(aes(x = epoch, y = freq, color = snp_label), cex = 1, na.rm = TRUE) +
+
+            # print the labels
+            geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE)
+    } else {
+        plt <- plt +
+
+            # plot the maximum posterior trajectory
+            geom_line(aes(x = epoch, y = freq, color = snp_label, alpha = as.numeric(significant)), cex = 1, na.rm = TRUE) +
+
+            # print the labels
+            geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
+
+            # plot non-significant trajectories as transparent
+            scale_alpha(range = c(0.3, 1))
+    }
+
+    plt <- plt +
         # display as a grid
         facet_grid(description ~ ancestry, labeller = labeller(description = label_wrap_gen())) +
 
-        # print the labels
-        geom_dl(aes(x = epoch, y = freq, label = snp_label, color = snp_label, alpha = as.numeric(significant)), method = list(dl.trans(x = x + 0.1), "last.qp", cex = 0.8), na.rm = TRUE) +
-
-        # plot non-significant trajectories as transparent
-        scale_alpha(range = c(0.3, 1)) +
-
         # set the axis breaks
         scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, .2), position = "left", expand = expansion(add = c(0.03, 0.03))) +
-        scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 230))) +
+        scale_x_continuous(limits = c(xmin, xmax), breaks = xbreaks, labels = xlabels, expand = expansion(add = c(0, 360))) +
         ylab("DAF") +
         xlab("kyr BP") +
 
@@ -196,9 +221,9 @@ for (page in 1:num_pages) {
             panel.border = element_blank(),
             panel.background = element_blank(),
             plot.background = element_rect(fill = "white", color = "white"),
-            panel.spacing = unit(1, "lines")
+            panel.spacing = unit(0.5, "lines")
         )
 
     # save the plot
-    ggsave(sprintf(argv$out_png, page), plt, width = num_cols * 3.3, height = num_pheno * 2.3, limitsize = FALSE)
+    ggsave(sprintf(argv$out_png, page), plt, width = num_cols * 2.475, height = num_pheno * 1.725, limitsize = FALSE)
 }

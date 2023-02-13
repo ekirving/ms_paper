@@ -82,9 +82,9 @@ if (argv$infectious) {
     # only retain the top overlapping phenotypes
     top_traits <- finngen_selected %>%
         # drop T1D duplicates
-        filter(!grepl("T1D_", phenotype)) %>%
+        filter(!grepl("T1D_|E4_DM1", phenotype)) %>%
         # drop "strict" phenotypes
-        filter(!grepl("_strict", phenotype)) %>%
+        filter(!grepl("_strict", phenotype, ignore.case = TRUE)) %>%
         group_by(phenotype) %>%
         tally() %>%
         slice_max(order_by = n, n = as.numeric(argv$num_traits), with_ties = FALSE) %>%

@@ -102,6 +102,7 @@ checkpoint ukbb_compare:
         " --pheno {input.pheno}"
         " --palm {input.palm}"
         " --polarize {wildcards.polarize}"
+        " --significant"
         " --out-png {params.png}"
         " --out-tsv {output.tsv}"
 
@@ -191,6 +192,7 @@ checkpoint finngen_compare:
         " --pheno {input.pheno}"
         " --palm {input.palm}"
         " --polarize {wildcards.polarize}"
+        " --significant"
         " --out-png {params.png}"
         " --out-tsv {output.tsv}"
 
