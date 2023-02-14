@@ -444,3 +444,18 @@ rule palm_all_overlapping_traits_report:
         " --ukbb {input.ukbb}"
         " --finngen {input.finngen}"
         " --output {output.tsv}"
+
+
+rule palm_plot_multi_trait:
+    """
+    Plot the results of the PALM multi-trait report
+    """
+    input:
+        tsv="results/palm/{dataset}-{trait}-palm_report_multi_trait.tsv",
+    output:
+        png="results/palm/{dataset}-{trait}-palm_report_multi_trait-{biobank}.png",
+    shell:
+        "Rscript scripts/palm_plot_multi_trait.R"
+        " --biobank {wildcards.biobank}"
+        " --report {input.tsv}"
+        " --output {output.png}"

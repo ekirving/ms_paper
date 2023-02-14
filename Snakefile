@@ -92,4 +92,11 @@ rule all:
         # plot the FinnGen infectious disease upset plot
         expand("results/compare/ancestral_paths_new-{trait}-finngen-upset-infectious.png", trait=TRAITS),
         # make a PALM multi-trait report for all overlapping traits in UKBB and FinnGEN
-        expand("results/palm/ancestral_paths_new-{trait}-palm_report_multi_trait.tsv", trait=["ms-r0.05-kb250"]),
+        expand(
+            [
+                "results/palm/ancestral_paths_new-{trait}-palm_report_multi_trait.tsv",
+                "results/palm/ancestral_paths_new-{trait}-palm_report_multi_trait-{biobank}.tsv",
+            ],
+            trait=["ms-r0.05-kb250"],
+            biobank=["ukbb", "finngen"],
+        ),
