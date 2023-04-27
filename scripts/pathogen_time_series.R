@@ -14,7 +14,7 @@ pathogen <- "brucella"
 # pathogen <- "listeria"
 
 # get the sample metadata
-samples <- read_tsv("data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv", col_types = cols()) %>%
+samples <- read_tsv("data/ancestral_paths_v3/ancestral_paths_merged_filtered_age.sampleInfo.tsv", col_types = cols()) %>%
     select(sampleId, popId, groupAge, ageAverage)
 
 BIN_SIZE <- 1000

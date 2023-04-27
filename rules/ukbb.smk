@@ -134,7 +134,7 @@ rule ukbb_intersect_gwas:
     """
     input:
         gwas1="data/ukbb/nealelab/gwas/{pheno}.gwas.imputed_v3.{sex}.tsv.bgz",
-        gwas2="data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv",
+        gwas2="data/targets/gwas_ms-full_ancestral_paths_v3_palm.tsv",
         vars="data/ukbb/nealelab/variants.tsv.bgz",
     output:
         tsv="data/ukbb/nealelab/clump/{pheno}.gwas.imputed_v3.{sex}.ms-full.tsv",

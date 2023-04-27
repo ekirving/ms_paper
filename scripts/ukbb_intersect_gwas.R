@@ -14,7 +14,7 @@ quiet(library(tidyverse)) # v1.3.1
 # get the command line arguments
 p <- arg_parser("Filter one GWAS based on the positions in another")
 p <- add_argument(p, "--gwas1", help = "The primary GWAS to be filtered", default = "data/ukbb/nealelab/gwas/20002_1456.gwas.imputed_v3.both_sexes.tsv.bgz")
-p <- add_argument(p, "--gwas2", help = "The secondary GWAS", default = "data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--gwas2", help = "The secondary GWAS", default = "data/targets/gwas_ms-full_ancestral_paths_v3_palm.tsv")
 p <- add_argument(p, "--vars", help = "Variant details", default = "data/ukbb/nealelab/variants.tsv.bgz")
 p <- add_argument(p, "--output", help = "Output file", default = "data/ukbb/nealelab/clump/20002_1456.gwas.imputed_v3.both_sexes.ms-full.tsv")
 

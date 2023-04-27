@@ -18,6 +18,7 @@ benchmarks/
 bin/
 data/1000g/
 data/Ancestral_paths_new
+data/ancestral_paths_v3
 data/clues/
 data/dbsnp/
 data/ensembl/

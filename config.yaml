@@ -1,6 +1,12 @@
 # analysis groups
 samples:
 
+  ancestral_paths_v3:
+    reference: GRCh37
+    metadata: data/ancestral_paths_v3/ancestral_paths_v3.sampleInfo.tsv
+    genotypes: data/ancestral_paths_v3/ancestral_paths_v3.bcf
+    is_likelihood: False
+
   ancestral_paths_new:
     reference: GRCh37
     metadata: data/Ancestral_paths_new/ancestral_paths_merged_filtered_age.sampleInfo.tsv

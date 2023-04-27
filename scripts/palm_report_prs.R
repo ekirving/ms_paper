@@ -16,10 +16,10 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Add an extra column to the PALM report that contains the delta PRS for each SNP")
-p <- add_argument(p, "--data", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
-p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
+p <- add_argument(p, "--data", help = "PALM report", default = "results/palm/ancestral_paths_v3-ALL-ms-palm_report.tsv")
+p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_v3")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
-p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report_prs.tsv")
+p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_v3-ALL-ms-palm_report_prs.tsv")
 
 argv <- parse_args(p)
 

@@ -18,13 +18,13 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Compare associations between trait associated SNPs and all other traits in FinnGen")
-p <- add_argument(p, "--finngen", help = "FinnGen associations", default = "results/compare/finngen/ancestral_paths_new-ms-r0.05-kb250.significant.tsv.gz")
+p <- add_argument(p, "--finngen", help = "FinnGen associations", default = "results/compare/finngen/ancestral_paths_v3-ms-r0.05-kb250.significant.tsv.gz")
 p <- add_argument(p, "--pheno", help = "FinnGen phenotypes", default = "data/finngen/finngen_R8_manifest.tsv")
-p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_prs.tsv")
+p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_v3-ms-r0.05-kb250-palm_report_prs.tsv")
 p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "marginal")
 p <- add_argument(p, "--significant", help = "Ony show significant SNPs", flag = TRUE)
-p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-finngen-marginal-%03d.png")
-p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-finngen-marginal.tsv")
+p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_v3-ms-r0.05-kb250-finngen-marginal-%03d.png")
+p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_v3-ms-r0.05-kb250-finngen-marginal.tsv")
 
 argv <- parse_args(p)
 
@@ -59,7 +59,7 @@ snps <- palm %>%
     # filter on SNPs with a FinnGen association
     filter(rsid %in% gwas_snps) %>%
     # compose the model prefixes from the PALM metadata
-    mutate(prefix = paste0("results/clues/", rsid, "/ancestral_paths_new-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", ancestry))
+    mutate(prefix = paste0("results/clues/", rsid, "/ancestral_paths_v3-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", ancestry))
 
 # count the number of SNPs with significant CLUES p-values that intersect with each FinnGen phenotype
 snp_count <- finngen %>%

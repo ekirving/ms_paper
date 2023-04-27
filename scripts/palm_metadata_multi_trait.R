@@ -15,13 +15,13 @@ quiet(library(tidyverse)) # v1.3.1
 p <- arg_parser("Convert the GWAS metadata into PALM input format")
 p <- add_argument(p, "--trait1", help = "The first complex trait name", default = "cd")
 p <- add_argument(p, "--trait2", help = "The second complex trait name", default = "ra")
-p <- add_argument(p, "--gwas1-ind", help = "Independent GWAS associations for trait 1", default = "data/targets/gwas_cd-r0.05-kb250_ancestral_paths_new_palm.tsv")
-p <- add_argument(p, "--gwas2-ind", help = "Independent GWAS associations for trait 2", default = "data/targets/gwas_ra-r0.05-kb250_ancestral_paths_new_palm.tsv")
-p <- add_argument(p, "--gwas1-all", help = "All GWAS associations for trait 1", default = "data/targets/gwas_cd-full_ancestral_paths_new_palm.tsv")
-p <- add_argument(p, "--gwas2-all", help = "All GWAS associations for trait 2", default = "data/targets/gwas_ra-full_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--gwas1-ind", help = "Independent GWAS associations for trait 1", default = "data/targets/gwas_cd-r0.05-kb250_ancestral_paths_v3_palm.tsv")
+p <- add_argument(p, "--gwas2-ind", help = "Independent GWAS associations for trait 2", default = "data/targets/gwas_ra-r0.05-kb250_ancestral_paths_v3_palm.tsv")
+p <- add_argument(p, "--gwas1-all", help = "All GWAS associations for trait 1", default = "data/targets/gwas_cd-full_ancestral_paths_v3_palm.tsv")
+p <- add_argument(p, "--gwas2-all", help = "All GWAS associations for trait 2", default = "data/targets/gwas_ra-full_ancestral_paths_v3_palm.tsv")
 p <- add_argument(p, "--ld", help = "Pairwise LD for finding proxy SNPs", default = "data/targets/gwas_cd-r0.05-kb250_ld.tsv.gz")
 p <- add_argument(p, "--min-ld", help = "Minimum LD threshold for pairing variants", default = 0.3)
-p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_cd~ra_ancestral_paths_new_palm.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "data/targets/gwas_cd~ra_ancestral_paths_v3_palm.tsv")
 
 argv <- parse_args(p)
 

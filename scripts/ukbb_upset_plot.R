@@ -20,13 +20,13 @@ source("scripts/clues_utils.R")
 # get the command line arguments
 p <- arg_parser("Compare associations between trait associated SNPs and all other traits in UKBB")
 p <- add_argument(p, "--trait", help = "Focal trait name", default = "ms-r0.05-kb250")
-p <- add_argument(p, "--ukbb", help = "UKBB associations", default = "results/compare/ukbb/ancestral_paths_new-ms-r0.05-kb250.both_sexes.significant.tsv.gz")
+p <- add_argument(p, "--ukbb", help = "UKBB associations", default = "results/compare/ukbb/ancestral_paths_v3-ms-r0.05-kb250.both_sexes.significant.tsv.gz")
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
-p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_prs.tsv")
+p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_v3-ms-r0.05-kb250-palm_report_prs.tsv")
 p <- add_argument(p, "--infectious", help = "Ony show infectious diesase phenotypes", flag = TRUE)
 p <- add_argument(p, "--num-traits", help = "Number of traits to show", default = 20)
-p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-upset-top.png")
-p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-upset-top.tsv")
+p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_v3-ms-r0.05-kb250-ukbb-upset-top.png")
+p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_v3-ms-r0.05-kb250-ukbb-upset-top.tsv")
 
 argv <- parse_args(p)
 

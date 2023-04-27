@@ -18,8 +18,8 @@ source("scripts/clues_utils.R")
 # get the command line arguments
 p <- arg_parser("Compare associations between trait associated SNPs and all other traits in the GWAS catalog")
 p <- add_argument(p, "--catalog", help = "GWAS catalog", default = "data/gwascat/gwas_catalog_significant_ontology.tsv.gz")
-p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_new-ms-all-gwas_catalog.png")
+p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_v3-ms-all-palm_report_prs.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "results/compare/ancestral_paths_v3-ms-all-gwas_catalog.png")
 
 argv <- parse_args(p)
 
@@ -59,7 +59,7 @@ snps <- palm %>%
     # with a GWAS Catalog entry
     filter(rsid %in% gwas_snps) %>%
     # compose the model prefixes from the PALM metadata
-    mutate(prefix = paste0("results/clues/", rsid, "/ancestral_paths_new-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", ancestry))
+    mutate(prefix = paste0("results/clues/", rsid, "/ancestral_paths_v3-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", ancestry))
 
 models <- list()
 for (i in 1:nrow(snps)) {

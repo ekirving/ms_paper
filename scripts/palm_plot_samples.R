@@ -17,12 +17,12 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Plot the density of the sampling and ancestry painting over time")
-p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_new-ALL-ms-palm_report.tsv")
-p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_new-ALL-ms-palm.json")
+p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_v3-ALL-ms-palm_report.tsv")
+p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_v3-ALL-ms-palm.json")
 p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms")
-p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_new")
+p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_v3")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_new-ALL-ms-palm_trajectory.png")
+p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_v3-ALL-ms-palm_trajectory.png")
 
 argv <- parse_args(p)
 

@@ -18,23 +18,49 @@ sys.path.append(os.getcwd())
 
 from scripts.utils import get_samples
 
-# ancestral path codes used in the VCF
-PATH_ANA = "1"  # Anatolian Farmers         -> Neolithic
-PATH_CHG = "2"  # Caucasus Hunter-gatherers -> Yamnaya
-PATH_WHG = "3"  # Western Hunter-gatherers  -> Neolithic
-PATH_EHG = "4"  # Eastern Hunter-gatherers  -> Yamnaya
-PATH_EHG_WHG = "5"  # North European ancestry (WHG or EHG path) but unable to be more specific
-PATH_ANA_CHG = "6"  # West Asian ancestry (CHG or Anatolian path) but unable to be more specific
-PATH_UNKNOWN = "0"  # Unable to assign specific path (This labels 0,5,6,9 and 10)
 
-# map 3-letter codes to ancestral path codes
-ANCESTRY_MAP = {
-    "ALL": None,
-    "ANA": [PATH_ANA, PATH_ANA_CHG],
-    "CHG": [PATH_CHG, PATH_ANA_CHG],
-    "WHG": [PATH_WHG, PATH_EHG_WHG],
-    "EHG": [PATH_EHG, PATH_EHG_WHG],
-}
+def get_ancestry_map(dataset):
+    """
+    Handle the difference in ancestry codes between `ancestral_paths_new` and `ancestral_paths_v3`
+    """
+    PATH_ANA = "1"  # Anatolian Farmers -> Neolithic
+    PATH_CHG = "2"  # Caucasus Hunter-gatherers -> Yamnaya
+    PATH_WHG = "3"  # Western Hunter-gatherers -> Neolithic
+    PATH_EHG = "4"  # Eastern Hunter-gatherers -> Yamnaya
+
+    ancestry_map = dict()
+
+    if dataset in ["ancestral_paths_new", "chr3_true_paths", "chr3_inferred_paths"]:
+
+        PATH_EHG_WHG = "5"  # North European ancestry (WHG or EHG path) but unable to be more specific
+        PATH_ANA_CHG = "6"  # West Asian ancestry (CHG or Anatolian path) but unable to be more specific
+        PATH_UNKNOWN = "0"  # Unable to assign specific path (This labels 0,5,6,9 and 10)
+
+        ancestry_map = {
+            "ALL": None,
+            "ANA": [PATH_ANA, PATH_ANA_CHG],
+            "CHG": [PATH_CHG, PATH_ANA_CHG],
+            "WHG": [PATH_WHG, PATH_EHG_WHG],
+            "EHG": [PATH_EHG, PATH_EHG_WHG],
+        }
+    elif dataset in ["ancestral_paths_v3", "simulated_relate_painted"]:
+
+        PATH_ANA_BAA = "5"  # Anatolian Farmer -> Bronze Age Anatolian
+        PATH_CHG_BAA = "6"  # Caucasus Hunter-gatherers -> Bronze Age Anatolian
+
+        # NB we don't use paths 5 and 6 as they lead to BAA
+        ancestry_map = {
+            "ALL": None,
+            "ANA": [PATH_ANA],
+            "CHG": [PATH_CHG],
+            "WHG": [PATH_WHG],
+            "EHG": [PATH_EHG],
+        }
+
+    return ancestry_map
+
+
+SEXES = ["XX", "XY", "any"]
 
 BASES = ["A", "C", "G", "T"]
 BASES_N = BASES + ["N", "0"]
@@ -47,7 +73,13 @@ MIN_ANCIENT_SAMPLES = 2
 @click.option("--vcf", "vcf_file", metavar="<file>", help="VCF file", type=click.Path(exists=True), required=True)
 @click.option("--dataset", metavar="<string>", help="Name of the dataset", required=True)
 @click.option("--variant", metavar="<chr:pos:anc:der>", help="Variant name", required=True)
-@click.option("--ancestry", metavar="<string>", help="Ancestry code", type=click.Choice(ANCESTRY_MAP), required=True)
+@click.option(
+    "--ancestry",
+    metavar="<string>",
+    help="Ancestry code",
+    type=click.Choice(["ALL", "ANA", "CHG", "WHG", "EHG"]),
+    required=True,
+)
 @click.option("--gen-time", metavar="<int>", help="Years per generation", type=int, required=True)
 @click.option("--mod-freq", metavar="<file>", type=click.File("w"), help="Modern frequency filename", required=True)
 @click.option("--output", metavar="<file>", type=click.File("w"), help="Output filename", required=True)
@@ -68,6 +100,7 @@ def clues_ancient_samples(vcf_file, dataset, variant, ancestry, gen_time, mod_fr
     ancients = samples[samples["age"] != 0]
     ancients = ancients[ancients["age"].notnull()]
     ancients = ancients.sort_values("age")
+    ancestry_map = get_ancestry_map(dataset)
 
     # also get all the modern samples
     moderns = samples[samples["age"] == 0]
@@ -86,6 +119,9 @@ def clues_ancient_samples(vcf_file, dataset, variant, ancestry, gen_time, mod_fr
         raise RuntimeError(f"SNP {chrom}:{pos} not found in {vcf_file}")
 
     alleles = [rec.ref] + list(rec.alts)
+
+    if ancestral == "0":
+        ancestral = rec.ref
 
     if len(alleles) > 2:
         raise RuntimeError(f"{chrom}:{pos} {rec.id} SNP is polyallelic {alleles} in {vcf_file}")
@@ -148,7 +184,7 @@ def clues_ancient_samples(vcf_file, dataset, variant, ancestry, gen_time, mod_fr
 
             # treat each call as pseudo-haploid
             for geno, path in zip(gt, rec.samples[sample].get("AP", "")[0].split("|")):
-                if path in ANCESTRY_MAP[ancestry]:
+                if path in ancestry_map[ancestry]:
                     if gt == (1, 1):
                         gp_haploid = (gp_diploid[0] + (gp_diploid[1] / 2), gp_diploid[2])
                     elif gt == (0, 0):
@@ -199,7 +235,7 @@ def clues_ancient_samples(vcf_file, dataset, variant, ancestry, gen_time, mod_fr
 
             # filter for genotypes belonging to this ancestry
             for call, path in zip(rec.samples[sample].alleles, rec.samples[sample].get("AP", "")[0].split("|")):
-                if path in ANCESTRY_MAP[ancestry]:
+                if path in ancestry_map[ancestry]:
                     # count the ancestry specific genotypes
                     calls.append(call)
 

@@ -18,8 +18,8 @@ source("scripts/clues_utils.R")
 # get the command line arguments
 p <- arg_parser("Plot the joint PALM models")
 p <- add_argument(p, "--biobank", help = "The GWAS biobank", default = "ukbb")
-p <- add_argument(p, "--report", help = "PALM multi-trait report", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_multi_trait.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_multi_trait-ukbb.png")
+p <- add_argument(p, "--report", help = "PALM multi-trait report", default = "results/palm/ancestral_paths_v3-ms-r0.05-kb250-palm_report_multi_trait.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "results/palm/ancestral_paths_v3-ms-r0.05-kb250-palm_report_multi_trait-ukbb.png")
 
 argv <- parse_args(p)
 

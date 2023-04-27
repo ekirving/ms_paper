@@ -11,9 +11,9 @@ quiet <- function(x) {
 quiet(library(tidyverse)) # v1.3.1
 
 
-ms_all <- read_tsv("results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv", col_types = cols()) %>% mutate(trait = "ms")
-ra_all <- read_tsv("results/palm/ancestral_paths_new-ra-all-palm_report_prs.tsv", col_types = cols()) %>% mutate(trait = "ra")
-cd_all <- read_tsv("results/palm/ancestral_paths_new-cd-all-palm_report_prs.tsv", col_types = cols()) %>% mutate(trait = "cd")
+ms_all <- read_tsv("results/palm/ancestral_paths_v3-ms-all-palm_report_prs.tsv", col_types = cols()) %>% mutate(trait = "ms")
+ra_all <- read_tsv("results/palm/ancestral_paths_v3-ra-all-palm_report_prs.tsv", col_types = cols()) %>% mutate(trait = "ra")
+cd_all <- read_tsv("results/palm/ancestral_paths_v3-cd-all-palm_report_prs.tsv", col_types = cols()) %>% mutate(trait = "cd")
 
 traits <- bind_rows(ms_all, ra_all, cd_all)
 

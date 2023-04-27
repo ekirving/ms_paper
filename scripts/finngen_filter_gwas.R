@@ -15,8 +15,8 @@ quiet(library(tidyverse)) # v1.3.1
 p <- arg_parser("Filter the FinnGen GWAS file to retain only the SNPs with a significant GWAS assocation in the focal trait")
 p <- add_argument(p, "--pheno", help = "FinnGen phenotype", default = "R8_AB1_OTHER_BACTERIAL")
 p <- add_argument(p, "--finngen", help = "FinnGen associations", default = "data/finngen/gwas/finngen_R8_AB1_OTHER_BACTERIAL.significant.tsv.bgz")
-p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "results/compare/finngen/ancestral_paths_new-ms-r0.05-kb250.AB1_OTHER_BACTERIAL.significant.tsv")
+p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_v3-ms-all-palm_report_prs.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "results/compare/finngen/ancestral_paths_v3-ms-r0.05-kb250.AB1_OTHER_BACTERIAL.significant.tsv")
 
 argv <- parse_args(p)
 

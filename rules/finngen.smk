@@ -113,7 +113,7 @@ rule finngen_intersect_gwas:
     """
     input:
         gwas1="data/finngen/gwas/finngen_R8_{pheno}.tsv.bgz",
-        gwas2="data/targets/gwas_ms-full_ancestral_paths_new_palm.tsv",
+        gwas2="data/targets/gwas_ms-full_ancestral_paths_v3_palm.tsv",
     output:
         tsv="data/finngen/clump/finngen_R8_{pheno}.ms-full.tsv",
     resources:

@@ -17,8 +17,8 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Plot a scatter plot of -log10(pval) vs delra_prs")
-p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_prs.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-scatter.png")
+p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_v3-ms-r0.05-kb250-palm_report_prs.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "results/palm/ancestral_paths_v3-ms-r0.05-kb250-scatter.png")
 
 argv <- parse_args(p)
 

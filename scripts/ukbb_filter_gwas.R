@@ -15,8 +15,8 @@ quiet(library(tidyverse)) # v1.3.1
 p <- arg_parser("Filter the UKBB GWAS file to retain only the SNPs with a significant GWAS assocation in the focal trait")
 p <- add_argument(p, "--pheno", help = "UKBB phenotype", default = "C21")
 p <- add_argument(p, "--ukbb", help = "UKBB associations", default = "data/ukbb/nealelab/gwas/C21.gwas.imputed_v3.both_sexes.significant.tsv.bgz")
-p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-all-palm_report_prs.tsv")
-p <- add_argument(p, "--output", help = "Output file", default = "results/palm/ukbb/ancestral_paths_new-ms-all.C21.gwas.imputed_v3.both_sexes.significant.tsv")
+p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_v3-ms-all-palm_report_prs.tsv")
+p <- add_argument(p, "--output", help = "Output file", default = "results/palm/ukbb/ancestral_paths_v3-ms-all.C21.gwas.imputed_v3.both_sexes.significant.tsv")
 
 argv <- parse_args(p)
 

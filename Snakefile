@@ -15,7 +15,7 @@ configfile: "config.yaml"
 
 wildcard_constraints:
     ancestry="[A-Z]{3}",
-    dataset="ancestral_paths_new|imputed_unfiltered",
+    dataset="ancestral_paths_v3|ancestral_paths_new|imputed_unfiltered",
     trait="\w+-[^_]+",
 
 
@@ -48,7 +48,7 @@ def all_clues_plots(_):
 
     for trait in traits:
         # noinspection PyUnresolvedReferences
-        meta_tsv = checkpoints.palm_metadata_single_trait.get(dataset="ancestral_paths_new", trait=trait).output.tsv
+        meta_tsv = checkpoints.palm_metadata_single_trait.get(dataset="ancestral_paths_v3", trait=trait).output.tsv
 
         snp = pd.read_table(meta_tsv)
 
@@ -56,7 +56,7 @@ def all_clues_plots(_):
             rsid = row.rsid
             variant = f"{row.chrom}:{row.pos}:{row.ancestral_allele}:{row.derived_allele}"
 
-            files += [f"results/clues/{rsid}/ancestral_paths_new-{variant}-{ancestry}.png" for ancestry in ANCESTRIES]
+            files += [f"results/clues/{rsid}/ancestral_paths_v3-{variant}-{ancestry}.png" for ancestry in ANCESTRIES]
 
     return files
 
@@ -68,33 +68,33 @@ rule all:
         # run PALM and plot all the traits
         expand(
             [
-                "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-pval.png",
-                "results/palm/ancestral_paths_new-{ancestry}-{trait}-palm_lines-prs.png",
-                "results/palm/ancestral_paths_new-{trait}-delta_prs.png",
-                "results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv",
-                "results/palm/ancestral_paths_new-{trait}-scatter.png",
+                "results/palm/ancestral_paths_v3-{ancestry}-{trait}-palm_lines-pval.png",
+                "results/palm/ancestral_paths_v3-{ancestry}-{trait}-palm_lines-prs.png",
+                "results/palm/ancestral_paths_v3-{trait}-delta_prs.png",
+                "results/palm/ancestral_paths_v3-{trait}-palm_report_prs.tsv",
+                "results/palm/ancestral_paths_v3-{trait}-scatter.png",
             ],
             ancestry=ANCESTRIES,
             trait=config.get("trait", TRAITS),
         ),
         # make a report for each trait using the "all genome-wide SNPs" ascertainments
-        expand("results/palm/ancestral_paths_new-{trait}-palm_report_prs.tsv", trait=["ms-all", "ra-all"]),
+        expand("results/palm/ancestral_paths_v3-{trait}-palm_report_prs.tsv", trait=["ms-all", "ra-all"]),
         # plot the UKBB and FinnGen comparisons
         expand(
             [
-                "results/compare/ancestral_paths_new-{trait}-{biobank}-marginal-001.png",
-                "results/compare/ancestral_paths_new-{trait}-{biobank}-upset-top.png",
+                "results/compare/ancestral_paths_v3-{trait}-{biobank}-marginal-001.png",
+                "results/compare/ancestral_paths_v3-{trait}-{biobank}-upset-top.png",
             ],
             trait=TRAITS,
             biobank=["ukbb", "finngen"],
         ),
         # plot the FinnGen infectious disease upset plot
-        expand("results/compare/ancestral_paths_new-{trait}-finngen-upset-infectious.png", trait=TRAITS),
+        expand("results/compare/ancestral_paths_v3-{trait}-finngen-upset-infectious.png", trait=TRAITS),
         # make a PALM multi-trait report for all overlapping traits in UKBB and FinnGEN
         expand(
             [
-                "results/palm/ancestral_paths_new-{trait}-palm_report_multi_trait.tsv",
-                "results/palm/ancestral_paths_new-{trait}-palm_report_multi_trait-{biobank}.tsv",
+                "results/palm/ancestral_paths_v3-{trait}-palm_report_multi_trait.tsv",
+                "results/palm/ancestral_paths_v3-{trait}-palm_report_multi_trait-{biobank}.tsv",
             ],
             trait=["ms-r0.05-kb250"],
             biobank=["ukbb", "finngen"],

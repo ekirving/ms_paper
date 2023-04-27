@@ -18,13 +18,13 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Compare associations between trait associated SNPs and all other traits in the UKBB")
-p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/compare/ukbb/ancestral_paths_new-ms-r0.05-kb250.both_sexes.significant.tsv.gz")
+p <- add_argument(p, "--ukbb", help = "UKBB assocations", default = "results/compare/ukbb/ancestral_paths_v3-ms-r0.05-kb250.both_sexes.significant.tsv.gz")
 p <- add_argument(p, "--pheno", help = "UKBB phenotypes", default = "data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz")
-p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_new-ms-r0.05-kb250-palm_report_prs.tsv")
+p <- add_argument(p, "--palm", help = "PALM report for all ancestries", default = "results/palm/ancestral_paths_v3-ms-r0.05-kb250-palm_report_prs.tsv")
 p <- add_argument(p, "--polarize", help = "How should we polarize the trajectories", default = "marginal")
 p <- add_argument(p, "--significant", help = "Ony show significant SNPs", flag = TRUE)
-p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-marginal-%03d.png")
-p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_new-ms-r0.05-kb250-ukbb-marginal.tsv")
+p <- add_argument(p, "--out-png", help = "Output file", default = "results/compare/ancestral_paths_v3-ms-r0.05-kb250-ukbb-marginal-%03d.png")
+p <- add_argument(p, "--out-tsv", help = "Output file", default = "results/compare/ancestral_paths_v3-ms-r0.05-kb250-ukbb-marginal.tsv")
 
 argv <- parse_args(p)
 
@@ -61,7 +61,7 @@ snps <- palm %>%
     # filter on SNPs with a UKBB association
     filter(variant %in% gwas_snps) %>%
     # compose the model prefixes from the PALM metadata
-    mutate(prefix = paste0("results/clues/", rsid, "/ancestral_paths_new-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", ancestry))
+    mutate(prefix = paste0("results/clues/", rsid, "/ancestral_paths_v3-", chrom, ":", pos, ":", ancestral_allele, ":", derived_allele, "-", ancestry))
 
 # count the number of SNPs with significant CLUES p-values that intersect with each UKBB phenotype
 snp_count <- ukbb %>%
