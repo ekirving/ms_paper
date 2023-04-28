@@ -94,7 +94,7 @@ rule all:
         expand(
             [
                 "results/palm/ancestral_paths_v3-{trait}-palm_report_multi_trait.tsv",
-                "results/palm/ancestral_paths_v3-{trait}-palm_report_multi_trait-{biobank}.tsv",
+                "results/palm/ancestral_paths_v3-{trait}-palm_report_multi_trait-{biobank}.png",
             ],
             trait=["ms-r0.05-kb250"],
             biobank=["ukbb", "finngen"],
