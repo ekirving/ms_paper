@@ -54,6 +54,7 @@ ukbb_selected <- ukbb %>%
     # remove long and unnecessary prefixes
     mutate(description = str_replace(description, "Diagnoses - main ICD10: ", "")) %>%
     mutate(description = str_replace(description, "Non-cancer illness code, self-reported: ", "")) %>%
+    mutate(description = str_replace(description, "Blood clot, DVT, bronchitis, emphysema, asthma, rhinitis, eczema, allergy diagnosed by doctor: ", "")) %>%
     # add the phenotype code as a suffix
     mutate(description = paste0(str_replace(description, phenotype, ""), " [", phenotype, "]")) %>%
     # capitalize first word and strip whitespace
