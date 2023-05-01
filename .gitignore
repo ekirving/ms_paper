@@ -43,6 +43,6 @@ ms-*.log
 nohup*
 results/
 scratch.*
-supplement/
+supplement*
 tmp/
 ~*
