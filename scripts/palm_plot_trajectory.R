@@ -128,7 +128,7 @@ xlabels <- round(xbreaks * argv$gen_time / 1000)
 # get the maximum likelihood trajectory
 max_traj <- df_prob %>%
     group_by(epoch) %>%
-    top_n(1, density) %>%
+    slice_max(density, n=1, with_ties = FALSE) %>%
     ungroup() %>%
     arrange(epoch)
 

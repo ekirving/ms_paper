@@ -47,7 +47,7 @@ clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NU
     # extract the maximum posterior trajectory
     traj <- model %>%
         group_by(epoch) %>%
-        top_n(1, density) %>%
+        slice_max(density, n=1, with_ties = FALSE) %>%
         ungroup() %>%
         arrange(epoch)
 

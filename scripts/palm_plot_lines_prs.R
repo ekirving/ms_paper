@@ -53,7 +53,7 @@ for (i in 1:nrow(snps)) {
     # load the CLUES model, and extract the maximum likelihood path
     model <- clues_load_data(snps[i, ]$prefix) %>%
         group_by(epoch) %>%
-        top_n(1, density) %>%
+        slice_max(density, n=1, with_ties = FALSE) %>%
         ungroup() %>%
         arrange(epoch) %>%
         mutate(
