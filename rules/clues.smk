@@ -78,6 +78,7 @@ rule clues_inference_ancient:
         " --coal {input.coal}"
         " --{params.flg} {input.anct}"
         " --timeBins {input.bins}"
+        " --betaParam 0.5"
         " --out {params.out} &> {log}"
 
 

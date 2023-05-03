@@ -172,6 +172,7 @@ rule palm_single_trait:
         " --traitDir {params.dir}"
         " --metadata {input.tsv}"
         " --B 1000"
+        " --seed 333"
         " 1> {output.txt}"
         " 2> {log}"
 
@@ -197,6 +198,7 @@ rule palm_multi_trait:
         " --B 1000"
         " --maxp 5e-8"
         " --traits {wildcards.trait1},{wildcards.trait2}"
+        " --seed 162"
         " 1> {output.txt}"
         " 2> {log}"
 
