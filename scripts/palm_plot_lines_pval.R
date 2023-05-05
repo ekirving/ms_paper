@@ -104,7 +104,7 @@ plot_title <- paste0(
     " | ω = ", results$sel,
     " | se = ", results$se,
     " | z = ", results$z,
-    " | p = ", signif(pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2, 3)
+    " | p = ", sprintf("%.2e", pnorm(q = abs(as.numeric(results$z)), lower.tail = FALSE) * 2)
 )
 
 # constrain the extent of the plotting
@@ -184,3 +184,10 @@ plt <- df_ml %>%
 
 # save the plot
 ggsave(filename = argv$output, plt, width = 12, height = 8)
+
+if (argv$trait == "ms-r0.05-kb250") {
+    ggsave(filename = "figure/fig_5a.png", plt, width = 806, height = 618, units = "px", dpi = 90)
+
+} else if (argv$trait == "ra-r0.05-kb250") {
+    ggsave(filename = "figure/supp_fig_6.1a.png", plt, width = 806, height = 618, units = "px", dpi = 90)
+}
