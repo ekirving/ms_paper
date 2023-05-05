@@ -80,3 +80,12 @@ cp results/palm/ancestral_paths_v3-ra-r0.05-kb250-palm_report_prs.tsv supplement
 # MS joint-PALM
 cp results/palm/ancestral_paths_v3-ms-r0.05-kb250-palm_report_multi_trait.tsv supplement/table_6.v_ancestral_paths_v3-ms-r0.05-kb250-palm_report_multi_trait.tsv
 
+# ----------------------------------------------------------------------------------------------------------------------
+# prepare the composite main text figures
+# ----------------------------------------------------------------------------------------------------------------------
+# append the two parts of Figure_5 together
+convert -append figure/fig_5a.png figure/fig_5b.png figure/fig_5.png
+
+# resize and crop, then append the two parts of Supplementary Figure 6.1 together
+convert results/clues/rs660895/imputed_unfiltered-6:32577380:A:G-ALL.png -resize '806x' -crop '806x480+0+0' figure/supp_fig_6.1b.png
+convert -append figure/supp_fig_6.1a.png figure/supp_fig_6.1b.png figure/supp_fig_6.1.png
