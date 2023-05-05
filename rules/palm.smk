@@ -437,7 +437,7 @@ rule palm_all_overlapping_traits_report:
         ukbb="data/ukbb/nealelab/phenotypes.both_sexes.tsv.bgz",
         finngen="data/finngen/finngen_R8_manifest.tsv",
     params:
-        models=lambda wildcards, input: [f"--model {model}" for model in input.models],
+        models=lambda wildcards, input: [f"--model {model}" for model in input.get('models', [])],
     output:
         tsv="results/palm/{dataset}-{trait}-palm_report_multi_trait.tsv",
     shell:
