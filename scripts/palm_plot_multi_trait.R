@@ -28,8 +28,10 @@ report <- read_tsv(argv$report, col_types = cols())
 data <- report %>%
     filter(trait2_gwas == argv$biobank)
 
-# set the sort order of the marginal traits based on their R-score
-data$trait2 <- factor(data$trait2, levels = data %>% filter(ancestry == "CHG") %>% arrange(trait1_r) %>% pull(trait2) %>% unique())
+top_ancestry <- report %>% group_by() %>% slice_max(abs(trait1_r)) %>% pull(ancestry)
+
+# set the sort order of the marginal traits based on their R-score in the ancestry with the largest score
+data$trait2 <- factor(data$trait2, levels = data %>% filter(ancestry == top_ancestry) %>% arrange(trait1_r) %>% pull(trait2) %>% unique())
 
 # apply a Bonferroni correction for the number of tests
 num_traits <- length(unique(data$trait2))
