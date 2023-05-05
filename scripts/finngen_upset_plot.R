@@ -150,6 +150,7 @@ plt <- data %>%
     scale_x_upset() +
     scale_y_continuous(breaks = seq(0, bar_height, ifelse(bar_height > 10, 5, 1))) +
     ggtitle(plot_title) +
+    theme(plot.title = element_text(hjust = 0)) +
     ylab("Count of SNPs") +
     xlab(x_label)
 
