@@ -1,11 +1,12 @@
 # Polygenic selection analysis for Multiple Sclerosis (MS)
 This repository contains code for the ancestry stratified polygenic selection analyses from 
-[Genetic Risk for Multiple Sclerosis Originated in Pastoralist Steppe Populations](https://).
+[Elevated Genetic Risk for Multiple Sclerosis Originated in Steppe Pastoralist Populations](
+https://doi.org/10.1101/2022.09.23.509097).
 
 ![Figure 2](./figure/Figure_5.png?raw=true)
 
 If you reuse any of this code then please cite the preprint:
-> Barrie, W.&ast;, Yang, Y.&ast;, Attfield, K.E.&ast;, Irving-Pease, E.&ast;, Scorrano, G.&ast;, Jensen, L.T.&ast;, 
+> Barrie, W.&ast;, Yang, Y.&ast;, Irving-Pease, E.K.&ast;, Attfield, K.E.&ast;, Scorrano, G.&ast;, Jensen, L.T.&ast;, 
 > Armen, A.P., Dimopoulos, E.A., Stern, A., Refoyo-Martinez, A., Ramsøe, A., Gaunitz, C., Demeter, F., 
 > Jørkov, M.L.S., Møller, S.B., Springborg, B., Klassen, L., Hyldgård, I.M., Wickmann, N., Vinner, L., 
 > Korneliussen, T.S., Allentoft, M.E., Sikora, M., Kristiansen, K., Rodriguez, S., Nielsen, R., Iversen, A.K.N., 
@@ -31,11 +32,14 @@ conda activate ms
 
 ## Running the code
 
-To reproduce all the analyses, simply run:
+Assuming you have all the input data, you can reproduce the analyses by running:
 
 ```bash
 snakemake all
 ```
+
+In practice, computing the DAG of the rule chain will take a long time, and you will need a lot of computational 
+resources to perform an end-to-end replication (e.g., about 1 week of wall-time on a cluster of three 96-core nodes).
 
 ## Author
 
