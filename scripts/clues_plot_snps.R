@@ -98,7 +98,7 @@ ancestry_epochs <- tibble(
     rowwise() %>%
     mutate(start = max(start, xmin), finish = min(finish, xmax))
 
-plt <- ggplot(traj) +
+plt_snps <- ggplot(traj) +
 
     # shade the ancestry epoch
     geom_rect(data = ancestry_epochs, aes(xmin = start, xmax = finish, ymin = 0, ymax = Inf), alpha = 0.5, fill = "#F4F4F4") +
@@ -138,10 +138,3 @@ plt <- ggplot(traj) +
         text = element_text(size = 10)
     )
 
-# save the plot
-ggsave(output_png, width = 16, height = 4 * .9)
-
-# save figure 5b for the main text
-if (description == "DRB1*15:01") {
-    ggsave(filename = "figure/fig_5b.png", plt, width = 806, height = 190, units = "px", dpi = 90)
-}

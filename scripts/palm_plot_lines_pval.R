@@ -18,13 +18,13 @@ source("scripts/clues_utils.R")
 
 # get the command line arguments
 p <- arg_parser("Plot the trajectory of the polygenic risk score as stacked lines")
-p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_v3-ALL-ms-r0.05-kb250-palm_report.tsv")
-p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_v3-ALL-ms-r0.05-kb250-palm.json")
-p <- add_argument(p, "--trait", help = "The complex trait name", default = "ms-r0.05-kb250")
+p <- add_argument(p, "--tsv", help = "PALM report", default = "results/palm/ancestral_paths_v3-ALL-ra-r0.05-kb250-palm_report.tsv")
+p <- add_argument(p, "--json", help = "PALM json file", default = "results/palm/ancestral_paths_v3-ALL-ra-r0.05-kb250-palm.json")
+p <- add_argument(p, "--trait", help = "The complex trait name", default = "ra-r0.05-kb250")
 p <- add_argument(p, "--dataset", help = "The dataset", default = "ancestral_paths_v3")
 p <- add_argument(p, "--ancestry", help = "The ancestry path", default = "ALL")
 p <- add_argument(p, "--gen-time", help = "Generation time", default = 28)
-p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_v3-ALL-ms-palm_lines-pval.png")
+p <- add_argument(p, "--output", help = "PALM trajectory", default = "results/palm/ancestral_paths_v3-ALL-ra-palm_lines-pval.png")
 
 argv <- parse_args(p)
 
@@ -144,7 +144,7 @@ show_significant <- function(x, to = c(0, 1), from = NULL) {
     ifelse(x < bonferroni, scales::rescale(x, to = to, from = c(min(x, na.rm = TRUE), bonferroni)), 1)
 }
 
-plt <- df_ml %>%
+plt_lines <- df_ml %>%
     # plot the heatmap
     ggplot(aes(x = epoch, y = prs_freq, group = rsid)) +
 
@@ -181,13 +181,3 @@ plt <- df_ml %>%
         panel.background = element_blank(),
         plot.title = element_text(size = 11)
     )
-
-# save the plot
-ggsave(filename = argv$output, plt, width = 12, height = 8)
-
-if (argv$trait == "ms-r0.05-kb250") {
-    ggsave(filename = "figure/fig_5a.png", plt, width = 806, height = 618, units = "px", dpi = 90)
-
-} else if (argv$trait == "ra-r0.05-kb250") {
-    ggsave(filename = "figure/supp_fig_6.1a.png", plt, width = 806, height = 618, units = "px", dpi = 90)
-}
