@@ -85,17 +85,17 @@ clues_trajectory <- function(rsid, ancestry, prefix, smooth = 10, ancestral = NU
 
 traits <- list(
     "cd-all" = "Celiac disease (all genome-wide significant)",
-    "cd-r0.05-kb250" = "Celiac disease (r^2 < 0.05; window 250 kb)",
+    "cd-r0.05-kb250" = "Celiac disease (R² < 0.05; window 250 kb)",
     "ms-all" = "Multiple sclerosis (all genome-wide significant)",
-    "ms-r0.05-kb250" = "Multiple sclerosis (r^2 < 0.05; window 250 kb)",
+    "ms-r0.05-kb250" = "Multiple sclerosis (R² < 0.05; window 250 kb)",
     "ra-all" = "Rheumatoid arthritis (all genome-wide significant)",
-    "ra-r0.05-kb250" = "Rheumatoid arthritis (r^2 < 0.05; window 250 kb)",
-    "T1D-finngen-r0.05-kb250" = "Type1 diabetes (FinnGen) (r^2 < 0.05; window 250 kb)",
-    "K11_COELIAC-finngen-r0.05-kb250" = "Coeliac disease (FinnGen) (r^2 < 0.05; window 250 kb)",
-    "M13_ANKYLOSPON-finngen-r0.05-kb250" = "Ankylosing spondylitis (FinnGen) (r^2 < 0.05; window 250 kb)",
-    "H7_IRIDOACUTE-finngen-r0.05-kb250" = "Acute and subacute iridocyclitis (FinnGen) (r^2 < 0.05; window 250 kb)",
-    "M13_RHEUMA-finngen-r0.05-kb250" = "Rheumatoid arthritis (FinnGen) (r^2 < 0.05; window 250 kb)",
-    "L12_PSORIASIS-finngen-r0.05-kb250" = "Psoriasis (FinnGen) (r^2 < 0.05; window 250 kb)"
+    "ra-r0.05-kb250" = "Rheumatoid arthritis (R² < 0.05; window 250 kb)",
+    "T1D-finngen-r0.05-kb250" = "Type1 diabetes (FinnGen) (R² < 0.05; window 250 kb)",
+    "K11_COELIAC-finngen-r0.05-kb250" = "Coeliac disease (FinnGen) (R² < 0.05; window 250 kb)",
+    "M13_ANKYLOSPON-finngen-r0.05-kb250" = "Ankylosing spondylitis (FinnGen) (R² < 0.05; window 250 kb)",
+    "H7_IRIDOACUTE-finngen-r0.05-kb250" = "Acute and subacute iridocyclitis (FinnGen) (R² < 0.05; window 250 kb)",
+    "M13_RHEUMA-finngen-r0.05-kb250" = "Rheumatoid arthritis (FinnGen) (R² < 0.05; window 250 kb)",
+    "L12_PSORIASIS-finngen-r0.05-kb250" = "Psoriasis (FinnGen) (R² < 0.05; window 250 kb)"
 )
 
 # decode the ancestry and trait names

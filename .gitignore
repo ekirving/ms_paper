@@ -3,6 +3,8 @@
 *.old
 *.pdf
 *.png
+*.pptx
+*.tif
 *.txt
 *.xlsx
 *.zip
