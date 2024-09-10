@@ -1,17 +1,13 @@
 # Polygenic selection analysis for Multiple Sclerosis (MS)
 This repository contains code for the ancestry stratified polygenic selection analyses from 
 [Elevated Genetic Risk for Multiple Sclerosis Originated in Steppe Pastoralist Populations](
-https://doi.org/10.1101/2022.09.23.509097).
+https://doi.org/10.1038/s41586-023-06618-z).
 
 ![Figure 2](./figure/Figure_5.png?raw=true)
 
-If you reuse any of this code then please cite the preprint:
-> Barrie, W.&ast;, Yang, Y.&ast;, Irving-Pease, E.K.&ast;, Attfield, K.E.&ast;, Scorrano, G.&ast;, Jensen, L.T.&ast;, 
-> Armen, A.P., Dimopoulos, E.A., Stern, A., Refoyo-Martinez, A., Ramsøe, A., Gaunitz, C., Demeter, F., 
-> Jørkov, M.L.S., Møller, S.B., Springborg, B., Klassen, L., Hyldgård, I.M., Wickmann, N., Vinner, L., 
-> Korneliussen, T.S., Allentoft, M.E., Sikora, M., Kristiansen, K., Rodriguez, S., Nielsen, R., Iversen, A.K.N., 
-> Lawson, D.J., Fugger, L., Willerslev, E., 2022. Genetic risk for Multiple Sclerosis originated in Pastoralist Steppe 
-> populations. *bioRxiv* 2022.09.23.509097. https://doi.org/10.1101/2022.09.23.509097
+If you reuse any of this code then please cite the paper:
+> Barrie, W.&ast;, Yang, Y.&ast;, Irving-Pease, E.K.&ast; et al. Elevated genetic risk for multiple sclerosis emerged in 
+> steppe pastoralist populations. *Nature* 625, 321–328 (2024). https://doi.org/10.1038/s41586-023-06618-z
 
 ## Installation
 Download the code: 
